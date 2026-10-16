@@ -94,7 +94,8 @@ export function fillTemplate(template: Buffer, data: DocumentData, options: Fill
   };
 }
 
-function removeMailMergeLink(zip: DocxZip): boolean {
+/** Removes the Access mail-merge link. Returns false if the document had none. */
+export function removeMailMergeLink(zip: DocxZip): boolean {
   const settings = zip.getText('word/settings.xml');
   if (!settings) return false;
   const block = /<w:mailMerge\b[\s\S]*?<\/w:mailMerge>|<w:mailMerge\b[^>]*\/>/.exec(settings);

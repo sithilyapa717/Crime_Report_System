@@ -149,6 +149,24 @@ Findings:
 - In `USFL/usfl new බෝතලය`, `Quantity1` and `Quantity` are side by side with no text between them. Sample values 180 and 750 print as "180750". What `Quantity1` means must be confirmed (bottle size?).
 - `Cash_Number` and `Cash_Number_1`: are they note serial numbers or note counts?
 
+### Phase 3: fidelity tests done
+
+Everything lives in `tests/documents-fidelity/` and runs in CI's Documents job.
+
+- **`fidelity.test.ts`**, one test per template (92). It fills the template with marker values, giving each text field its own `⟦marker⟧`, then checks:
+  - the output text equals the original wording with each field replaced by its expected value in the same place;
+  - every field is mapped, and none is left behind;
+  - the XML is well-formed;
+  - the Access link is gone;
+  - every untouched part is byte-identical.
+- **`fixed-text.test.ts`**, the wording snapshot. Each template's fixed text is stored as a readable `.txt` in `fixed-text/`, which is easier to review than a hash: a deliberate template change requires `approve-fixed-text.ts`, and the PR then shows the wording change as a diff.
+- **`fidelity-lib.ts`** reads Word XML independently of the engine, so the tests don't judge the engine with its own code.
+- **Mutation check.** Three kinds of tampering were tried: an altered Sinhala word, two swapped values and a dropped value. All are caught, and broken XML is caught by the well-formedness check.
+- **Comparison with Word's own merge.** `compare-with-word.ts` + `word-merge.ps1` is a Windows-only tool that needs Word and is not run in CI. Word mail-merges the same values into every template that has fields, and the visible text is compared with the engine's. Results are in `WORD_COMPARISON.md`.
+  - **Result: 85 of 85 templates are identical to Word's merge.** The other 7 templates have no fields.
+  - The first run found 2 differences. Both turned out to be a bug in the test reader, which didn't count Word's short form `<w:p/>` as a paragraph; the engine was correct.
+- **Still open:** comparing against documents Word merged from **real Access data**. This needs the real `.accdb` data (§10 Q1).
+
 ## Notes to raise with the team
 
 - **The real folders differ from REWRITE_PLAN §1.7.** There are no `UPA` or `UPFL` folders: those templates live in `USA-UPA/`. There is an extra `PUMB 2021.02.11/` folder (7 files), and `GOLD LEAF/` has 15 files. The catalogue follows the real folders.
