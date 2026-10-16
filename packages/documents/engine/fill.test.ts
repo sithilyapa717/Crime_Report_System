@@ -15,7 +15,7 @@ test('zip round trip without edits keeps every entry byte-identical', () => {
   const a = DocxZip.read(template);
   const b = DocxZip.read(a.write());
   assert.deepEqual(b.names(), a.names());
-  a.entries.forEach((e, i) => assert.ok(b.entries[i].compressed.equals(e.compressed), e.name));
+  a.entries.forEach((e, i) => assert.ok(b.entries[i]?.compressed.equals(e.compressed), e.name));
 });
 
 test('fillTemplate fills a real template and removes the Access link', () => {

@@ -112,7 +112,7 @@ for (const family of FAMILY_ORDER) {
 <table><tr><th>No</th><th>Template</th><th>Offence</th><th>Variant</th><th>Questions</th></tr>`;
   for (const r of group) {
     n++;
-    html += `<tr><td class="n">${n}</td><td><a href="${esc(encodeURI(r.samplePdf))}">${esc(r.entry.id)}</a></td><td>${esc(
+    html += `<tr><td class="n">${n}</td><td><a href="${esc(r.samplePdf.split('/').map(encodeURIComponent).join('/'))}">${esc(r.entry.id)}</a></td><td>${esc(
       r.entry.offenceCodes.join(' ') || (family === 'plaint' || family === 'charge-sheet' ? '? (not set)' : 'any'),
     )}</td><td>${esc(r.variant)}</td><td class="q">${esc(r.entry.notes ?? '')}</td></tr>`;
   }

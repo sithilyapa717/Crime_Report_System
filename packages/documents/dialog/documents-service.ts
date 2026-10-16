@@ -3,7 +3,7 @@
 // the React dialog only renders what they return. No wording here: the UI maps the `family`,
 // `status` and warning `code` values to captions from packages/shared/labels.
 import type { DocDataService, Session } from '../../shared/contract/src/index.ts';
-import type { DocumentGenerator } from '../generation/generate.ts';
+import type { DocumentGenerator, GenerationWarning, GenerationWarningCode } from '../generation/generate.ts';
 import type { GenerationLog, GenerationLogEntry } from '../generation/log.ts';
 import { FAMILY_ORDER } from '../registry/families.ts';
 import type { TemplateEntry, TemplateFamily, TemplateRegistry, TemplateVariant } from '../registry/registry.ts';
@@ -32,13 +32,13 @@ export interface DialogData {
   pdfAvailable: boolean;
 }
 
-export type WarningCode = 'unconfirmed' | 'other_offence' | 'empty_fields' | 'pdf_failed' | 'pdf_unavailable';
+export type WarningCode = GenerationWarningCode;
 
 export interface DialogResult {
   filePath: string;
   fileName: string;
   pdfPath?: string;
-  warnings: { code: WarningCode; detail: string }[];
+  warnings: GenerationWarning[];
 }
 
 export interface DocumentsServiceDeps {
@@ -47,15 +47,6 @@ export interface DocumentsServiceDeps {
   registry: TemplateRegistry;
   log: GenerationLog;
   session: () => Session;
-}
-
-/** Map generator warnings (English, for logs) to stable codes for the UI. */
-function warningCode(text: string): WarningCode {
-  if (/not yet confirmed/.test(text)) return 'unconfirmed';
-  if (/^template is for /.test(text)) return 'other_offence';
-  if (/^left empty/.test(text)) return 'empty_fields';
-  if (/not available/.test(text)) return 'pdf_unavailable';
-  return 'pdf_failed';
 }
 
 export class DocumentsService {
@@ -101,7 +92,7 @@ export class DocumentsService {
       filePath: result.filePath,
       fileName: result.fileName,
       ...(result.logEntry.pdfPath ? { pdfPath: result.logEntry.pdfPath } : {}),
-      warnings: result.warnings.map((w) => ({ code: warningCode(w), detail: w })),
+      warnings: result.warnings,
     };
   }
 

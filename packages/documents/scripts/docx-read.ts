@@ -57,8 +57,9 @@ export function fieldInstructions(xml: string): string[] {
     else if (m[2] === 'begin') stack.push('');
     else if (m[2] === 'separate' || m[2] === 'end') {
       // the instruction is complete at "separate" (or at "end" when there is no result)
-      if (stack.length && stack[stack.length - 1] !== '\u0000') {
-        out.push(stack[stack.length - 1].trim());
+      const top = stack[stack.length - 1];
+      if (top !== undefined && top !== '\u0000') {
+        out.push(top.trim());
         stack[stack.length - 1] = '\u0000';
       }
       if (m[2] === 'end') stack.pop();
@@ -72,5 +73,5 @@ export function fieldInstructions(xml: string): string[] {
 /** MERGEFIELD name from an instruction, e.g. `MERGEFIELD "Name_of_Accused" \* MERGEFORMAT`. */
 export function mergeFieldName(instr: string): string | null {
   const m = /^MERGEFIELD\s+(?:"([^"]+)"|(\S+))/i.exec(instr);
-  return m ? (m[1] ?? m[2]) : null;
+  return m ? (m[1] ?? m[2] ?? null) : null;
 }

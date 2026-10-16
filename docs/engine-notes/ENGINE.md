@@ -31,7 +31,11 @@ There are no npm dependencies. Everything runs on Node 24 with built-in TypeScri
    - **Complex fields:** run(`fldChar begin`) run(`instrText`)… [run(`separate`) result runs…] run(`end`). The instruction can be split over several `instrText` runs, and `separate` plus the result can be missing.
    - **Filling:** like a Word mail merge, the field becomes plain runs. The first result run keeps its `rPr` and gets the value; other result runs are removed. A field with no result gets a new run with the instruction run's `rPr`.
    - **Nested fields:** a MERGEFIELD inside another field (`IF`…) is left untouched and reported as unsupported. None of the 92 templates have one.
-   - **Duplicate content:** text boxes appear twice, in `mc:AlternateContent` Choice and Fallback. Both are filled.
+   - **Switches:** a field with a switch that changes the printed text (`\b`, `\f`, `\* Upper`, `\@`, `\#`…) is also left untouched and reported, because the engine does not apply switches. `\* MERGEFORMAT` and `\* CHARFORMAT` are fine. None of the 92 templates use other switches. The generator and `add-template.ts` refuse templates with unsupported fields.
+   - **Text boxes:** only innermost runs are matched. A run holding a text box contains runs of its own, and **most merge fields in the templates are inside text boxes** (872 text boxes contain fields). Matching such a run from its start would cut through the text box.
+   - **Duplicate content:** text boxes appear twice, in `mc:AlternateContent` Choice (DrawingML) and Fallback (VML). Both are filled.
+   - **Mixed runs:** a run holding both a field character and text is refused with an error rather than losing the text. None exist in the templates.
+   - **Values:** characters XML 1.0 forbids are removed (`cleanText`), and Word's manual line break (U+000B) and page break (U+000C) become line breaks. Without this, Word would refuse to open the file.
 3. **Access link** (`fill.ts → removeMailMergeLink`). Removes `<w:mailMerge>` and its `mailMergeSource` relationships, so Word doesn't ask for the old `.accdb`. This happens in the generated copy only.
 4. **Values.** There are two entry points:
    - `fillTemplate(template, data)` takes raw values by canonical field name, and `mapping/format.ts` formats them.

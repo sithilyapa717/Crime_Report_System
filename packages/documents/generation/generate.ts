@@ -47,9 +47,16 @@ export interface GeneratedDocument {
   fileName: string;
   template: TemplateEntry;
   report: FillReport;
-  /** Shown by the dialog: e.g. "template not yet confirmed by staff". */
-  warnings: string[];
+  /** Shown by the dialog (the UI maps `code` to a Sinhala caption; `detail` is for logs). */
+  warnings: GenerationWarning[];
   logEntry: GenerationLogEntry;
+}
+
+export type GenerationWarningCode = 'unconfirmed' | 'other_offence' | 'empty_fields' | 'pdf_failed' | 'pdf_unavailable';
+
+export interface GenerationWarning {
+  code: GenerationWarningCode;
+  detail: string;
 }
 
 export class GenerationError extends Error {}
@@ -71,6 +78,7 @@ export class DocumentGenerator {
 
   async generate(req: GenerateRequest): Promise<GeneratedDocument> {
     const { registry, originalsDir, outputDir, log, now = () => new Date() } = this.deps;
+    if (!req.crNumber.trim()) throw new GenerationError('the CR has no CR number');
     const template = registry.get(req.templateId);
     if (!template) throw new GenerationError(`unknown template: ${req.templateId}`);
     if (template.status === 'archived') throw new GenerationError(`template is archived: ${template.title}`);
@@ -85,25 +93,30 @@ export class DocumentGenerator {
     if (expected !== templateSha256) throw new GenerationError(`template file was changed: ${template.id}`);
 
     const { docx, report } = fillTemplateFromFields(templateBytes, req.fields);
+    // an unsupported field would stay a live field showing the template's old sample value
+    if (report.unsupported.length) {
+      throw new GenerationError(`template has fields the engine cannot fill: ${report.unsupported.join(', ')}`);
+    }
 
     await mkdir(outputDir, { recursive: true });
     const baseName = documentFileName(req.crNumber, template.title);
     const { filePath, fileName } = await writeNew(outputDir, baseName, docx);
 
-    const warnings: string[] = [];
-    if (template.status === 'unconfirmed') warnings.push('template not yet confirmed as current by staff');
-    if (!registry.appliesTo(template, req.offenceCode)) warnings.push(`template is for ${template.offenceCodes.join(', ')}`);
-    if (report.missing.length) warnings.push(`left empty: ${report.missing.join(', ')}`);
+    const warnings: GenerationWarning[] = [];
+    const warn = (code: GenerationWarningCode, detail: string) => warnings.push({ code, detail });
+    if (template.status === 'unconfirmed') warn('unconfirmed', 'template not yet confirmed as current by staff');
+    if (!registry.appliesTo(template, req.offenceCode)) warn('other_offence', `template is for ${template.offenceCodes.join(', ')}`);
+    if (report.missing.length) warn('empty_fields', `left empty: ${report.missing.join(', ')}`);
 
     let pdfPath: string | undefined;
     if (req.pdf) {
-      if (!this.deps.pdfExporter) warnings.push('PDF export is not available on this computer');
+      if (!this.deps.pdfExporter) warn('pdf_unavailable', 'PDF export is not available on this computer');
       else {
         try {
           pdfPath = await this.deps.pdfExporter(filePath);
         } catch (e) {
           // the .docx is already saved; a failed PDF must not lose it
-          warnings.push(`PDF not created: ${(e as Error).message}`);
+          warn('pdf_failed', `PDF not created: ${(e as Error).message}`);
         }
       }
     }
