@@ -1,0 +1,971 @@
+{
+  "about": "Template registry (D5). Seeded from file names by scripts/seed-registry.ts; maintained by hand. Set status to \"current\" or \"archived\" when staff decide (REWRITE_PLAN §10 Q3).",
+  "templates": [
+    {
+      "id": "GOLD LEAF/297 21 බීඩි plaint.docx",
+      "title": "297 21 බීඩි plaint",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm"
+    },
+    {
+      "id": "GOLD LEAF/460, 461 PDFC.docx",
+      "title": "460, 461 PDFC",
+      "family": "plaint",
+      "offenceCodes": [
+        "PDFC"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "GOLD LEAF/FORRIN SIGERAT AC OFFICE NEW 460 2021.docx",
+      "title": "FORRIN SIGERAT AC OFFICE NEW 460 2021",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm"
+    },
+    {
+      "id": "GOLD LEAF/FORRIN SIGERAT AC OFFICE NEW 461 2021.docx",
+      "title": "FORRIN SIGERAT AC OFFICE NEW 461 2021",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm"
+    },
+    {
+      "id": "GOLD LEAF/FORRIN SIGERAT AC OFFICE NEW.docx",
+      "title": "FORRIN SIGERAT AC OFFICE NEW",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm"
+    },
+    {
+      "id": "GOLD LEAF/FORRIN SIGERAT AC OFFICE.docx",
+      "title": "FORRIN SIGERAT AC OFFICE",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm"
+    },
+    {
+      "id": "GOLD LEAF/FORRIN SIGERAT AC OFFICE.docx 1 11.docx",
+      "title": "FORRIN SIGERAT AC OFFICE.docx 1 11",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm; file name looks like a saved-again copy"
+    },
+    {
+      "id": "GOLD LEAF/FORRIN SIGERAT AC OFFICE.docx 1.docx",
+      "title": "FORRIN SIGERAT AC OFFICE.docx 1",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm; file name looks like a saved-again copy"
+    },
+    {
+      "id": "GOLD LEAF/FORRIN SIGERAT AC OFFICE.docx 1.docx 2.docx",
+      "title": "FORRIN SIGERAT AC OFFICE.docx 1.docx 2",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm; file name looks like a saved-again copy"
+    },
+    {
+      "id": "GOLD LEAF/FORRIN SIGERAT AC OFFICE.docx 11.docx",
+      "title": "FORRIN SIGERAT AC OFFICE.docx 11",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm; file name looks like a saved-again copy"
+    },
+    {
+      "id": "GOLD LEAF/FORRIN SIGERAT USAVI 1.docx",
+      "title": "FORRIN SIGERAT USAVI 1",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm; file name looks like a saved-again copy"
+    },
+    {
+      "id": "GOLD LEAF/FORRIN SIGERAT USAVI.docx",
+      "title": "FORRIN SIGERAT USAVI",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm"
+    },
+    {
+      "id": "GOLD LEAF/PUMB.docx",
+      "title": "PUMB",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUMB"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "GOLD LEAF/aaaaaaaaaaaaaa.docx",
+      "title": "aaaaaaaaaaaaaa",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm; file name looks like a saved-again copy"
+    },
+    {
+      "id": "GOLD LEAF/beedi.docx",
+      "title": "beedi",
+      "family": "plaint",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "cigarette/beedi template: offence code to confirm"
+    },
+    {
+      "id": "PUDS/puds  බෝතලය.docx",
+      "title": "puds  බෝතලය",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUDS"
+      ],
+      "variant": {
+        "container": "bottle"
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUDS/puds කෑනය සාම්පල් බෝතලය.docx",
+      "title": "puds කෑනය සාම්පල් බෝතලය",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUDS"
+      ],
+      "variant": {
+        "container": "can",
+        "sample": true
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUDS/puds කෑනය.docx",
+      "title": "puds කෑනය",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUDS"
+      ],
+      "variant": {
+        "container": "can"
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUMB 2021.02.11/19 2021 PUMB.docx",
+      "title": "19 2021 PUMB",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUMB"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUMB 2021.02.11/20 2021 PUMB.docx",
+      "title": "20 2021 PUMB",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUMB"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUMB 2021.02.11/21 2021 PUMB.docx",
+      "title": "21 2021 PUMB",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUMB"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUMB 2021.02.11/22 2021 PUMB.docx",
+      "title": "22 2021 PUMB",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUMB"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUMB 2021.02.11/23 2021 PUMB.docx",
+      "title": "23 2021 PUMB",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUMB"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUMB 2021.02.11/PUMB.docx",
+      "title": "PUMB",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUMB"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUMB 2021.02.11/චෝදනා පත්.docx",
+      "title": "චෝදනා පත්",
+      "family": "charge-sheet",
+      "offenceCodes": [
+        "PUMB"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUML/PUML  කෑනය සාම්පල් බෝතලය.docx",
+      "title": "PUML  කෑනය සාම්පල් බෝතලය",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUML"
+      ],
+      "variant": {
+        "container": "can",
+        "sample": true
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUML/PUML  කෑනය.docx",
+      "title": "PUML  කෑනය",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUML"
+      ],
+      "variant": {
+        "container": "can"
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "PUML/PUML  බෝතලය.docx",
+      "title": "PUML  බෝතලය",
+      "family": "plaint",
+      "offenceCodes": [
+        "PUML"
+      ],
+      "variant": {
+        "container": "bottle"
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "REWARDS/REWARD  2023 දඩ.docx",
+      "title": "REWARD  2023 දඩ",
+      "family": "reward-voucher",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "REWARDS/REWARD  2025  දඩ.docx",
+      "title": "REWARD  2025  දඩ",
+      "family": "reward-voucher",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "REWARDS/REWARD  දඩ නම් ඇතුලත් කිරීම.docx",
+      "title": "REWARD  දඩ නම් ඇතුලත් කිරීම",
+      "family": "reward-voucher",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "REWARDS/REWARD  දඩ.docx",
+      "title": "REWARD  දඩ",
+      "family": "reward-voucher",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "REWARDS/REWARD  සමථ මුදල් අය කිරීම.docx",
+      "title": "REWARD  සමථ මුදල් අය කිරීම",
+      "family": "reward-voucher",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "REWARDS/REWARD ප්‍රජාසේවය.docx",
+      "title": "REWARD ප්‍රජාසේවය",
+      "family": "reward-voucher",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "REWARDS/සුරාබදු ඊ 6c වවුචර sr wasantha samarasinhe.docx",
+      "title": "සුරාබදු ඊ 6c වවුචර sr wasantha samarasinhe",
+      "family": "reward-voucher",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "REWARDS/සුරාබදු ඊ 6c වවුචර.docx",
+      "title": "සුරාබදු ඊ 6c වවුචර",
+      "family": "reward-voucher",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "SUDS-PUDS/SUDS PUDS  සාම්පල් නැත.docx",
+      "title": "SUDS PUDS  සාම්පල් නැත",
+      "family": "plaint",
+      "offenceCodes": [
+        "SUDS",
+        "PUDS"
+      ],
+      "variant": {
+        "sample": false
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "SUDS-PUDS/SUDS PUDS සාම්පල්.docx",
+      "title": "SUDS PUDS සාම්පල්",
+      "family": "plaint",
+      "offenceCodes": [
+        "SUDS",
+        "PUDS"
+      ],
+      "variant": {
+        "sample": true
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "SUML-PUML/SUML PUML.docx",
+      "title": "SUML PUML",
+      "family": "plaint",
+      "offenceCodes": [
+        "SUML",
+        "PUML"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UCG/UCG.docx",
+      "title": "UCG",
+      "family": "plaint",
+      "offenceCodes": [
+        "UCG"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UCG/puds new edit UCG.docx",
+      "title": "puds new edit UCG",
+      "family": "plaint",
+      "offenceCodes": [
+        "UCG"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UMA/UMA  new.docx",
+      "title": "UMA  new",
+      "family": "plaint",
+      "offenceCodes": [
+        "UMA"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UMA/UMA NEW 2 OFFENCE.docx",
+      "title": "UMA NEW 2 OFFENCE",
+      "family": "plaint",
+      "offenceCodes": [
+        "UMA"
+      ],
+      "variant": {
+        "offences": 2
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UMA/UMA NEW 3 OFFENCE කුඩා වඩියක්.docx",
+      "title": "UMA NEW 3 OFFENCE කුඩා වඩියක්",
+      "family": "plaint",
+      "offenceCodes": [
+        "UMA"
+      ],
+      "variant": {
+        "offences": 3
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UMA/UMA NEW 3 OFFENCE.docx",
+      "title": "UMA NEW 3 OFFENCE",
+      "family": "plaint",
+      "offenceCodes": [
+        "UMA"
+      ],
+      "variant": {
+        "offences": 3
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UMA/UMA NEW 4 OFFENCE 1.docx",
+      "title": "UMA NEW 4 OFFENCE 1",
+      "family": "plaint",
+      "offenceCodes": [
+        "UMA"
+      ],
+      "variant": {
+        "offences": 4
+      },
+      "status": "unconfirmed",
+      "notes": "file name looks like a saved-again copy"
+    },
+    {
+      "id": "UMA/UMA NEW 4 OFFENCE.docx",
+      "title": "UMA NEW 4 OFFENCE",
+      "family": "plaint",
+      "offenceCodes": [
+        "UMA"
+      ],
+      "variant": {
+        "offences": 4
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UMA/uma උපකරණ ලගතබා ගැනාම.docx",
+      "title": "uma උපකරණ ලගතබා ගැනාම",
+      "family": "plaint",
+      "offenceCodes": [
+        "UMA"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UPG/UPG NEW 111.docx",
+      "title": "UPG NEW 111",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPG"
+      ],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "file name looks like a saved-again copy"
+    },
+    {
+      "id": "UPG/UPG NEW.docx",
+      "title": "UPG NEW",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPG"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UPG/UPG NEW.docx 111 moda.docx",
+      "title": "UPG NEW.docx 111 moda",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPG"
+      ],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "file name looks like a saved-again copy"
+    },
+    {
+      "id": "UPG/blank upg.docx",
+      "title": "blank upg",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPG"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UPG/upg new 1.docx",
+      "title": "upg new 1",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPG"
+      ],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "file name looks like a saved-again copy"
+    },
+    {
+      "id": "UPG/upg.docx",
+      "title": "upg",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPG"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UPH/UPH 1111.docx",
+      "title": "UPH 1111",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPH"
+      ],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "file name looks like a saved-again copy"
+    },
+    {
+      "id": "UPH/UPH 25.docx",
+      "title": "UPH 25",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPH"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UPH/UPH.docx",
+      "title": "UPH",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPH"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UPS/SIGARAT 21.docx",
+      "title": "SIGARAT 21",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPS"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UPT/upt body.docx",
+      "title": "upt body",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPT"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UPT/upt කෑන් හා සාම්පල් .docx",
+      "title": "upt කෑන් හා සාම්පල් ",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPT"
+      ],
+      "variant": {
+        "container": "can",
+        "sample": true
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UPT/upt කෑන්.docx",
+      "title": "upt කෑන්",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPT"
+      ],
+      "variant": {
+        "container": "can"
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "USA-UPA/UPA new විස්තර.docx",
+      "title": "UPA new විස්තර",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPA"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "USA-UPA/UPA new.docx",
+      "title": "UPA new",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPA"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "USA-UPA/UPFL new.docx",
+      "title": "UPFL new",
+      "family": "plaint",
+      "offenceCodes": [
+        "UPFL"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "USA-UPA/USA UPA.docx",
+      "title": "USA UPA",
+      "family": "plaint",
+      "offenceCodes": [
+        "USA",
+        "UPA"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "USA-UPA/USFL UPFL excibeter 11 111 111.docx",
+      "title": "USFL UPFL excibeter 11 111 111",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL",
+        "UPFL"
+      ],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "file name looks like a saved-again copy"
+    },
+    {
+      "id": "USA-UPA/USFL UPFL excibeter 11 111.docx",
+      "title": "USFL UPFL excibeter 11 111",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL",
+        "UPFL"
+      ],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "file name looks like a saved-again copy"
+    },
+    {
+      "id": "USA-UPA/USFL UPFL excibeter 11.docx",
+      "title": "USFL UPFL excibeter 11",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL",
+        "UPFL"
+      ],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "file name looks like a saved-again copy"
+    },
+    {
+      "id": "USA-UPA/USFL UPFL excibeter.docx",
+      "title": "USFL UPFL excibeter",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL",
+        "UPFL"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "USA-UPA/USFL UPFL.docx",
+      "title": "USFL UPFL",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL",
+        "UPFL"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "USA/usa  බෝතලය 750 රු 1000 නෝට්ටු සමග.docx",
+      "title": "usa  බෝතලය 750 රු 1000 නෝට්ටු සමග",
+      "family": "plaint",
+      "offenceCodes": [
+        "USA"
+      ],
+      "variant": {
+        "container": "bottle",
+        "volumeMl": 750,
+        "noteRs": 1000
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "USA/usa බෝතලය 180 රු 1000 නෝට්ටුව.docx",
+      "title": "usa බෝතලය 180 රු 1000 නෝට්ටුව",
+      "family": "plaint",
+      "offenceCodes": [
+        "USA"
+      ],
+      "variant": {
+        "container": "bottle",
+        "volumeMl": 180,
+        "noteRs": 1000
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "USA/usa බෝතලය 375 රු 1000 නෝට්ටුව.docx",
+      "title": "usa බෝතලය 375 රු 1000 නෝට්ටුව",
+      "family": "plaint",
+      "offenceCodes": [
+        "USA"
+      ],
+      "variant": {
+        "container": "bottle",
+        "volumeMl": 375,
+        "noteRs": 1000
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "USFL/usfl new කෑනය 1000  කැන් 1.docx",
+      "title": "usfl new කෑනය 1000  කැන් 1",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL"
+      ],
+      "variant": {
+        "container": "can"
+      },
+      "status": "unconfirmed",
+      "notes": "\"1000\" in the name: note value (Rs) or volume (ml)? to confirm; file name looks like a saved-again copy"
+    },
+    {
+      "id": "USFL/usfl new කෑනය 1000  කැන් 2.docx",
+      "title": "usfl new කෑනය 1000  කැන් 2",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL"
+      ],
+      "variant": {
+        "container": "can"
+      },
+      "status": "unconfirmed",
+      "notes": "\"1000\" in the name: note value (Rs) or volume (ml)? to confirm; file name looks like a saved-again copy"
+    },
+    {
+      "id": "USFL/usfl new කෑනය 1000.docx",
+      "title": "usfl new කෑනය 1000",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL"
+      ],
+      "variant": {
+        "container": "can"
+      },
+      "status": "unconfirmed",
+      "notes": "\"1000\" in the name: note value (Rs) or volume (ml)? to confirm"
+    },
+    {
+      "id": "USFL/usfl new කෑනය 500 කෑනය කිහිපයක්.docx",
+      "title": "usfl new කෑනය 500 කෑනය කිහිපයක්",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL"
+      ],
+      "variant": {
+        "container": "can"
+      },
+      "status": "unconfirmed",
+      "notes": "\"500\" in the name: note value (Rs) or volume (ml)? to confirm"
+    },
+    {
+      "id": "USFL/usfl new කෑනය 500.docx",
+      "title": "usfl new කෑනය 500",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL"
+      ],
+      "variant": {
+        "container": "can"
+      },
+      "status": "unconfirmed",
+      "notes": "\"500\" in the name: note value (Rs) or volume (ml)? to confirm"
+    },
+    {
+      "id": "USFL/usfl new බෝතලය බෝතලය 2.docx",
+      "title": "usfl new බෝතලය බෝතලය 2",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL"
+      ],
+      "variant": {
+        "container": "bottle"
+      },
+      "status": "unconfirmed",
+      "notes": "file name looks like a saved-again copy"
+    },
+    {
+      "id": "USFL/usfl new බෝතලය බෝතලය.docx",
+      "title": "usfl new බෝතලය බෝතලය",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL"
+      ],
+      "variant": {
+        "container": "bottle"
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "USFL/usfl new බෝතලය.docx",
+      "title": "usfl new බෝතලය",
+      "family": "plaint",
+      "offenceCodes": [
+        "USFL"
+      ],
+      "variant": {
+        "container": "bottle"
+      },
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UST-UPT/ust upt 11.docx",
+      "title": "ust upt 11",
+      "family": "plaint",
+      "offenceCodes": [
+        "UST",
+        "UPT"
+      ],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "file name looks like a saved-again copy"
+    },
+    {
+      "id": "UST-UPT/ust upt 12.docx",
+      "title": "ust upt 12",
+      "family": "plaint",
+      "offenceCodes": [
+        "UST",
+        "UPT"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UST-UPT/ust upt.docx",
+      "title": "ust upt",
+      "family": "plaint",
+      "offenceCodes": [
+        "UST",
+        "UPT"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "UST/ust.docx",
+      "title": "ust",
+      "family": "plaint",
+      "offenceCodes": [
+        "UST"
+      ],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "Warrant/පෙර වැරදි නොමැති බව.docx",
+      "title": "පෙර වැරදි නොමැති බව",
+      "family": "previous-record",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "Warrant/පෙර වැරදි වාර්තා 1.docx",
+      "title": "පෙර වැරදි වාර්තා 1",
+      "family": "previous-record",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed",
+      "notes": "file name looks like a saved-again copy"
+    },
+    {
+      "id": "Warrant/මොෂන්  කොළ.docx",
+      "title": "මොෂන්  කොළ",
+      "family": "motion-sheet",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "Warrant/වරෙන්තු දිර්ග කිරීම.docx",
+      "title": "වරෙන්තු දිර්ග කිරීම",
+      "family": "warrant-extension",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "Warrant/හිස් මෝෂන් කොළ.docx",
+      "title": "හිස් මෝෂන් කොළ",
+      "family": "motion-sheet",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "පෙර වැරදි/පෙර වැරදි වාර්තාව 336 338 345.docx",
+      "title": "පෙර වැරදි වාර්තාව 336 338 345",
+      "family": "previous-record",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    },
+    {
+      "id": "හිස් සාක්ෂි භාණ්ඩ රැගෙන ඒම (1).docx",
+      "title": "හිස් සාක්ෂි භාණ්ඩ රැගෙන ඒම (1)",
+      "family": "production",
+      "offenceCodes": [],
+      "variant": {},
+      "status": "unconfirmed"
+    }
+  ]
+}
