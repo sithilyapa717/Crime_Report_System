@@ -111,6 +111,44 @@ Findings:
   - The admin guide must list these fonts for installation (§10 Q4).
 - **No two templates are byte-identical**, so staff must still choose current versions by name. The inventory marks likely copies.
 
+### Phase 2: engine core done
+
+**Engine** (`packages/documents/engine/`):
+
+- `fillTemplate(templateBuffer, data, options)` returns `{ docx, report }`.
+- Fills `fldSimple` fields and complex `fldChar` fields, including instructions split over several runs and fields that have no result part.
+- Like a Word merge, a filled field becomes plain runs. The formatting (`rPr`) of the field's result run is kept.
+- Removes `<w:mailMerge>` and its `mailMergeSource` relationships from the generated copy only, so Word no longer asks for the old `.accdb`.
+- Edits are made on the XML text, never through a DOM, and any ZIP entry that is not changed is written back with its original compressed bytes.
+- No npm dependency: a small ZIP reader and writer built on `node:zlib` replaces `pizzip`. Byte-for-byte copying of untouched parts is a stronger fidelity guarantee than repacking every part.
+
+**Mapping** (`packages/documents/mapping/`):
+
+- 53 canonical fields cover all 60 template field names. Matching ignores case, and aliases are marked `confirmed: false` until staff and B agree them.
+- Formatters:
+  - date `YYYY.MM.DD`
+  - time `HH.MM` (to confirm)
+  - money from integer cents, printed without grouping (to confirm)
+- `sample-data.ts` holds a made-up CR until B8 exists.
+
+**Checks:**
+
+- `node --test "packages/documents/**/*.test.ts"`: 17 unit tests pass.
+- `node packages/documents/scripts/fill-sample.ts <out dir>`: fills all 92 templates, with 0 failures.
+- A one-off check over all 92 templates passed for each one:
+  - the visible text outside the fields is unchanged;
+  - no `MERGEFIELD` is left;
+  - the Access link is removed;
+  - every untouched ZIP entry is byte-identical.
+  - Phase 3 turns this into the permanent fidelity test.
+- Visual check through Word (PDF export) of two filled templates (PUDS bottle, USFL bottle): the Unicode Sinhala values render correctly. The legacy-font risk is lower than feared.
+  - This PC does not have Iskoola Pota or the FM/DL fonts installed, so the check must be repeated on a department PC.
+
+**Questions found:**
+
+- In `USFL/usfl new බෝතලය`, `Quantity1` and `Quantity` are side by side with no text between them. Sample values 180 and 750 print as "180750". What `Quantity1` means must be confirmed (bottle size?).
+- `Cash_Number` and `Cash_Number_1`: are they note serial numbers or note counts?
+
 ## Notes to raise with the team
 
 - **The real folders differ from REWRITE_PLAN §1.7.** There are no `UPA` or `UPFL` folders: those templates live in `USA-UPA/`. There is an extra `PUMB 2021.02.11/` folder (7 files), and `GOLD LEAF/` has 15 files. The catalogue follows the real folders.
