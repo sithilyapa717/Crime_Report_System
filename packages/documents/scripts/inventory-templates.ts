@@ -35,7 +35,7 @@ const manifest = JSON.parse(readFileSync(MANIFEST_PATH, 'utf8')) as Manifest;
 const templates: TemplateInfo[] = [];
 
 for (const entry of manifest.files) {
-  const folder = entry.path.includes('/') ? entry.path.split('/')[0] : '(root)';
+  const folder = entry.path.includes('/') ? (entry.path.split('/')[0] ?? '(root)') : '(root)';
   const info: TemplateInfo = {
     path: entry.path,
     folder,
@@ -77,13 +77,13 @@ for (const entry of manifest.files) {
 
     const settings = text('word/settings.xml');
     const q = /<w:mailMerge\b[\s\S]*?<w:query\b[^>]*\bw:val="([^"]*)"/.exec(settings);
-    info.mailMergeQuery = q ? decodeXmlEntities(q[1]) : null;
+    info.mailMergeQuery = q?.[1] !== undefined ? decodeXmlEntities(q[1]) : null;
     info.hasDataSourceLink = /<w:mailMerge\b[\s\S]*?<w:dataSource\b/.test(settings);
 
     const fonts = new Set<string>();
     for (const part of [...parts, 'word/styles.xml']) {
       for (const m of text(part).matchAll(/<w:rFonts\b([^>]*)\/?>/g)) {
-        for (const a of m[1].matchAll(/w:(?:ascii|hAnsi|cs|eastAsia)="([^"]+)"/g)) fonts.add(a[1]);
+        for (const a of (m[1] ?? '').matchAll(/w:(?:ascii|hAnsi|cs|eastAsia)="([^"]+)"/g)) if (a[1]) fonts.add(a[1]);
       }
     }
     info.fonts = [...fonts].sort();

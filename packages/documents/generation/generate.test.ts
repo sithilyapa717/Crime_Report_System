@@ -79,7 +79,7 @@ test('generates a CR-named file and logs it', async () => {
   assert.deepEqual(await log.forCrimeReport('cr-1'), [out.logEntry]);
   assert.equal(out.logEntry.generatedBy, 'user-1');
   assert.equal(out.logEntry.generatedAt, '2026-10-16T08:00:00.000Z');
-  assert.ok(out.warnings.some((w) => /not yet confirmed/.test(w)));
+  assert.ok(out.warnings.some((w) => w.code === 'unconfirmed'));
 });
 
 test('regenerating never overwrites: the second file gets (2)', async () => {
@@ -98,7 +98,7 @@ test('refuses archived templates, unknown templates and the wrong offence', asyn
   await assert.rejects(gen.generate({ ...req, templateId: 'nope.docx' }), GenerationError);
   await assert.rejects(gen.generate({ ...req, offenceCode: 'UPH' }), /not for offence UPH/);
   const forced = await gen.generate({ ...req, offenceCode: 'UPH', allowOtherOffence: true });
-  assert.ok(forced.warnings.some((w) => /template is for PUDS/.test(w)));
+  assert.ok(forced.warnings.some((w) => w.code === 'other_offence' && /template is for PUDS/.test(w.detail)));
 });
 
 test('refuses a template file that no longer matches MANIFEST.json', async () => {
@@ -126,7 +126,7 @@ test('PDF: exporter result is logged; a failing exporter keeps the .docx and war
     throw new Error('Word crashed');
   }).generate({ ...req, pdf: true });
   assert.ok(readFileSync(failed.filePath).length > 0);
-  assert.ok(failed.warnings.some((w) => /PDF not created: Word crashed/.test(w)));
+  assert.ok(failed.warnings.some((w) => w.code === 'pdf_failed' && /Word crashed/.test(w.detail)));
   assert.equal(failed.logEntry.pdfPath, undefined);
 });
 

@@ -87,7 +87,14 @@ The dialog needs captions for these values. None exist yet, so wording must be a
 4. call `documents.generate(...)`, then show the warnings and "Open" / "Show in folder" buttons;
 5. show the history list.
 
-## 5. Open questions for B
+## 5. Found in the full review (for B)
+
+- **`pnpm-lock.yaml` on `main` doesn't install.** Both pnpm 10 and pnpm 11 reject it with "expected a single document in the stream, but found more". The file contains two YAML documents; the second starts at line 158.
+- **`vitest.config.ts` includes `packages/**/*.test.ts`.** Member D's tests use `node:test`, which CI's `run-tests.ts` runs correctly. But `pnpm test` (Vitest) would also pick them up and report "no test suite found". Please exclude `packages/documents/**`, or run D's files with `node --test` there too.
+- **Packaging.** `generation/docx-to-pdf.ps1` and `scripts/pdf-batch.ps1` are run by PowerShell, which can't read files inside an asar archive. `templates/original/` must also be real files on disk. Add both to `asarUnpack`, or ship them as extra resources, in the electron-builder config.
+- **Warnings.** `DocumentGenerator` and `DocumentsService` now return warnings as `{ code, detail }`. Show the Sinhala caption for `code` and keep `detail` for the log.
+
+## 6. Open questions for B
 
 - **Who formats values?** `@excise/docdata` formats money as `1,500.50` and passes times through as `14:45`. D's formatters give `1500` and `14.45`, and the print layouts use D's. The proposal is that B returns raw values and D formats them in one place.
 - **Convicts list column order.** B7's `CONVICT_COLUMNS` follows REWRITE_PLAN §1.6: name, offence, quantity, address, court, date, case, fine, sentences, NIC. The old monthly report (§97) has CR, name, NIC, offence, quantity, fine, address, court, case, date, then the sentences. The print layout follows §97. Staff should confirm it against an old printout.

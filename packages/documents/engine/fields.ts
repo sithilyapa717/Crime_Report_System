@@ -29,10 +29,29 @@ export type FieldResolver = (name: string) => string | undefined;
 /** MERGEFIELD name from an instruction such as ` MERGEFIELD "Name_of_Accused" \* MERGEFORMAT `. */
 export function mergeFieldName(instruction: string): string | null {
   const m = /^\s*MERGEFIELD\s+(?:"([^"]+)"|(\S+))/i.exec(instruction);
-  return m ? (m[1] ?? m[2]) : null;
+  return m ? (m[1] ?? m[2] ?? null) : null;
 }
 
-const RUN_RE = /<w:r\b[^>]*\/>|<w:r\b[^>]*>[\s\S]*?<\/w:r>/g;
+/**
+ * Switches that change what Word prints (\b text before, \f text after, \* Upper, \@ date
+ * format, \# number format, …). The engine does not apply them, so a field using one is reported
+ * as unsupported instead of printing something different from Word. \* MERGEFORMAT and
+ * \* CHARFORMAT only keep formatting and are fine. None of the original templates use others.
+ */
+export function unsupportedSwitches(instruction: string): string[] {
+  const afterName = instruction.replace(/^\s*MERGEFIELD\s+(?:"[^"]+"|\S+)/i, '');
+  return (afterName.match(/\\[^\s"]+(?:\s+(?:"[^"]*"|[^\s\\]+))?/g) ?? [])
+    .map((s) => s.trim())
+    .filter((s) => !/^\\\*\s*(MERGEFORMAT|CHARFORMAT)$/i.test(s));
+}
+
+/**
+ * Innermost runs only. A run that holds a drawing or text box contains whole paragraphs with
+ * runs of their own; matching it from its start would cut through the text box (most merge
+ * fields in the templates are inside text boxes). The tempered pattern refuses to cross a nested
+ * <w:r, so the outer run is left alone and the inner runs are matched one by one.
+ */
+const RUN_RE = /<w:r\b[^>]*\/>|<w:r\b[^>]*>(?:(?!<w:r\b)[\s\S])*?<\/w:r>/g;
 
 interface Run {
   start: number;
@@ -68,14 +87,22 @@ function resultReplacement(resultRuns: string[], fallbackLike: string, value: st
   return resultRuns.flatMap((r, i) => (i === firstText ? [makeRun(r, value)] : hasText(r) ? [] : [r]));
 }
 
-function replaceSimpleFields(xml: string, resolve: FieldResolver, found: FieldOccurrence[]): string {
+function replaceSimpleFields(
+  xml: string,
+  resolve: FieldResolver,
+  found: FieldOccurrence[],
+  unsupported: string[],
+): string {
   return xml.replace(
     /<w:fldSimple\b([^>]*?)(?:\/>|>([\s\S]*?)<\/w:fldSimple>)/g,
     (whole, attrs: string, inner: string | undefined) => {
-      const instr = /\bw:instr="([^"]*)"/.exec(attrs);
-      const instruction = instr ? decodeXmlEntities(instr[1]) : '';
+      const instruction = decodeXmlEntities(/\bw:instr="([^"]*)"/.exec(attrs)?.[1] ?? '');
       const name = mergeFieldName(instruction);
       if (!name) return whole;
+      if (unsupportedSwitches(instruction).length) {
+        unsupported.push(name);
+        return whole;
+      }
       found.push({ name, instruction: instruction.trim(), kind: 'simple' });
       const value = fieldValue(name, resolve);
       const body = inner ?? '';
@@ -91,13 +118,18 @@ function replaceSimpleFields(xml: string, resolve: FieldResolver, found: FieldOc
 export function replaceMergeFields(xml: string, resolve: FieldResolver): ReplaceResult {
   const occurrences: FieldOccurrence[] = [];
   const unsupported: string[] = [];
-  xml = replaceSimpleFields(xml, resolve, occurrences);
+  xml = replaceSimpleFields(xml, resolve, occurrences, unsupported);
 
   const runs: Run[] = [...xml.matchAll(RUN_RE)].map((m) => ({
     start: m.index,
     end: m.index + m[0].length,
     xml: m[0],
   }));
+  const runAt = (i: number): Run => {
+    const run = runs[i];
+    if (!run) throw new Error(`no run ${i}`);
+    return run;
+  };
 
   interface Open {
     begin: number;
@@ -117,6 +149,10 @@ export function replaceMergeFields(xml: string, resolve: FieldResolver): Replace
   runs.forEach((run, i) => {
     const chars = [...run.xml.matchAll(/<w:fldChar\b[^>]*\bw:fldCharType="(begin|separate|end)"/g)].map((m) => m[1]);
     if (chars.length > 1) throw new Error(`run with more than one fldChar at offset ${run.start}`);
+    // removing a field-character run must never remove text with it
+    if (chars.length && /<w:t\b|<w:instrText\b/.test(run.xml)) {
+      throw new Error(`run with a fldChar and text at offset ${run.start}; not supported`);
+    }
     const top = stack[stack.length - 1];
     if (chars[0] === 'begin') {
       if (top) top.hasChild = true;
@@ -129,7 +165,7 @@ export function replaceMergeFields(xml: string, resolve: FieldResolver): Replace
     } else if (top) {
       const instrText = [...run.xml.matchAll(/<w:instrText\b[^>]*>([^<]*)<\/w:instrText>/g)];
       if (top.separate < 0) {
-        top.instr += instrText.map((m) => decodeXmlEntities(m[1])).join('');
+        top.instr += instrText.map((m) => decodeXmlEntities(m[1] ?? '')).join('');
         top.instrRuns.push(i);
       } else {
         top.resultRuns.push(i);
@@ -143,7 +179,7 @@ export function replaceMergeFields(xml: string, resolve: FieldResolver): Replace
   for (const f of fields) {
     const name = mergeFieldName(f.instr);
     if (!name) continue;
-    if (f.nested || f.hasChild) {
+    if (f.nested || f.hasChild || unsupportedSwitches(f.instr).length) {
       unsupported.push(name);
       continue;
     }
@@ -152,8 +188,8 @@ export function replaceMergeFields(xml: string, resolve: FieldResolver): Replace
     edits.set(f.begin, null);
     for (const r of f.instrRuns) edits.set(r, null);
     if (f.separate >= 0) edits.set(f.separate, null);
-    const resultXml = f.resultRuns.map((r) => runs[r].xml);
-    const like = runs[f.instrRuns[0] ?? f.begin].xml;
+    const resultXml = f.resultRuns.map((r) => runAt(r).xml);
+    const like = runAt(f.instrRuns[0] ?? f.begin).xml;
     const replaced = resultReplacement(resultXml, like, value);
     f.resultRuns.forEach((r) => edits.set(r, null));
     // the end run's slot carries the result, so it lands exactly where the field was

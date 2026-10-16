@@ -46,8 +46,16 @@ tfoot { display: table-row-group; } /* total once, at the end */
 function cell(key: string, value: string | number | null): { html: string; cls: string } {
   if (TICK_KEYS.has(key)) return { html: value ? tick(true) : '', cls: 'c' };
   if (value === null || value === undefined || value === '') return { html: '', cls: '' };
-  if (key === 'fineAmount' && typeof value === 'number') return { html: esc(formatMoney(value)), cls: 'num' };
-  if (/Date$/.test(key) && typeof value === 'string') return { html: esc(formatDate(value)), cls: 'nw' };
+  // a register lists many CRs: one bad value prints as stored rather than stopping the whole printout
+  const safe = (format: () => string) => {
+    try {
+      return format();
+    } catch {
+      return String(value);
+    }
+  };
+  if (key === 'fineAmount' && typeof value === 'number') return { html: esc(safe(() => formatMoney(value))), cls: 'num' };
+  if (/Date$/.test(key) && typeof value === 'string') return { html: esc(safe(() => formatDate(value))), cls: 'nw' };
   if (typeof value === 'number') return { html: esc(value), cls: 'num' };
   return { html: esc(value), cls: /^(crNumber|accusedNic|caseNumber|offenceCode)$/.test(key) ? 'nw' : '' };
 }

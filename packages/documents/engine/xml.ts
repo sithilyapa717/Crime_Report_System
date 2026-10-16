@@ -16,10 +16,26 @@ export function escapeXmlText(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/**
+ * Characters XML 1.0 does not allow (control characters other than tab / LF / CR, lone surrogates,
+ * U+FFFE / U+FFFF). One of them in document.xml makes Word refuse to open the file. Access data
+ * pasted from Word often contains U+000B (Word's manual line break) and U+000C (page break).
+ */
+export function cleanText(value: string): string {
+  let out = '';
+  for (const ch of value.replace(/[\u000B\u000C]/g, '\n')) {
+    const c = ch.codePointAt(0) ?? 0;
+    const allowed =
+      c === 0x9 || c === 0xa || c === 0xd || (c >= 0x20 && c <= 0xd7ff) || (c >= 0xe000 && c <= 0xfffd) || c >= 0x10000;
+    if (allowed) out += ch;
+  }
+  return out;
+}
+
 /** Run content for a value: <w:t> pieces with <w:br/> for line breaks and <w:tab/> for tabs. */
 export function valueToRunContent(value: string): string {
   if (value === '') return '';
-  return value
+  return cleanText(value)
     .replace(/\r\n?/g, '\n')
     .split('\n')
     .map((line) =>
