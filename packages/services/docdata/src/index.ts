@@ -1,5 +1,11 @@
 import { assertCan } from '@excise/auth';
-import type { CaseRepository, CrRepository, DocDataService, ReferenceLookup, Session } from '@excise/contract';
+import type {
+  CaseRepository,
+  CrRepository,
+  DocDataService,
+  ReferenceLookup,
+  Session,
+} from '@excise/contract';
 import type { CaseRecord, CrimeReport } from '@excise/schemas';
 
 /** Old Access format for dates in documents: `YYYY.MM.DD`. */
@@ -62,10 +68,16 @@ export class DefaultDocDataService implements DocDataService {
 type Names = Awaited<ReturnType<DefaultDocDataService['names']>>;
 
 /** Every merge field found in the original templates (docs/document-catalogue/MERGE_FIELDS.md). */
-export function buildFields(cr: CrimeReport, c: CaseRecord | null, n: Names): Record<string, string> {
+export function buildFields(
+  cr: CrimeReport,
+  c: CaseRecord | null,
+  n: Names,
+): Record<string, string> {
   const s = (v?: string | null) => v ?? '';
   const cash = (kind: 'used' | 'left', denomination: number) =>
-    formatNumber(cr.cashNotes.find((x) => x.kind === kind && x.denomination === denomination)?.count);
+    formatNumber(
+      cr.cashNotes.find((x) => x.kind === kind && x.denomination === denomination)?.count,
+    );
   const fine = c?.outcomes.find((o) => o.outcomeType === 'fine');
   const convicted = c?.outcomes.find((o) => o.convictedDate)?.convictedDate;
   const warrant = c?.hearings.find((h) => h.kind === 'warrant')?.date;
@@ -111,7 +123,7 @@ export function buildFields(cr: CrimeReport, c: CaseRecord | null, n: Names): Re
     infor_help: s(cr.informantHelp),
     detection_officer: n.detecting,
     Detection_Officer: n.detecting,
-    'ග්රහණ_නිළධාරි': n.detecting,
+    ග්රහණ_නිළධාරි: n.detecting,
     Ac: n.ac,
     Sc: n.sc,
     oic: n.oic,

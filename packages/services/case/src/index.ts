@@ -39,7 +39,8 @@ export class DefaultCaseService implements CaseService {
     ];
     // A hearing date cannot be before the detection date (§4.3).
     input.hearings.forEach((h, i) => {
-      if (h.date < cr.detectionDate) issues.push({ field: `hearings.${i}.date`, code: 'before_detection' });
+      if (h.date < cr.detectionDate)
+        issues.push({ field: `hearings.${i}.date`, code: 'before_detection' });
     });
     if (input.courtDate && input.courtDate < cr.detectionDate) {
       issues.push({ field: 'courtDate', code: 'before_detection' });

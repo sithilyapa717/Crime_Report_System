@@ -1,5 +1,10 @@
 import type { ReportParams, Session } from '@excise/contract';
-import { createMemoryRepositories, sampleCaseInput, sampleCrInput, seedReferences } from '@excise/mocks';
+import {
+  createMemoryRepositories,
+  sampleCaseInput,
+  sampleCrInput,
+  seedReferences,
+} from '@excise/mocks';
 import type { Role } from '@excise/schemas';
 import { describe, expect, it } from 'vitest';
 import { DefaultReportService } from './index.js';
@@ -26,12 +31,22 @@ async function setup(role: Role = 'oic') {
   const c2 = await add(2, 1);
   await repos.cases.save(
     sampleCaseInput(c2.id, refs, {
-      outcomes: [{ outcomeType: 'fine', fineAmount: 500000, convictedDate: '2026-01-20', addToConvictRegister: true }],
+      outcomes: [
+        {
+          outcomeType: 'fine',
+          fineAmount: 500000,
+          convictedDate: '2026-01-20',
+          addToConvictRegister: true,
+        },
+      ],
     }),
     null,
   );
   const c3 = await add(3, 2);
-  await repos.cases.save(sampleCaseInput(c3.id, refs, { caseType: 'warrant', caseNumber: 'W/3' }), null);
+  await repos.cases.save(
+    sampleCaseInput(c3.id, refs, { caseType: 'warrant', caseNumber: 'W/3' }),
+    null,
+  );
   const c4 = await add(4, 3);
   await repos.cases.save(
     sampleCaseInput(c4.id, refs, { caseNumber: undefined, caseType: undefined }),
@@ -49,7 +64,10 @@ async function setup(role: Role = 'oic') {
   await repos.cases.save(
     sampleCaseInput(c5.id, refs, {
       rewardVoucherReceived: true,
-      outcomes: [{ outcomeType: 'fine', fineAmount: 250000, addToConvictRegister: true }, { outcomeType: 'imprisonment', prisonMonths: 6, addToConvictRegister: true }],
+      outcomes: [
+        { outcomeType: 'fine', fineAmount: 250000, addToConvictRegister: true },
+        { outcomeType: 'imprisonment', prisonMonths: 6, addToConvictRegister: true },
+      ],
     }),
     null,
   );
@@ -59,7 +77,11 @@ async function setup(role: Role = 'oic') {
   return { svc: new DefaultReportService(repos.reportRows, session(role)), refs };
 }
 
-const params = (refs: { office: string }, type: ReportParams['type'], extra: Partial<ReportParams> = {}): ReportParams => ({
+const params = (
+  refs: { office: string },
+  type: ReportParams['type'],
+  extra: Partial<ReportParams> = {},
+): ReportParams => ({
   scope: { kind: 'year', officeId: refs.office, year: 2026 },
   person: { kind: 'none' },
   type,
@@ -90,15 +112,27 @@ describe('ReportService', () => {
 
   it('half-year uses the half chosen at entry, and month scope works', async () => {
     const { svc, refs } = await setup();
-    const half = await svc.run(params(refs, 'register', { scope: { kind: 'half_year', officeId: refs.office, year: 2026, half: 'second' } }));
+    const half = await svc.run(
+      params(refs, 'register', {
+        scope: { kind: 'half_year', officeId: refs.office, year: 2026, half: 'second' },
+      }),
+    );
     expect(numbers(half.rows)).toEqual(['5/2026']);
-    const month = await svc.run(params(refs, 'register', { scope: { kind: 'month', officeId: refs.office, year: 2026, month: 1 } }));
+    const month = await svc.run(
+      params(refs, 'register', {
+        scope: { kind: 'month', officeId: refs.office, year: 2026, month: 1 },
+      }),
+    );
     expect(numbers(month.rows)).toEqual(['1/2026', '2/2026']);
   });
 
   it('filters by detecting officer', async () => {
     const { svc, refs } = await setup();
-    const r = await svc.run(params(refs, 'register', { person: { kind: 'detecting_officer', officerId: refs.otherOfficer } }));
+    const r = await svc.run(
+      params(refs, 'register', {
+        person: { kind: 'detecting_officer', officerId: refs.otherOfficer },
+      }),
+    );
     expect(numbers(r.rows)).toEqual(['5/2026']);
   });
 
@@ -124,7 +158,9 @@ describe('ReportService', () => {
     const { svc, refs } = await setup('observation');
     await expect(svc.run(params(refs, 'register'))).resolves.toBeTruthy();
     await expect(
-      svc.run(params(refs, 'register', { person: { kind: 'informant', officerId: refs.informant } })),
+      svc.run(
+        params(refs, 'register', { person: { kind: 'informant', officerId: refs.informant } }),
+      ),
     ).rejects.toThrow(/lacks permission/);
   });
 });

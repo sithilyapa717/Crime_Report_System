@@ -5,8 +5,21 @@ export const HalfYear = z.enum(['first', 'second']);
 export const Sex = z.enum(['male', 'female']);
 
 export const SeizedItemType = z.enum([
-  'spirit', 'kasippu', 'goda', 'state_arrack', 'beer', 'foreign_liquor', 'cigarettes',
-  'beedi', 'cannabis', 'cannabis_plants', 'heroin', 'tablets', 'cannabis_mixture', 'toddy', 'ice',
+  'spirit',
+  'kasippu',
+  'goda',
+  'state_arrack',
+  'beer',
+  'foreign_liquor',
+  'cigarettes',
+  'beedi',
+  'cannabis',
+  'cannabis_plants',
+  'heroin',
+  'tablets',
+  'cannabis_mixture',
+  'toddy',
+  'ice',
 ]);
 
 export const AccusedInput = z.object({

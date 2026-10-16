@@ -15,6 +15,7 @@ import { DefaultCrService } from '@excise/cr';
 import { DefaultDocDataService } from '@excise/docdata';
 import { DefaultReportService } from '@excise/reports';
 import { DefaultSearchService } from '@excise/search';
+import { ARG_SCHEMAS } from './args.js';
 
 export interface Repositories {
   crs: CrRepository;
@@ -62,7 +63,8 @@ export function createServiceHost(repos: Repositories, opts: HostOptions) {
     'case.save': (...a: Parameters<typeof cases.save>) => cases.save(...a),
     'case.getByCrimeReport': (crimeReportId: string) => cases.getByCrimeReport(crimeReportId),
 
-    'search.crimeReports': (...a: Parameters<typeof search.crimeReports>) => search.crimeReports(...a),
+    'search.crimeReports': (...a: Parameters<typeof search.crimeReports>) =>
+      search.crimeReports(...a),
     'search.convicts': (...a: Parameters<typeof search.convicts>) => search.convicts(...a),
     'search.previousOffences': (...a: Parameters<typeof search.previousOffences>) =>
       search.previousOffences(...a),
@@ -103,7 +105,10 @@ export function serializeError(e: unknown): Extract<CallResult<never>, { ok: fal
   return { name: 'Error', message: String(e) };
 }
 
-/** Runs one call by channel name; unknown channels and thrown errors become `ok: false`. */
+/**
+ * Runs one call by channel name. Unknown channels, arguments of the wrong shape and thrown errors
+ * all become `ok: false`.
+ */
 export async function dispatch(
   handlers: Handlers,
   channel: unknown,
@@ -112,9 +117,20 @@ export async function dispatch(
   if (typeof channel !== 'string' || !Object.hasOwn(handlers, channel) || !Array.isArray(args)) {
     return { ok: false, error: { name: 'UnknownChannel', message: String(channel) } };
   }
+  const parsed = ARG_SCHEMAS[channel as Channel].safeParse(args);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: {
+        name: 'InvalidArguments',
+        message: channel,
+        issues: parsed.error.issues.map((i) => ({ field: i.path.join('.'), code: i.code })),
+      },
+    };
+  }
   try {
     const fn = handlers[channel as Channel] as (...a: unknown[]) => Promise<unknown>;
-    return { ok: true, value: await fn(...args) };
+    return { ok: true, value: await fn(...(parsed.data as unknown[])) };
   } catch (e) {
     return { ok: false, error: serializeError(e) };
   }

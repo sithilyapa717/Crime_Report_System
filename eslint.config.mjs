@@ -16,7 +16,9 @@ export default tseslint.config(
     rules: {
       'no-restricted-imports': [
         'error',
-        { patterns: ['**/apps/desktop/renderer/**', '**/packages/services/**', '@excise/services*'] },
+        {
+          patterns: ['**/apps/desktop/renderer/**', '**/packages/services/**', '@excise/services*'],
+        },
       ],
     },
   },

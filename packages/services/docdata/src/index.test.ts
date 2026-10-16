@@ -1,7 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { Session } from '@excise/contract';
-import { createMemoryRepositories, sampleCaseInput, sampleCrInput, seedReferences } from '@excise/mocks';
+import {
+  createMemoryRepositories,
+  sampleCaseInput,
+  sampleCrInput,
+  seedReferences,
+} from '@excise/mocks';
 import type { Role } from '@excise/schemas';
 import { describe, expect, it } from 'vitest';
 import { DefaultDocDataService, formatMoney } from './index.js';
@@ -38,7 +43,14 @@ async function setup(role: Role = 'detecting') {
   await repos.cases.save(
     sampleCaseInput(cr.id, refs, {
       hearings: [{ kind: 'warrant', date: '2026-02-03' }],
-      outcomes: [{ outcomeType: 'fine', fineAmount: 1500050, convictedDate: '2026-01-20', addToConvictRegister: true }],
+      outcomes: [
+        {
+          outcomeType: 'fine',
+          fineAmount: 1500050,
+          convictedDate: '2026-01-20',
+          addToConvictRegister: true,
+        },
+      ],
     }),
     null,
   );

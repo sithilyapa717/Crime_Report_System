@@ -19,11 +19,11 @@ EXCISE_RENDERER_URL=http://localhost:5173 pnpm start
 
 The app runs on in-memory repositories from `packages/services/mocks` with two sample CRs. Data is lost when the app closes. Dev accounts, all with the password `dev-password`:
 
-| Username | Role |
-|---|---|
-| `oic` | Station head (OIC) |
-| `detecting` | Detecting officers |
-| `observation` | Observation officers |
+| Username      | Role                      |
+| ------------- | ------------------------- |
+| `oic`         | Station head (OIC)        |
+| `detecting`   | Detecting officers        |
+| `observation` | Observation officers      |
 | `supervising` | Supervising (AC) officers |
 
 These accounts exist only in mock mode. When A's SQLite repositories are ready, `src/main.ts` swaps `createDevRepositories()` for them (marked `TODO(A)`).
