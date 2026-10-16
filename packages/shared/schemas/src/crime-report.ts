@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import { CrNumber, IsoDate, MoneyCents, Nic, TimeOfDay, Uuid } from './common.js';
+import { CrNumber, IsoDate, MoneyCents, Nic, Uuid } from './common.js';
+
+/** Text exactly as staff typed it; never reformatted. */
+const TypedText = z.string().max(500);
 
 export const HalfYear = z.enum(['first', 'second']);
 export const Sex = z.enum(['male', 'female']);
@@ -42,12 +45,13 @@ export const SuretyInput = z.object({
   phone: z.string().optional(),
 });
 
+/** Free text in Access with no agreed format (e.g. 14.45 or 14:45), so kept as typed. */
 export const DetectionTimesInput = z.object({
-  arrival: TimeOfDay.optional(),
-  bcLeaving: TimeOfDay.optional(),
-  iprLeaving: TimeOfDay.optional(),
-  detection: TimeOfDay.optional(),
-  afterDetection: TimeOfDay.optional(),
+  arrival: TypedText.optional(),
+  bcLeaving: TypedText.optional(),
+  iprLeaving: TypedText.optional(),
+  detection: TypedText.optional(),
+  afterDetection: TypedText.optional(),
 });
 
 export const SeizedItemInput = z.object({
@@ -57,11 +61,25 @@ export const SeizedItemInput = z.object({
   overQuantity: z.number().nonnegative().optional(),
 });
 
+export const CashDenomination = z.union([
+  z.literal(5000),
+  z.literal(1000),
+  z.literal(500),
+  z.literal(100),
+  z.literal(50),
+  z.literal(20),
+  z.literal(10),
+]);
+
+/**
+ * One of the 14 cash boxes on the old form: `Cash 5000`..`Cash 10` (notes used) and
+ * `Cash1 5000`..`Cash7 10` (notes left). They were Text in Access and staff typed the note
+ * serial numbers into them (e.g. "S/426 672487"), so the value is kept as typed.
+ */
 export const CashNoteInput = z.object({
   kind: z.enum(['used', 'left']),
-  denomination: z.number().int().positive(),
-  count: z.number().int().nonnegative(),
-  foundPlace: z.string().optional(),
+  denomination: CashDenomination,
+  text: TypedText,
 });
 
 /** Support officer slot 1-10 (dh1-dh5, inh1-inh5). */
@@ -88,10 +106,12 @@ export const CrimeReportInput = z.object({
   oicId: Uuid.optional(),
   driverId: Uuid.optional(),
   notes: z.string().optional(),
-  /** Free-text legacy fields that the Word templates print as typed (`Quantity`, `Quantity1`, `Over Quantity`). */
-  quantityText: z.string().optional(),
-  quantityExtraText: z.string().optional(),
-  overQuantityText: z.string().optional(),
+  /** `Quantity`, `Quantity1`, `Over Quantity`: whole numbers (Long Integer in Access). */
+  quantity: z.number().int().nonnegative().optional(),
+  quantityExtra: z.number().int().nonnegative().optional(),
+  overQuantity: z.number().int().nonnegative().optional(),
+  /** `place of cash`: where the decoy cash was found. */
+  cashFoundPlace: TypedText.optional(),
   /** Serial numbers of the decoy notes (`Cash Number`, `Cash Number 1`). */
   cashSerials: z.string().optional(),
   cashSerials1: z.string().optional(),
@@ -104,8 +124,16 @@ export const CrimeReportInput = z.object({
   times: DetectionTimesInput.optional(),
   supportOfficers: z.array(SupportOfficerInput).max(10).default([]),
   seizedItems: z.array(SeizedItemInput).default([]),
-  cashNotes: z.array(CashNoteInput).default([]),
-  productions: z.array(z.string()).default([]),
+  cashNotes: z
+    .array(CashNoteInput)
+    .max(14)
+    .refine(
+      (notes) => new Set(notes.map((n) => `${n.kind}:${n.denomination}`)).size === notes.length,
+      'One entry per cash box',
+    )
+    .default([]),
+  /** [0] = `Production list`, [1] = `Production1`, [2] = `Production2`. */
+  productions: z.array(TypedText).max(3).default([]),
 });
 export type CrimeReportInput = z.infer<typeof CrimeReportInput>;
 

@@ -11,9 +11,6 @@ export const IsoDate = z
     return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
   }, 'Invalid date');
 
-/** `HH:mm` 24-hour time. */
-export const TimeOfDay = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
-
 /** Old NIC: 9 digits + V/X. New NIC: 12 digits (§4.3). */
 export const Nic = z.string().regex(/^(\d{9}[VvXx]|\d{12})$/);
 

@@ -86,7 +86,8 @@ export interface ConvictRow {
   accusedNic: string | null;
   offenceCode: string;
   offenceName: string;
-  quantityText: string | null;
+  /** `Quantity` (whole number). */
+  quantity: number | null;
   courtId: string | null;
   courtName: string | null;
   caseNumber: string | null;
@@ -191,7 +192,8 @@ export interface ReportRow {
   fineAmount: number | null;
   rewardVoucherReceived: boolean;
   addToConvictRegister: boolean;
-  quantityText: string | null;
+  /** `Quantity` (whole number). */
+  quantity: number | null;
   seized: { itemType: string; quantity: number }[];
 }
 
