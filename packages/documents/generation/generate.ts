@@ -64,6 +64,11 @@ export class DocumentGenerator {
     this.deps = deps;
   }
 
+  /** Whether `pdf: true` can produce a PDF on this computer. */
+  get canExportPdf(): boolean {
+    return !!this.deps.pdfExporter;
+  }
+
   async generate(req: GenerateRequest): Promise<GeneratedDocument> {
     const { registry, originalsDir, outputDir, log, now = () => new Date() } = this.deps;
     const template = registry.get(req.templateId);

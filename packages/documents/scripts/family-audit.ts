@@ -10,23 +10,13 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { lookupField } from '../mapping/fields.ts';
-import { JsonTemplateSource, OFFENCE_SPECIFIC, type TemplateEntry, type TemplateFamily } from '../registry/registry.ts';
+import { FAMILY_ORDER, familyTitle } from '../registry/families.ts';
+import { JsonTemplateSource, OFFENCE_SPECIFIC, type TemplateEntry } from '../registry/registry.ts';
 
 const REPO = join(import.meta.dirname, '..', '..', '..');
 const OUT = join(REPO, 'docs', 'document-catalogue', 'FAMILIES.md');
 const B8 = join(REPO, 'packages', 'services', 'docdata', 'src', 'index.ts');
 const INVENTORY = join(import.meta.dirname, '..', 'registry', 'template-inventory.json');
-
-const FAMILY_NAMES: Record<TemplateFamily, string> = {
-  plaint: 'Plaints by offence (පැමිණිලි)',
-  'charge-sheet': 'Charge sheets (චෝදනා පත්‍ර)',
-  'reward-voucher': 'Reward and fine vouchers (REWARDS, ඊ 6c)',
-  'motion-sheet': 'Motion sheets (මෝෂන් කොළ)',
-  'warrant-extension': 'Warrant extension (වරෙන්තු දිර්ග කිරීම)',
-  'previous-record': 'Previous-record notes (පෙර වැරදි)',
-  production: 'Productions (සාක්ෂි භාණ්ඩ)',
-  other: 'Other',
-};
 
 /** Field names B8 returns, read from buildFields() in its source; null if the file is missing. */
 function b8Fields(): { produced: Set<string>; unresolved: Set<string> } | null {
@@ -93,7 +83,7 @@ Sources: \`registry/templates.json\` (families, offences, variants, status), \`r
 `;
 
 const summary: string[] = [];
-for (const family of Object.keys(FAMILY_NAMES) as TemplateFamily[]) {
+for (const family of FAMILY_ORDER) {
   const rows = entries.filter((e) => e.family === family);
   if (!rows.length) continue;
   const fields = [...new Set(rows.flatMap((e) => inventory.get(e.id) ?? []))].sort((a, b) => a.localeCompare(b));
@@ -103,10 +93,10 @@ for (const family of Object.keys(FAMILY_NAMES) as TemplateFamily[]) {
   const staticCount = rows.filter((e) => !(inventory.get(e.id) ?? []).length).length;
   const status = (s: TemplateEntry['status']) => rows.filter((e) => e.status === s).length;
   summary.push(
-    `| ${FAMILY_NAMES[family]} | ${rows.length} | ${status('current')} / ${status('unconfirmed')} / ${status('archived')} | ${fields.length} | ${cov.missing.length + cov.unresolved.length || '–'} | ${noOffence.length || '–'} |`,
+    `| ${familyTitle(family)} | ${rows.length} | ${status('current')} / ${status('unconfirmed')} / ${status('archived')} | ${fields.length} | ${cov.missing.length + cov.unresolved.length || '–'} | ${noOffence.length || '–'} |`,
   );
 
-  md += `## ${FAMILY_NAMES[family]}\n\n`;
+  md += `## ${familyTitle(family)}\n\n`;
   md += `- ${rows.length} templates; offences: ${offences.length ? offences.join(', ') : 'any'}`;
   md += staticCount ? `; ${staticCount} without merge fields (printed as they are)\n` : '\n';
   md += `- ${fields.length} distinct fields: ${fields.map((f) => `\`${f}\``).join(', ') || '–'}\n`;
