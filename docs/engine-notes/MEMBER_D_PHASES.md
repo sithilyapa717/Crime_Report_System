@@ -205,6 +205,30 @@ Everything lives in `tests/documents-fidelity/` and runs in CI's Documents job.
 - Who formats values. `@excise/docdata` already formats them, so `formatMoney` gives `1,500.50` and times are passed through as `14:45`. D4's formatters give `1500` and `14.45`. Both are guesses until a real Word-merged document is checked.
 - My proposal: B returns raw values, and D's mapping does the formatting in one place.
 
+### Phase 5: family audit and staff review tools done; the family sign-off waits for staff
+
+The engine already handles every family the same way, and the fidelity tests and the Word comparison cover all 92 templates. What is left per family is staff decisions, so this phase builds the tools that collect them.
+
+**Family audit:** `scripts/family-audit.ts` writes `docs/document-catalogue/FAMILIES.md`. For each family it lists the templates, offences, variants, the fields used, and whether B8 supplies each field.
+
+- B8 supplies every field the templates use. The one exception is `type`, which B returns empty on purpose until its meaning is agreed. It is used only in UMA.
+- 13 plaints have no offence code, so they are not offered: 12 cigarette/beedi templates in GOLD LEAF, plus `aaaaaaaaaaaaaa`.
+- 7 templates have no fields. They are blank or static forms and are printed as they are.
+
+**Staff review pack:** `scripts/review-pack.ts <dir> [--pdf]` produces:
+
+- every template filled with the made-up sample CR, as `.docx` and, with `--pdf`, as a PDF made through Word in one session (`pdf-batch.ps1`);
+- `index.html`, a printable overview by family with instructions, the general questions and per-template questions;
+- `review-sheet.csv`, opened in Excel. Staff mark each template `current` / `old copy`, correct the offence codes, and add comments.
+
+**Applying the answers:** `scripts/apply-review.ts <sheet.csv> [--dry-run]` updates `registry/templates.json`.
+
+- It accepts sheets separated by commas or semicolons, and requires UTF-8 (it explains how to save as "CSV UTF-8").
+- If any row is wrong (unknown template, unclear decision, bad offence code), nothing is applied.
+- Logic lives in `registry/review.ts`, with 6 tests.
+
+**Still waiting on staff:** the filled review sheet, plus answers to the general questions (`Quantity1`, `Cash_Number`, money and time formats, the cigarette offence codes, fonts).
+
 ## Notes to raise with the team
 
 - **The real folders differ from REWRITE_PLAN §1.7.** There are no `UPA` or `UPFL` folders: those templates live in `USA-UPA/`. There is an extra `PUMB 2021.02.11/` folder (7 files), and `GOLD LEAF/` has 15 files. The catalogue follows the real folders.
