@@ -1,52 +1,55 @@
 # Who must approve changes to each folder. In this file the LAST matching line wins,
 # so general folders come first and specific folders after them.
-# Replace @A, @B, @C, @D and @project-owner with the real GitHub usernames before pushing.
-#   @A = Database   @B = Logical system   @C = UI / UX   @D = Documents
+# Members (see OWNERS.md):
+#   A = Database        @yohanruchitha2-star
+#   B = Logical system  @senanayakenithikas-ux
+#   C = UI / UX         @methuliH
+#   D = Documents       @sithilyapa717 (also the project owner)
 
 # Root config and ownership files
-*                                                @B
-/CODEOWNERS                                      @project-owner
-/OWNERS.md                                       @B
+*                                                @senanayakenithikas-ux
+/CODEOWNERS                                      @sithilyapa717
+/OWNERS.md                                       @senanayakenithikas-ux
 
 # Desktop app
-/apps/desktop/main/                              @B
-/apps/desktop/preload/                           @B
-/apps/desktop/renderer/                          @C
-/apps/desktop/renderer/screens/cr-entry-tabs/    @A
-/apps/desktop/renderer/screens/reference-lists/  @A
-/apps/desktop/renderer/screens/admin/            @A
-/apps/desktop/renderer/documents-dialog/         @D
+/apps/desktop/main/                              @senanayakenithikas-ux
+/apps/desktop/preload/                           @senanayakenithikas-ux
+/apps/desktop/renderer/                          @methuliH
+/apps/desktop/renderer/screens/cr-entry-tabs/    @yohanruchitha2-star
+/apps/desktop/renderer/screens/reference-lists/  @yohanruchitha2-star
+/apps/desktop/renderer/screens/admin/            @yohanruchitha2-star
+/apps/desktop/renderer/documents-dialog/         @sithilyapa717
 
 # Packages
-/packages/shared/                                @B
-/packages/shared/labels/                         @A @B @C @D
-/packages/shared/contract/                       @A @B @C @D
-/packages/services/                              @B
-/packages/services/reference/                    @A
-/packages/services/audit/                        @A
-/packages/db/                                    @A
-/packages/migration/                             @A
-/packages/documents/                             @D
+/packages/shared/                                @senanayakenithikas-ux
+/packages/shared/labels/                         @yohanruchitha2-star @senanayakenithikas-ux @methuliH @sithilyapa717
+/packages/shared/contract/                       @yohanruchitha2-star @senanayakenithikas-ux @methuliH @sithilyapa717
+/packages/services/                              @senanayakenithikas-ux
+/packages/services/reference/                    @yohanruchitha2-star
+/packages/services/audit/                        @yohanruchitha2-star
+/packages/db/                                    @yohanruchitha2-star
+/packages/migration/                             @yohanruchitha2-star
+/packages/documents/                             @sithilyapa717
 
 # Tests
-/tests/e2e/                                      @C
-/tests/reports-parity/                           @B
-/tests/documents-fidelity/                       @D
-/tests/migration/                                @A
+/tests/e2e/                                      @methuliH
+/tests/reports-parity/                           @senanayakenithikas-ux
+/tests/documents-fidelity/                       @sithilyapa717
+/tests/migration/                                @yohanruchitha2-star
 
 # Read-only reference material
-/prototype/                                      @project-owner
-/packages/documents/templates/original/          @project-owner
-/docs/legacy-screenshots/                        @project-owner
-/docs/LEGACY_SCREEN_INVENTORY.md                 @project-owner
-/docs/LEGACY_QUERY_CATALOG.md                    @project-owner
-/REWRITE_PLAN.md                                 @project-owner
-/TEAM_WORK_SPLIT.md                              @project-owner
+/prototype/                                      @sithilyapa717
+/packages/documents/templates/original/          @sithilyapa717
+/docs/legacy-screenshots/                        @sithilyapa717
+/docs/LEGACY_SCREEN_INVENTORY.md                 @sithilyapa717
+/docs/LEGACY_QUERY_CATALOG.md                    @sithilyapa717
+/REWRITE_PLAN.md                                 @sithilyapa717
+/TEAM_WORK_SPLIT.md                              @sithilyapa717
 
 # Documentation
-/docs/database-design/                           @A
-/docs/document-catalogue/                        @D
-/docs/user-guide/                                @D
-/docs/admin-guide/                               @D
-/docs/engine-notes/                              @D
-/docs/ui-guidelines/                             @C
+/docs/database-design/                           @yohanruchitha2-star
+/docs/document-catalogue/                        @sithilyapa717
+/docs/user-guide/                                @sithilyapa717
+/docs/admin-guide/                               @sithilyapa717
+/docs/engine-notes/                              @sithilyapa717
+/docs/ui-guidelines/                             @methuliH
