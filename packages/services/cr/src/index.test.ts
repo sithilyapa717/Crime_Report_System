@@ -35,6 +35,12 @@ describe('CrService', () => {
     await expect(svc.create(input)).rejects.toBeInstanceOf(CrValidationError);
   });
 
+  it('stores NICs upper-case so searches match however they were typed', async () => {
+    const { svc, input } = setup('oic');
+    const saved = await svc.create({ ...input, accused: { name: 'X', nic: '851234567v' } });
+    expect(saved.accused.nic).toBe('851234567V');
+  });
+
   it('blocks observation officers from writing', async () => {
     const { svc, input } = setup('observation');
     await expect(svc.create(input)).rejects.toThrow(/lacks permission/);

@@ -16,10 +16,19 @@ export function parseCrNumber(value: string): { seq: number; year: number } | nu
   return { seq: Number(seq), year: Number(year) };
 }
 
+/**
+ * Today's date on this PC (Sri Lanka time) as ISO `YYYY-MM-DD`. Not the UTC date: between
+ * 00:00 and 05:30 local time the UTC date is still yesterday.
+ */
+export function localToday(now: Date = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
 /** §4.3 cross-field rules for a CR. Dates are ISO `YYYY-MM-DD`; `today` is injectable for tests. */
 export function validateCrDates(
   input: { detectionDate: string; crYear: number; crNumber: string; hearingDates?: string[] },
-  today: string = new Date().toISOString().slice(0, 10),
+  today: string = localToday(),
 ): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   if (input.detectionDate > today) issues.push({ field: 'detectionDate', code: 'future_date' });
