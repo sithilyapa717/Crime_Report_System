@@ -8,7 +8,8 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fillTemplate } from '../engine/fill.ts';
 import { SAMPLE_CR } from '../mapping/sample-data.ts';
-import { JsonTemplateSource, type TemplateEntry, type TemplateFamily } from '../registry/registry.ts';
+import { FAMILY_ORDER, familyTitle } from '../registry/families.ts';
+import { JsonTemplateSource, type TemplateEntry } from '../registry/registry.ts';
 import { reviewSheetCsv, type ReviewRowInput } from '../registry/review.ts';
 import { ORIGINALS_DIR } from './originals-lib.ts';
 
@@ -20,27 +21,6 @@ if (!outArg) {
 }
 const out = resolve(outArg);
 const withPdf = args.includes('--pdf');
-
-const FAMILY_ORDER: TemplateFamily[] = [
-  'plaint',
-  'charge-sheet',
-  'reward-voucher',
-  'motion-sheet',
-  'warrant-extension',
-  'previous-record',
-  'production',
-  'other',
-];
-const FAMILY_TITLES: Record<TemplateFamily, string> = {
-  plaint: 'Plaints by offence – පැමිණිලි',
-  'charge-sheet': 'Charge sheets – චෝදනා පත්‍ර',
-  'reward-voucher': 'Reward and fine vouchers – REWARDS',
-  'motion-sheet': 'Motion sheets – මෝෂන් කොළ',
-  'warrant-extension': 'Warrant extension – වරෙන්තු දිර්ග කිරීම',
-  'previous-record': 'Previous-record notes – පෙර වැරදි',
-  production: 'Productions – සාක්ෂි භාණ්ඩ',
-  other: 'Other',
-};
 
 /** Questions that are not about one template (docs/engine-notes/MEMBER_D_PHASES.md). */
 const GENERAL_QUESTIONS = [
@@ -128,7 +108,7 @@ let n = 0;
 for (const family of FAMILY_ORDER) {
   const group = rows.filter((r) => r.entry.family === family);
   if (!group.length) continue;
-  html += `<h2>${esc(FAMILY_TITLES[family])} (${group.length})</h2>
+  html += `<h2>${esc(familyTitle(family))} (${group.length})</h2>
 <table><tr><th>No</th><th>Template</th><th>Offence</th><th>Variant</th><th>Questions</th></tr>`;
   for (const r of group) {
     n++;

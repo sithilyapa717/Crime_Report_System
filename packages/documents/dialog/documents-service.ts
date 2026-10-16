@@ -5,6 +5,7 @@
 import type { DocDataService, Session } from '../../shared/contract/src/index.ts';
 import type { DocumentGenerator } from '../generation/generate.ts';
 import type { GenerationLog, GenerationLogEntry } from '../generation/log.ts';
+import { FAMILY_ORDER } from '../registry/families.ts';
 import type { TemplateEntry, TemplateFamily, TemplateRegistry, TemplateVariant } from '../registry/registry.ts';
 
 export interface DialogTemplate {
@@ -47,17 +48,6 @@ export interface DocumentsServiceDeps {
   log: GenerationLog;
   session: () => Session;
 }
-
-const FAMILY_ORDER: TemplateFamily[] = [
-  'plaint',
-  'charge-sheet',
-  'reward-voucher',
-  'motion-sheet',
-  'warrant-extension',
-  'previous-record',
-  'production',
-  'other',
-];
 
 /** Map generator warnings (English, for logs) to stable codes for the UI. */
 function warningCode(text: string): WarningCode {

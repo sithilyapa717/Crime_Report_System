@@ -11,15 +11,15 @@ Sources: `registry/templates.json` (families, offences, variants, status), `regi
 
 | Family | Templates | Current / unconfirmed / archived | Fields | Data gaps | Plaints without offence |
 |---|---|---|---|---|---|
-| Plaints by offence (පැමිණිලි) | 76 | 0 / 76 / 0 | 49 | 1 | 13 |
-| Charge sheets (චෝදනා පත්‍ර) | 1 | 0 / 1 / 0 | 3 | – | – |
-| Reward and fine vouchers (REWARDS, ඊ 6c) | 8 | 0 / 8 / 0 | 19 | – | – |
-| Motion sheets (මෝෂන් කොළ) | 2 | 0 / 2 / 0 | 7 | – | – |
-| Warrant extension (වරෙන්තු දිර්ග කිරීම) | 1 | 0 / 1 / 0 | 0 | – | – |
-| Previous-record notes (පෙර වැරදි) | 3 | 0 / 3 / 0 | 4 | – | – |
-| Productions (සාක්ෂි භාණ්ඩ) | 1 | 0 / 1 / 0 | 0 | – | – |
+| Plaints by offence – පැමිණිලි | 76 | 0 / 76 / 0 | 49 | 1 | 13 |
+| Charge sheets – චෝදනා පත්‍ර | 1 | 0 / 1 / 0 | 3 | – | – |
+| Reward and fine vouchers (REWARDS) – ත්‍යාග හා දඩ වවුචර | 8 | 0 / 8 / 0 | 19 | – | – |
+| Motion sheets – මෝෂන් කොළ | 2 | 0 / 2 / 0 | 7 | – | – |
+| Warrant extension – වරෙන්තු දිර්ග කිරීම | 1 | 0 / 1 / 0 | 0 | – | – |
+| Previous-record notes – පෙර වැරදි | 3 | 0 / 3 / 0 | 4 | – | – |
+| Productions – සාක්ෂි භාණ්ඩ | 1 | 0 / 1 / 0 | 0 | – | – |
 
-## Plaints by offence (පැමිණිලි)
+## Plaints by offence – පැමිණිලි
 
 - 76 templates; offences: PDFC, PUDS, PUMB, PUML, SUDS, SUML, UCG, UMA, UPA, UPFL, UPG, UPH, UPS, UPT, USA, USFL, UST; 3 without merge fields (printed as they are)
 - 49 distinct fields: `Accused_Address`, `Accused_Name`, `Address_of_Accused`, `Address_of_Suerty`, `Case_no`, `Cash_100`, `Cash_1000`, `Cash_500`, `Cash_Number`, `Cash_Number_1`, `Cash2_1000`, `Cash3_500`, `court_officer`, `Courts_Date`, `CR_No`, `CR_NO_2015`, `CR_NO_2017`, `Date_of_court`, `Date_of_Court`, `Date_of_Detection`, `Detection_Date`, `detection_officer`, `Detection_Officer`, `dh1`, `infor_help`, `Informan`, `inh1`, `Name_of_Accused`, `Name_of_court`, `Name_of_Court`, `name_of_Suerty`, `Name_of_Suerty`, `NIC_No_of_Accused`, `NIC_Suerty`, `office`, `Over_Quantity`, `Place_of_Detection`, `Production1`, `Production2`, `Quantity`, `Quantity_Full`, `Quantity1`, `sp5`, `Time_of_Arraival`, `Time_of_BC_leaving`, `Time_of_Detection`, `Time_of_IPR_leaving`, `type`, `ග්රහණ_නිළධාරි`
@@ -105,7 +105,7 @@ Sources: `registry/templates.json` (families, offences, variants, status), `regi
 | UST-UPT/ust upt.docx | UST, UPT |  | 24 | unconfirmed |  |
 | UST/ust.docx | UST |  | 22 | unconfirmed |  |
 
-## Charge sheets (චෝදනා පත්‍ර)
+## Charge sheets – චෝදනා පත්‍ර
 
 - 1 templates; offences: PUMB
 - 3 distinct fields: `Address_of_Accused`, `Date_of_Court`, `Name_of_Accused`
@@ -114,7 +114,7 @@ Sources: `registry/templates.json` (families, offences, variants, status), `regi
 |---|---|---|---|---|---|
 | PUMB 2021.02.11/චෝදනා පත්.docx | PUMB |  | 3 | unconfirmed |  |
 
-## Reward and fine vouchers (REWARDS, ඊ 6c)
+## Reward and fine vouchers (REWARDS) – ත්‍යාග හා දඩ වවුචර
 
 - 8 templates; offences: any
 - 19 distinct fields: `Ac`, `Case_no`, `CR_NO_2017`, `Date_of_Detection`, `detection_officer`, `dh1`, `dh2`, `dh3`, `dh4`, `Drive`, `fine_date`, `Informan`, `Name_of_Court`, `Offence`, `office`, `oic`, `Quantity`, `result`, `Sc`
@@ -130,7 +130,7 @@ Sources: `registry/templates.json` (families, offences, variants, status), `regi
 | REWARDS/සුරාබදු ඊ 6c වවුචර sr wasantha samarasinhe.docx | any |  | 10 | unconfirmed |  |
 | REWARDS/සුරාබදු ඊ 6c වවුචර.docx | any |  | 10 | unconfirmed |  |
 
-## Motion sheets (මෝෂන් කොළ)
+## Motion sheets – මෝෂන් කොළ
 
 - 2 templates; offences: any; 1 without merge fields (printed as they are)
 - 7 distinct fields: `Address_of_Accused`, `Case_no`, `Date_of_Court`, `Name_of_Accused`, `Name_of_Court`, `office`, `WT_date`
@@ -140,7 +140,7 @@ Sources: `registry/templates.json` (families, offences, variants, status), `regi
 | Warrant/මොෂන්  කොළ.docx | any |  | 7 | unconfirmed |  |
 | Warrant/හිස් මෝෂන් කොළ.docx | any |  | 0 | unconfirmed |  |
 
-## Warrant extension (වරෙන්තු දිර්ග කිරීම)
+## Warrant extension – වරෙන්තු දිර්ග කිරීම
 
 - 1 templates; offences: any; 1 without merge fields (printed as they are)
 - 0 distinct fields: –
@@ -149,7 +149,7 @@ Sources: `registry/templates.json` (families, offences, variants, status), `regi
 |---|---|---|---|---|---|
 | Warrant/වරෙන්තු දිර්ග කිරීම.docx | any |  | 0 | unconfirmed |  |
 
-## Previous-record notes (පෙර වැරදි)
+## Previous-record notes – පෙර වැරදි
 
 - 3 templates; offences: any; 1 without merge fields (printed as they are)
 - 4 distinct fields: `Address_of_Accused`, `Name_of_Accused`, `NIC_No_of_Accused`, `office`
@@ -160,7 +160,7 @@ Sources: `registry/templates.json` (families, offences, variants, status), `regi
 | Warrant/පෙර වැරදි වාර්තා 1.docx | any |  | 4 | unconfirmed | file name looks like a saved-again copy |
 | පෙර වැරදි/පෙර වැරදි වාර්තාව 336 338 345.docx | any |  | 0 | unconfirmed |  |
 
-## Productions (සාක්ෂි භාණ්ඩ)
+## Productions – සාක්ෂි භාණ්ඩ
 
 - 1 templates; offences: any; 1 without merge fields (printed as they are)
 - 0 distinct fields: –
