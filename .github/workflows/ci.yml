@@ -1,0 +1,135 @@
+# One job per member, plus shared guards. Every job runs what exists today and switches
+# itself on as that member adds code, so nothing here needs editing when a folder fills up.
+#   guards      everyone   read-only zones, locked files, layer rules, CODEOWNERS
+#   quality     B          lint, format, typecheck, build (root package.json)
+#   database    A          SQL migrations on a fresh SQLite database, A's tests
+#   services    B          tests for shared, services, main, preload, reports parity
+#   ui          C          renderer tests, Playwright flows in tests/e2e
+#   documents   D          frozen templates, template inventory, D's tests and fidelity tests
+#   installer   A          Windows installer build (root "dist" script)
+#   all-checks             the one status to require in branch protection
+# Once the root package.json exists it must have "lint" and "typecheck" scripts.
+# Tests are *.test.ts / *.spec.ts files: node:test or Vitest; Playwright in tests/e2e.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guards:
+    name: Guards (everyone)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Read-only zones unchanged
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'read-only-change') }}
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: node .github/scripts/guard-readonly.ts "$BASE" HEAD
+      - name: Layer rules
+        run: node .github/scripts/check-layers.ts
+      - name: CODEOWNERS uses real usernames
+        run: |
+          if grep -nE '@(A|B|C|D|project-owner)\b' CODEOWNERS | grep -vE '^[0-9]+:\s*#'; then
+            echo "::warning file=CODEOWNERS::CODEOWNERS still has placeholder names (@A, @B, ...), so GitHub cannot request the right reviewers."
+          fi
+
+  quality:
+    name: Lint and typecheck (B)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+      - run: node .github/scripts/run-quality.ts
+
+  database:
+    name: Database (A)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+      - name: Migrations apply to a fresh SQLite database
+        run: node .github/scripts/migrate-sqlite.ts
+      - name: Tests
+        run: >-
+          node .github/scripts/run-tests.ts unit
+          packages/db packages/migration packages/services/reference packages/services/audit
+          apps/desktop/renderer/screens/cr-entry-tabs apps/desktop/renderer/screens/reference-lists
+          apps/desktop/renderer/screens/admin tests/migration
+
+  services:
+    name: Logic and services (B)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+      - name: Tests
+        run: >-
+          node .github/scripts/run-tests.ts unit
+          packages/shared packages/services apps/desktop/main apps/desktop/preload tests/reports-parity
+          --exclude packages/services/reference packages/services/audit
+
+  ui:
+    name: UI (C)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+      - name: Tests
+        run: >-
+          node .github/scripts/run-tests.ts unit apps/desktop/renderer
+          --exclude apps/desktop/renderer/screens/cr-entry-tabs apps/desktop/renderer/screens/reference-lists
+          apps/desktop/renderer/screens/admin apps/desktop/renderer/documents-dialog
+      - name: Playwright flows
+        run: node .github/scripts/run-tests.ts playwright tests/e2e
+
+  documents:
+    name: Documents (D)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+      - name: Original templates unchanged
+        run: node packages/documents/scripts/verify-originals.ts
+      - name: Template inventory is up to date
+        run: |
+          node packages/documents/scripts/inventory-templates.ts
+          git diff --exit-code -- docs/document-catalogue packages/documents/registry
+      - name: Tests
+        run: >-
+          node .github/scripts/run-tests.ts unit
+          packages/documents apps/desktop/renderer/documents-dialog tests/documents-fidelity
+
+  installer:
+    name: Windows installer (A)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+      - run: node .github/scripts/run-quality.ts dist
+
+  all-checks:
+    name: All checks
+    if: always()
+    needs: [guards, quality, database, services, ui, documents, installer]
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: exit 1
+      - run: echo "All member checks passed."
