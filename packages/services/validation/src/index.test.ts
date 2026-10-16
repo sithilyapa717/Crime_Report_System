@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { isValidNic, parseCrNumber, validateCrDates, validateOutcomeAllowed } from './index.js';
+import {
+  isValidNic,
+  localToday,
+  parseCrNumber,
+  validateCrDates,
+  validateOutcomeAllowed,
+} from './index.js';
 
 describe('validation', () => {
   it('accepts old and new NIC formats only', () => {
@@ -26,6 +32,10 @@ describe('validation', () => {
       'future_date',
       'year_mismatch',
     ]);
+  });
+  it('uses the local date, not UTC, for today', () => {
+    // 01:00 on 2 Jan local time is still 1 Jan in UTC for Sri Lanka (UTC+05:30).
+    expect(localToday(new Date(2026, 0, 2, 1, 0))).toBe('2026-01-02');
   });
   it('requires a case number for outcomes', () => {
     expect(validateOutcomeAllowed(undefined, 1)).toHaveLength(1);

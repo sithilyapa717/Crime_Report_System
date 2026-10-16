@@ -23,8 +23,12 @@ const devUrl = process.env.EXCISE_RENDERER_URL;
 const rendererFile = join(__dirname, '../../renderer/dist/index.html');
 
 function isTrustedSender(url: string): boolean {
-  if (devUrl) return new URL(url).origin === new URL(devUrl).origin;
-  return url.startsWith(pathToFileURL(rendererFile).href);
+  if (!devUrl) return url.startsWith(pathToFileURL(rendererFile).href);
+  try {
+    return new URL(url).origin === new URL(devUrl).origin;
+  } catch {
+    return false; // empty or malformed URL
+  }
 }
 
 async function createWindow(): Promise<BrowserWindow> {

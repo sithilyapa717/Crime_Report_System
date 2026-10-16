@@ -12,7 +12,11 @@ export const IsoDate = z
   }, 'Invalid date');
 
 /** Old NIC: 9 digits + V/X. New NIC: 12 digits (§4.3). */
-export const Nic = z.string().regex(/^(\d{9}[VvXx]|\d{12})$/);
+export const Nic = z
+  .string()
+  .regex(/^(\d{9}[VvXx]|\d{12})$/)
+  // Stored upper-case so searches match however it was typed (851234567v = 851234567V).
+  .transform((s) => s.toUpperCase());
 
 /** CR number `n/yyyy` (§4.3). */
 export const CrNumber = z.string().regex(/^[1-9]\d*\/\d{4}$/);
