@@ -1,0 +1,15 @@
+name: Set up Node and dependencies
+description: Node 24 for the scripts, plus pnpm install once the root package.json exists.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v5
+      with:
+        node-version: 24
+    - name: Install dependencies
+      if: hashFiles('package.json') != ''
+      shell: bash
+      run: |
+        npm install --global corepack@latest
+        corepack enable
+        pnpm install --frozen-lockfile
