@@ -1,0 +1,12 @@
+{
+  "name": "@excise/desktop-preload",
+  "private": true,
+  "version": "0.0.0",
+  "main": "src/api.ts",
+  "dependencies": {
+    "@excise/desktop-main": "workspace:*"
+  },
+  "devDependencies": {
+    "electron": "^44.7.2"
+  }
+}

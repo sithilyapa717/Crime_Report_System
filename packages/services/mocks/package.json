@@ -1,0 +1,11 @@
+{
+  "name": "@excise/mocks",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@excise/contract": "workspace:*",
+    "@excise/schemas": "workspace:*"
+  }
+}

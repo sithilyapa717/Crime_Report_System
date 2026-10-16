@@ -4,5 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "main": "src/index.ts",
-  "dependencies": { "@excise/schemas": "workspace:*" }
+  "dependencies": {
+    "@excise/contract": "workspace:*",
+    "@excise/schemas": "workspace:*",
+    "@node-rs/argon2": "^2.2.2"
+  },
+  "devDependencies": {
+    "@excise/mocks": "workspace:*"
+  }
 }

@@ -1,0 +1,28 @@
+{
+  "name": "@excise/desktop-main",
+  "private": true,
+  "version": "0.0.0",
+  "main": "dist/main.cjs",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "node build.mjs && electron ."
+  },
+  "dependencies": {
+    "@excise/auth": "workspace:*",
+    "@excise/case": "workspace:*",
+    "@excise/contract": "workspace:*",
+    "@excise/cr": "workspace:*",
+    "@excise/docdata": "workspace:*",
+    "@excise/mocks": "workspace:*",
+    "@excise/reports": "workspace:*",
+    "@excise/schemas": "workspace:*",
+    "@excise/search": "workspace:*",
+    "@node-rs/argon2": "^2.2.2",
+    "exceljs": "^4.4.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "electron": "^44.7.2",
+    "esbuild": "^0.25.12"
+  }
+}
