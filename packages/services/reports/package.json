@@ -1,0 +1,16 @@
+{
+  "name": "@excise/reports",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@excise/auth": "workspace:*",
+    "@excise/contract": "workspace:*",
+    "@excise/export": "workspace:*",
+    "@excise/schemas": "workspace:*"
+  },
+  "devDependencies": {
+    "@excise/mocks": "workspace:*"
+  }
+}

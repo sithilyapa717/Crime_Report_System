@@ -9,5 +9,8 @@
     "@excise/contract": "workspace:*",
     "@excise/schemas": "workspace:*",
     "@excise/validation": "workspace:*"
+  },
+  "devDependencies": {
+    "@excise/mocks": "workspace:*"
   }
 }

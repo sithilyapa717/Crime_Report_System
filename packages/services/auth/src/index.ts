@@ -59,3 +59,4 @@ const MAX_FAILED = 5;
 export function isLocked(failedAttempts: number): boolean {
   return failedAttempts >= MAX_FAILED;
 }
+export * from './service.js';

@@ -1,4 +1,11 @@
 {
   "extends": "./tsconfig.base.json",
-  "include": ["packages/shared/schemas/src", "packages/shared/contract/src", "packages/services/*/src", "tests/reports-parity"]
+  "include": [
+    "packages/shared/schemas/src",
+    "packages/shared/contract/src",
+    "packages/services/*/src",
+    "apps/desktop/main/src",
+    "apps/desktop/preload/src",
+    "tests/reports-parity"
+  ]
 }

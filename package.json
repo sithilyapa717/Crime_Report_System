@@ -6,7 +6,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build": "pnpm --filter @excise/desktop-main run build",
+    "start": "pnpm --filter @excise/desktop-main run start"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

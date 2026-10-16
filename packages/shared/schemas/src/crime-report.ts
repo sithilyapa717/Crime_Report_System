@@ -75,6 +75,17 @@ export const CrimeReportInput = z.object({
   oicId: Uuid.optional(),
   driverId: Uuid.optional(),
   notes: z.string().optional(),
+  /** Free-text legacy fields that the Word templates print as typed (`Quantity`, `Quantity1`, `Over Quantity`). */
+  quantityText: z.string().optional(),
+  quantityExtraText: z.string().optional(),
+  overQuantityText: z.string().optional(),
+  /** Serial numbers of the decoy notes (`Cash Number`, `Cash Number 1`). */
+  cashSerials: z.string().optional(),
+  cashSerials1: z.string().optional(),
+  /** `infor help` / `infor 2` / `Accused note`. */
+  informantHelp: z.string().optional(),
+  informantNote2: z.string().optional(),
+  accusedNote: z.string().optional(),
   accused: AccusedInput,
   surety: SuretyInput.optional(),
   times: DetectionTimesInput.optional(),

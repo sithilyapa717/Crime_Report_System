@@ -1,0 +1,16 @@
+{
+  "name": "@excise/search",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@excise/auth": "workspace:*",
+    "@excise/contract": "workspace:*",
+    "@excise/schemas": "workspace:*",
+    "@excise/validation": "workspace:*"
+  },
+  "devDependencies": {
+    "@excise/mocks": "workspace:*"
+  }
+}
