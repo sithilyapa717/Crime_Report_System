@@ -1,0 +1,580 @@
+{
+  "source": "C:\\sithil\\projects\\excise database\\Word Document edit",
+  "frozenAt": "2026-10-16T09:15:29.301Z",
+  "files": [
+    {
+      "path": "GOLD LEAF/297 21 බීඩි plaint.docx",
+      "bytes": 54960,
+      "sha256": "b52cca26449c13b80b7c0ec84418a3c0789eda11f2bb553dd1b03775800fca5c"
+    },
+    {
+      "path": "GOLD LEAF/460, 461 PDFC.docx",
+      "bytes": 16670,
+      "sha256": "a07df79dd039bb3f4b286d7bbf9542ab423328de13bf102c77f9bb7ee3601fa2"
+    },
+    {
+      "path": "GOLD LEAF/FORRIN SIGERAT AC OFFICE NEW 460 2021.docx",
+      "bytes": 66015,
+      "sha256": "b0a290b717a8e5f2a98078e0375c3ea38739ff57b66ea171f78e2496438114f8"
+    },
+    {
+      "path": "GOLD LEAF/FORRIN SIGERAT AC OFFICE NEW 461 2021.docx",
+      "bytes": 57704,
+      "sha256": "12e9944be997519a80c0835b83008b8291cdf10a7c9b2a9f81864d0a413d4602"
+    },
+    {
+      "path": "GOLD LEAF/FORRIN SIGERAT AC OFFICE NEW.docx",
+      "bytes": 57732,
+      "sha256": "671336b01a4201e3695153689cada17dd353c9cca54652e053c8ce3609bba461"
+    },
+    {
+      "path": "GOLD LEAF/FORRIN SIGERAT AC OFFICE.docx",
+      "bytes": 53305,
+      "sha256": "f9013f1e67daaab28294a019b0e74d954d7ebbb420e9fd1c47bbdca8d28bc21b"
+    },
+    {
+      "path": "GOLD LEAF/FORRIN SIGERAT AC OFFICE.docx 1 11.docx",
+      "bytes": 53266,
+      "sha256": "6139a7cb9560e4e628a9e9874dae2ccf6c73dc85020eec3561f90817ea26c2fb"
+    },
+    {
+      "path": "GOLD LEAF/FORRIN SIGERAT AC OFFICE.docx 1.docx",
+      "bytes": 61496,
+      "sha256": "cba6b09ed20131c6c4f7f454393ccd360ac20e9515a7c91f32fcf7b233b3fdf1"
+    },
+    {
+      "path": "GOLD LEAF/FORRIN SIGERAT AC OFFICE.docx 1.docx 2.docx",
+      "bytes": 61254,
+      "sha256": "6eb89fe314a1e920997ebb681b46cbbb3f11efad1e4551668f612d35e1902ffd"
+    },
+    {
+      "path": "GOLD LEAF/FORRIN SIGERAT AC OFFICE.docx 11.docx",
+      "bytes": 60791,
+      "sha256": "55451b2fe899db3608c8d8efed674814335de1aa29b26297dc764a07125dbd31"
+    },
+    {
+      "path": "GOLD LEAF/FORRIN SIGERAT USAVI 1.docx",
+      "bytes": 79532,
+      "sha256": "235025683c6e747647baff5c6fe837d3621227eba8ebe75c9f2b29af2f629876"
+    },
+    {
+      "path": "GOLD LEAF/FORRIN SIGERAT USAVI.docx",
+      "bytes": 80873,
+      "sha256": "312f0e34be69c167001e32d282e9d95347728b190da699fae21800b5328e2913"
+    },
+    {
+      "path": "GOLD LEAF/PUMB.docx",
+      "bytes": 54086,
+      "sha256": "355437c122d05af2dcad0088be83912807380aa7469c07fe3648436222e10dff"
+    },
+    {
+      "path": "GOLD LEAF/aaaaaaaaaaaaaa.docx",
+      "bytes": 56910,
+      "sha256": "660f5a27975250d34f4e071c948a83f42b0b7b029c2cd81e109a7fe2193d11fb"
+    },
+    {
+      "path": "GOLD LEAF/beedi.docx",
+      "bytes": 44415,
+      "sha256": "11aa048d6e0d59b325050e3bb466ad7ad3f07fd433e6567992139d0a9a310fd5"
+    },
+    {
+      "path": "PUDS/puds  බෝතලය.docx",
+      "bytes": 79055,
+      "sha256": "39392eb7e0dbc185703c00a3520406872bdf762110e11357a512ae9da33fc1a2"
+    },
+    {
+      "path": "PUDS/puds කෑනය සාම්පල් බෝතලය.docx",
+      "bytes": 110878,
+      "sha256": "48ac489d57faa69d26eddd7484060df0dd71e61c1cd8076ee9dc3de7059ac17a"
+    },
+    {
+      "path": "PUDS/puds කෑනය.docx",
+      "bytes": 66852,
+      "sha256": "11e6e278d4091587b1f2e655e46b54b5de14336ab424753a3e65664bd5ba10d3"
+    },
+    {
+      "path": "PUMB 2021.02.11/19 2021 PUMB.docx",
+      "bytes": 46037,
+      "sha256": "2ac166093bba813c6ac79da089e6ee4b0ef34e73301e5d72363a0e9d5a1e2722"
+    },
+    {
+      "path": "PUMB 2021.02.11/20 2021 PUMB.docx",
+      "bytes": 48174,
+      "sha256": "cbcb6a473ecf3b54d32672d4962a7668b2887b80abce861076074e8d2d6dedd2"
+    },
+    {
+      "path": "PUMB 2021.02.11/21 2021 PUMB.docx",
+      "bytes": 47566,
+      "sha256": "2598aa4cd7d3b5c7025691ee969b492e1286f4b943ef8fbb3e77d66e28a89676"
+    },
+    {
+      "path": "PUMB 2021.02.11/22 2021 PUMB.docx",
+      "bytes": 47471,
+      "sha256": "8b7c245a817db64150087a4e6d26cdaff9614ccbabe047bbcc694275647334e8"
+    },
+    {
+      "path": "PUMB 2021.02.11/23 2021 PUMB.docx",
+      "bytes": 47820,
+      "sha256": "8e43e5d25ca79f8d6172a5e6809ff6f2af0488f6823a694533934d4725c68a53"
+    },
+    {
+      "path": "PUMB 2021.02.11/PUMB.docx",
+      "bytes": 31959,
+      "sha256": "a809be881c74247e874eae82ff3b85023784e4194b501a9ad371bec65e48651c"
+    },
+    {
+      "path": "PUMB 2021.02.11/චෝදනා පත්.docx",
+      "bytes": 36073,
+      "sha256": "1d0709638c226aa8fc1c2164540e49015eb16222d0aa2f9be96da6ef57d63b67"
+    },
+    {
+      "path": "PUML/PUML  කෑනය සාම්පල් බෝතලය.docx",
+      "bytes": 114505,
+      "sha256": "f0a6fe72d6196e5980c5238849d1c863ee7395f642b0bae0a71f582a325147a6"
+    },
+    {
+      "path": "PUML/PUML  කෑනය.docx",
+      "bytes": 114016,
+      "sha256": "d6ed8f4b2427027fef85c1fd5046ff5579cdcb0153c7cb459a40c09eda98ed8a"
+    },
+    {
+      "path": "PUML/PUML  බෝතලය.docx",
+      "bytes": 82815,
+      "sha256": "fc0ad74daf424b8346c8247196e0a4f063f85d234d36a21b57dfb7ee9a04bd54"
+    },
+    {
+      "path": "REWARDS/REWARD  2023 දඩ.docx",
+      "bytes": 22995,
+      "sha256": "357adc34ae6311b7a7de780b6e48b96c70f379dbfb96912fe43dedb34f2f7798"
+    },
+    {
+      "path": "REWARDS/REWARD  2025  දඩ.docx",
+      "bytes": 23016,
+      "sha256": "cedd5c657eab86182fa25f7b9872d0902263d81c8ca43e5ce62b13fa80e5f0e3"
+    },
+    {
+      "path": "REWARDS/REWARD  දඩ නම් ඇතුලත් කිරීම.docx",
+      "bytes": 23327,
+      "sha256": "994083e6cb0f704cf00f92d1293a9f0268f5dc09f88b2a6c1cb87cc0ffb57e68"
+    },
+    {
+      "path": "REWARDS/REWARD  දඩ.docx",
+      "bytes": 23206,
+      "sha256": "6cea9ef4c3afbb950898280dd5ce8fdf35972bddb6b36ee4ac5835ffe3fd94a1"
+    },
+    {
+      "path": "REWARDS/REWARD  සමථ මුදල් අය කිරීම.docx",
+      "bytes": 23167,
+      "sha256": "4f0c3ea9df07ed5d3e8cd09d8eba0d5b1d982b4a7ba848a7ddb8b030be675d9d"
+    },
+    {
+      "path": "REWARDS/REWARD ප්‍රජාසේවය.docx",
+      "bytes": 23302,
+      "sha256": "70cdd8780be7ce3e53e5b88d6d13dabac31ca0124edee81d6c7d8464f9dce0f5"
+    },
+    {
+      "path": "REWARDS/සුරාබදු ඊ 6c වවුචර sr wasantha samarasinhe.docx",
+      "bytes": 38192,
+      "sha256": "79f5bb5ecb26b2af015fdf9e26a0da7200f3dc98ad39323784d5d8b81e718d7a"
+    },
+    {
+      "path": "REWARDS/සුරාබදු ඊ 6c වවුචර.docx",
+      "bytes": 38002,
+      "sha256": "e158119712fe477f164361366ea3460c9a5c25a49c55f7248c2e03d9587dd5cb"
+    },
+    {
+      "path": "SUDS-PUDS/SUDS PUDS  සාම්පල් නැත.docx",
+      "bytes": 85739,
+      "sha256": "9dfc1c506bbadf8d221a26a088663bca3c0539605a23add2849e18984c517acc"
+    },
+    {
+      "path": "SUDS-PUDS/SUDS PUDS සාම්පල්.docx",
+      "bytes": 88509,
+      "sha256": "fdf1b38c826df9a2678bf427550c20c1f06efc0a11c04a57938a42cb833bb0ec"
+    },
+    {
+      "path": "SUML-PUML/SUML PUML.docx",
+      "bytes": 86357,
+      "sha256": "53c4c100c6b1e93146fc75241f00ccd309fc9b1d7afece89390ed4622e0fa497"
+    },
+    {
+      "path": "UCG/UCG.docx",
+      "bytes": 78375,
+      "sha256": "27105f3740fdda4f5ea6bd01089fa014755c5cbc837f6b189cf6ccae754fe901"
+    },
+    {
+      "path": "UCG/puds new edit UCG.docx",
+      "bytes": 77407,
+      "sha256": "426cb90b63327f31bd198f6d7117668082bd35361cfd7b605de24d536bb8ea07"
+    },
+    {
+      "path": "UMA/UMA  new.docx",
+      "bytes": 45640,
+      "sha256": "65cfa4ab681d4d2e694d2acdda3d904e0d6f1716ef632c28ba00d470e57c7585"
+    },
+    {
+      "path": "UMA/UMA NEW 2 OFFENCE.docx",
+      "bytes": 83839,
+      "sha256": "36e14cefff4c294859a2939fa622799399f8b24bedb76db2d1d93ceea32e43f1"
+    },
+    {
+      "path": "UMA/UMA NEW 3 OFFENCE කුඩා වඩියක්.docx",
+      "bytes": 81544,
+      "sha256": "0f4b514f582e23d53c37c259516ea8e450c8d32719630b2973e4901100881a21"
+    },
+    {
+      "path": "UMA/UMA NEW 3 OFFENCE.docx",
+      "bytes": 92132,
+      "sha256": "5156bfde47de6a44e4feea879aa34583f6600f14426f1899c812759956969886"
+    },
+    {
+      "path": "UMA/UMA NEW 4 OFFENCE 1.docx",
+      "bytes": 84851,
+      "sha256": "96f0c03c1e971c095e7e597efdd0e428af1e9239a408dafe6779681ec5c9ef1e"
+    },
+    {
+      "path": "UMA/UMA NEW 4 OFFENCE.docx",
+      "bytes": 71035,
+      "sha256": "b8f41a46f981925ae73e5be72a54077fc21163cc097b588aeb4ab021e3383441"
+    },
+    {
+      "path": "UMA/uma උපකරණ ලගතබා ගැනාම.docx",
+      "bytes": 63344,
+      "sha256": "e1e80aea54159a73bb5986c5408ea00fee2dbc5f01560569be6587cf4981dab1"
+    },
+    {
+      "path": "UPG/UPG NEW 111.docx",
+      "bytes": 52532,
+      "sha256": "a61570759b10383ba7b08709e3744b997bbf322e0ae2e01bfebcdc499634b313"
+    },
+    {
+      "path": "UPG/UPG NEW.docx",
+      "bytes": 52156,
+      "sha256": "3ee2890609ba99d527c2992bd85136c2545f6dd78ffd09b0c1bdd7ce79506042"
+    },
+    {
+      "path": "UPG/UPG NEW.docx 111 moda.docx",
+      "bytes": 55681,
+      "sha256": "4184355f200e1e0eb1a9f7a5ddcd7698bf2fd901552405467643bc09b30db39a"
+    },
+    {
+      "path": "UPG/blank upg.docx",
+      "bytes": 151343,
+      "sha256": "d21bcddac11fcd849e198c0ae4a98fe8b7d20573d5393ad6000467090a741cb7"
+    },
+    {
+      "path": "UPG/upg new 1.docx",
+      "bytes": 62107,
+      "sha256": "9047e86a790fd8bf8f911d9bd5a23784b4ef5f19c06454d96a31bf1ab6e4df39"
+    },
+    {
+      "path": "UPG/upg.docx",
+      "bytes": 66699,
+      "sha256": "4bd9cab20bdc2d975351353f455f2d9c5cda8c259e57c1693c6894b54429766c"
+    },
+    {
+      "path": "UPH/UPH 1111.docx",
+      "bytes": 70936,
+      "sha256": "a922d01553d4125f187b56eaa704a8573a8523edd4c860f9b4755a92110120d1"
+    },
+    {
+      "path": "UPH/UPH 25.docx",
+      "bytes": 70129,
+      "sha256": "19051ef785be4f8352923727d27073d2749b7e038e5e3f08c329942840270b9a"
+    },
+    {
+      "path": "UPH/UPH.docx",
+      "bytes": 73969,
+      "sha256": "ec18540aaba37559b1f730a4cd83968ca26c34dc92210134f14311e23dfb2dfc"
+    },
+    {
+      "path": "UPS/SIGARAT 21.docx",
+      "bytes": 79903,
+      "sha256": "d250c5eb442a8310e466df2b9e15e0b5f77d581171d9e09c3e7795c5c8b19739"
+    },
+    {
+      "path": "UPT/upt body.docx",
+      "bytes": 16450,
+      "sha256": "41dd65f55b3dd2b38e161d28aa6ea3ba1259155b38bf236cea60c2893a3b534f"
+    },
+    {
+      "path": "UPT/upt කෑන් හා සාම්පල් .docx",
+      "bytes": 106371,
+      "sha256": "7bd5a47401c0031251a89e506816164a683179675f72d5aa167110f64bc466cc"
+    },
+    {
+      "path": "UPT/upt කෑන්.docx",
+      "bytes": 86376,
+      "sha256": "1d11ae3c4be5de09636529bf699d48c9d86e1279477a4ed418ed19e5bc7c54e0"
+    },
+    {
+      "path": "USA-UPA/UPA new විස්තර.docx",
+      "bytes": 82302,
+      "sha256": "f7e95adaacbb8cbf8d2d15b85467c86636ff9018f1b3ac30cd05e376ef06dd5a"
+    },
+    {
+      "path": "USA-UPA/UPA new.docx",
+      "bytes": 78058,
+      "sha256": "dfb016a8cb886593cc4e89561ad1bae1b141899d1b6b968ed11425b285a68e0f"
+    },
+    {
+      "path": "USA-UPA/UPFL new.docx",
+      "bytes": 82584,
+      "sha256": "62b47ee7f542fb5f42b94fcb6ea233280347b70271de24cba887192ce9c8a2ea"
+    },
+    {
+      "path": "USA-UPA/USA UPA.docx",
+      "bytes": 80939,
+      "sha256": "1e713228be86feba638b5e74a3237f0285df9361eed5c087c64513c927e06854"
+    },
+    {
+      "path": "USA-UPA/USFL UPFL excibeter 11 111 111.docx",
+      "bytes": 69724,
+      "sha256": "5c005fa3d77f4e5ad78128a680331cd70ea96d571e730ef65eb9cb4834fab2eb"
+    },
+    {
+      "path": "USA-UPA/USFL UPFL excibeter 11 111.docx",
+      "bytes": 69664,
+      "sha256": "a30936468c33e150f9dbc91bec21bbb8c093d90b729d9181c983859a4ffecb8d"
+    },
+    {
+      "path": "USA-UPA/USFL UPFL excibeter 11.docx",
+      "bytes": 69945,
+      "sha256": "23de0f41f5dad428461744f4b2a02ddbc814bdfb7929d4c139c77579e5345e56"
+    },
+    {
+      "path": "USA-UPA/USFL UPFL excibeter.docx",
+      "bytes": 81996,
+      "sha256": "cb6a68912c4277ccbdbb5cbd51c4b925892d7f5d6684d9236e5b47f43fda0ca4"
+    },
+    {
+      "path": "USA-UPA/USFL UPFL.docx",
+      "bytes": 82456,
+      "sha256": "0c609cbd26c431d106c5413a832a5868e71624526e168fb9c86ae69b1e160350"
+    },
+    {
+      "path": "USA/usa  බෝතලය 750 රු 1000 නෝට්ටු සමග.docx",
+      "bytes": 83771,
+      "sha256": "2f7ad327f33dcdbff499b43a8e5a193ba0ad0a67fc52e85fb6829e3fe628f620"
+    },
+    {
+      "path": "USA/usa බෝතලය 180 රු 1000 නෝට්ටුව.docx",
+      "bytes": 82153,
+      "sha256": "e3c2aeef0d613930adac1202b8473969761eaecfac647658dc20fd8a4a7fa4e5"
+    },
+    {
+      "path": "USA/usa බෝතලය 375 රු 1000 නෝට්ටුව.docx",
+      "bytes": 99889,
+      "sha256": "6117f5016026450b6c1cf480b5f24a8ee786eca5230104d0b9badad9c8694e52"
+    },
+    {
+      "path": "USFL/usfl new කෑනය 1000  කැන් 1.docx",
+      "bytes": 94530,
+      "sha256": "2015f5a0ac115b584e6c4d0b0a3fd58ab4c423f18c3c08e61b9cd5c9564653f4"
+    },
+    {
+      "path": "USFL/usfl new කෑනය 1000  කැන් 2.docx",
+      "bytes": 95302,
+      "sha256": "be09bc3fa1a4daeec91bfd9cfa0d94669bb4e2e7365c60e892150e3dfee89b37"
+    },
+    {
+      "path": "USFL/usfl new කෑනය 1000.docx",
+      "bytes": 105622,
+      "sha256": "cad29c6cfb561772974f2fb38abacd9be42270e012305e17a00bf1178356c946"
+    },
+    {
+      "path": "USFL/usfl new කෑනය 500 කෑනය කිහිපයක්.docx",
+      "bytes": 78121,
+      "sha256": "953816b547c6ad84d33d89490458ca49b8efa4eded2d72e3b64b9d234575824e"
+    },
+    {
+      "path": "USFL/usfl new කෑනය 500.docx",
+      "bytes": 97436,
+      "sha256": "05d732e1fd57af299d19acd52df728bddc96f2dcce5c642717a256801fe576fc"
+    },
+    {
+      "path": "USFL/usfl new බෝතලය බෝතලය 2.docx",
+      "bytes": 80575,
+      "sha256": "0d64d51b0c5b8bc000d8091957d8e3ee0fe3c499c2508f2a15960f110938c20d"
+    },
+    {
+      "path": "USFL/usfl new බෝතලය බෝතලය.docx",
+      "bytes": 79837,
+      "sha256": "d82434cc346757f2cfc5d6dcdebaae02e148c00891fe548faa4789db176af033"
+    },
+    {
+      "path": "USFL/usfl new බෝතලය.docx",
+      "bytes": 80114,
+      "sha256": "f2a2f543d57f4edab833450a2c034844bfa7c7629c34e3da2a08e0a81bfa7058"
+    },
+    {
+      "path": "UST-UPT/ust upt 11.docx",
+      "bytes": 89532,
+      "sha256": "5b121d27f3b2114c43f5961f05b325b8a79f09d0b671901ed1c04634465fa508"
+    },
+    {
+      "path": "UST-UPT/ust upt 12.docx",
+      "bytes": 73775,
+      "sha256": "350a7baf610629607058194856eacb6a13432b9feecb1c6bfac35727f9e6049c"
+    },
+    {
+      "path": "UST-UPT/ust upt.docx",
+      "bytes": 73732,
+      "sha256": "0d99636599208b2d8e43ff0b70d9910d5265ac89c436d344ba961fec6aa0e2a7"
+    },
+    {
+      "path": "UST/ust.docx",
+      "bytes": 84425,
+      "sha256": "b7fc44ac00e865233db6e14592c6afecec9e797f951ec9f9b480d6741b69757e"
+    },
+    {
+      "path": "Warrant/පෙර වැරදි නොමැති බව.docx",
+      "bytes": 141260,
+      "sha256": "d35209c76d93a727212197fee42239a7afeddb25df563c873def4de1c3229a56"
+    },
+    {
+      "path": "Warrant/පෙර වැරදි වාර්තා 1.docx",
+      "bytes": 15975,
+      "sha256": "e110601aebef0a4e1fa2f64508dcd11e31d4238fb953984c3336f857c2924d08"
+    },
+    {
+      "path": "Warrant/මොෂන්  කොළ.docx",
+      "bytes": 15308,
+      "sha256": "c1f974b3b05937d2673beac8e9fff7005ac3ef2c3b0f904211a493c2148e77ba"
+    },
+    {
+      "path": "Warrant/වරෙන්තු දිර්ග කිරීම.docx",
+      "bytes": 31053,
+      "sha256": "982193aec0ed05969885bfb8742efe2d988f5ccbc063f35aa580c3eebe7505dc"
+    },
+    {
+      "path": "Warrant/හිස් මෝෂන් කොළ.docx",
+      "bytes": 14309,
+      "sha256": "330ef0fb885b32bf43c45f10e4b5ce0332291d03e4dabcdafc6a886c04860b6c"
+    },
+    {
+      "path": "පෙර වැරදි/පෙර වැරදි වාර්තාව 336 338 345.docx",
+      "bytes": 13659,
+      "sha256": "eec0f7c6974d2934f2bcfb51fcecfa6e480dc455ff92eff71d021bf618f91196"
+    },
+    {
+      "path": "හිස් සාක්ෂි භාණ්ඩ රැගෙන ඒම (1).docx",
+      "bytes": 16380,
+      "sha256": "ded609b39b455bc2a8bd9d99407ade9355854b04be3f61ae296f8f891959c5a3"
+    }
+  ],
+  "excluded": [
+    {
+      "path": "GOLD LEAF/beedi body.pdf",
+      "reason": "not a .docx (reference material)"
+    },
+    {
+      "path": "GOLD LEAF/~$RRIN SIGERAT AC OFFICE NEW.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "PUDS/~$ds  බෝතලය.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "PUDS/~$ds new edit කෑනය සාම්පල් 2.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "PUDS/~$ds new edit කෑනය.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "PUDS/~$ds කෑනය සාම්පල් බෝතලය.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "PUML/~$ML  බෝතලය.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "REWARDS/~$WARD  2023 දඩ.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "UPH/~$UPH.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "UPT/~$t කෑන් හා සාම්පල් .docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "USA-UPA/New Microsoft Word Document.docx",
+      "reason": "empty file (not a valid .docx)"
+    },
+    {
+      "path": "USA-UPA/UPA new.pdf",
+      "reason": "not a .docx (reference material)"
+    },
+    {
+      "path": "USA-UPA/~$FL UPFL excibeter 11.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "USA-UPA/~$PA new.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "USA-UPA/~$SA UPA.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "USA/~$a  බෝතලය 180 රු 500 නෝට්ටුව 375 750.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "USA/~$a  බෝතලය 180 රු 500 නෝට්ටුව.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "USA/~$a බෝතලය 180 රු 1000 නෝට්ටුව.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "USFL/~$fl (Rum) new බෝතලය රු1000.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "USFL/~$fl new කෑනය 1000.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "USFL/~$fl new කෑනය 500.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "USFL/~$fl new කෑනය කෑනය කිහිපයක්.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "USFL/~$fl new බෝතලය බෝතලය 2.docx",
+      "reason": "Word lock file"
+    },
+    {
+      "path": "පෙර වැරදි/332.PNG",
+      "reason": "not a .docx (reference material)"
+    },
+    {
+      "path": "පෙර වැරදි/340.PNG",
+      "reason": "not a .docx (reference material)"
+    },
+    {
+      "path": "පෙර වැරදි/350.PNG",
+      "reason": "not a .docx (reference material)"
+    },
+    {
+      "path": "පෙර වැරදි/351.PNG",
+      "reason": "not a .docx (reference material)"
+    },
+    {
+      "path": "පෙර වැරදි/368.PNG",
+      "reason": "not a .docx (reference material)"
+    }
+  ]
+}
