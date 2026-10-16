@@ -1,5 +1,11 @@
 import { hash, verify } from '@node-rs/argon2';
-import type { AuthService, Session, UserRepository } from '@excise/contract';
+import type {
+  AuditAction,
+  AuditSink,
+  AuthService,
+  Session,
+  UserRepository,
+} from '@excise/contract';
 import { Role } from '@excise/schemas';
 import { assertCan, isLocked } from './index.js';
 
@@ -40,22 +46,46 @@ export class DefaultAuthService implements AuthService {
   constructor(
     private readonly users: UserRepository,
     private readonly sessions: SessionHolder,
+    private readonly audit: AuditSink,
   ) {}
+
+  /** Audit entries for users never include the password hash. */
+  private record(
+    action: AuditAction,
+    rowId: string | null,
+    after: unknown,
+    userId?: string | null,
+  ) {
+    return this.audit.record({
+      userId: userId === undefined ? (this.sessions.get()?.userId ?? null) : userId,
+      action,
+      table: 'users',
+      rowId,
+      before: null,
+      after,
+    });
+  }
 
   async login(username: string, password: string): Promise<Session> {
     const user = await this.users.findByUsername(username.trim());
     // Same error for unknown user, inactive user and wrong password.
-    if (!user || !user.active) throw new LoginError('invalid_credentials');
-    if (isLocked(user.failedAttempts)) throw new LoginError('locked');
+    if (!user || !user.active || isLocked(user.failedAttempts)) {
+      await this.record('login_failed', user?.id ?? null, { username: username.trim() }, null);
+      throw new LoginError(
+        user && isLocked(user.failedAttempts) ? 'locked' : 'invalid_credentials',
+      );
+    }
 
     if (!(await verify(user.passwordHash, password))) {
       await this.users.setFailedAttempts(user.id, user.failedAttempts + 1);
+      await this.record('login_failed', user.id, { username: user.username }, null);
       throw new LoginError(isLocked(user.failedAttempts + 1) ? 'locked' : 'invalid_credentials');
     }
     if (user.failedAttempts) await this.users.setFailedAttempts(user.id, 0);
 
     const session: Session = { userId: user.id, username: user.username, role: user.role };
     this.sessions.set(session);
+    await this.record('login', user.id, { username: user.username, role: user.role });
     return session;
   }
 
@@ -75,6 +105,7 @@ export class DefaultAuthService implements AuthService {
     }
     if (newPassword.length < MIN_PASSWORD) throw new PasswordPolicyError('too_short');
     await this.users.setPasswordHash(user.id, await hash(newPassword));
+    await this.record('password_change', user.id, { username: user.username });
   }
 
   async createUser(username: string, password: string, role: Role): Promise<void> {
@@ -83,18 +114,20 @@ export class DefaultAuthService implements AuthService {
     if (!/^[\w.-]{3,32}$/.test(name)) throw new PasswordPolicyError('bad_username');
     if (password.length < MIN_PASSWORD) throw new PasswordPolicyError('too_short');
     if (await this.users.findByUsername(name)) throw new PasswordPolicyError('username_taken');
-    await this.users.create({
+    const created = await this.users.create({
       username: name,
       passwordHash: await hash(password),
       role: Role.parse(role),
       active: true,
     });
+    await this.record('user_create', created.id, { username: name, role: created.role });
   }
 
   /** OIC unlocks a user after the lockout (B2). */
   async unlockUser(userId: string): Promise<void> {
     assertCan(this.sessions.current().role, 'admin');
     await this.users.setFailedAttempts(userId, 0);
+    await this.record('user_unlock', userId, null);
   }
 }
 

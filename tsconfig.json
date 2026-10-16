@@ -3,6 +3,7 @@
   "include": [
     "packages/shared/schemas/src",
     "packages/shared/contract/src",
+    "packages/shared/labels/src",
     "packages/services/*/src",
     "apps/desktop/main/src",
     "apps/desktop/preload/src",

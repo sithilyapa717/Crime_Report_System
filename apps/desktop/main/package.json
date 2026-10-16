@@ -13,6 +13,7 @@
     "@excise/contract": "workspace:*",
     "@excise/cr": "workspace:*",
     "@excise/docdata": "workspace:*",
+    "@excise/labels": "workspace:*",
     "@excise/mocks": "workspace:*",
     "@excise/reports": "workspace:*",
     "@excise/schemas": "workspace:*",

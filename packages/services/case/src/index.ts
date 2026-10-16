@@ -1,5 +1,11 @@
 import { assertCan } from '@excise/auth';
-import type { CaseRepository, CaseService, CrRepository, Session } from '@excise/contract';
+import type {
+  AuditSink,
+  CaseRepository,
+  CaseService,
+  CrRepository,
+  Session,
+} from '@excise/contract';
 import { CaseInput } from '@excise/schemas';
 import type { CaseRecord } from '@excise/schemas';
 import { validateOutcomeAllowed, type ValidationIssue } from '@excise/validation';
@@ -17,6 +23,7 @@ export class DefaultCaseService implements CaseService {
     private readonly cases: CaseRepository,
     private readonly crs: CrRepository,
     private readonly session: () => Session,
+    private readonly audit: AuditSink,
   ) {}
 
   async save(raw: CaseInput, expectedVersion: number | null): Promise<CaseRecord> {
@@ -58,8 +65,17 @@ export class DefaultCaseService implements CaseService {
     });
     if (issues.length) throw new CaseValidationError(issues);
 
+    const before = await this.cases.getByCrimeReport(input.crimeReportId);
     const saved = await this.cases.save(input, expectedVersion);
     if (!saved) throw new CaseConflictError('Case was changed by someone else');
+    await this.audit.record({
+      userId: this.session().userId,
+      action: before ? 'update' : 'create',
+      table: 'cases',
+      rowId: saved.id,
+      before,
+      after: saved,
+    });
     return saved;
   }
 

@@ -17,18 +17,26 @@ async function setup(role: Role = 'oic') {
   const repos = createMemoryRepositories();
   const refs = seedReferences(repos.store);
   const cr = await repos.crs.insert(sampleCrInput(refs));
-  const svc = new DefaultCaseService(repos.cases, repos.crs, session(role));
+  const svc = new DefaultCaseService(repos.cases, repos.crs, session(role), repos.audit);
   return { repos, refs, cr, svc };
 }
 
 describe('CaseService', () => {
-  it('saves a case then updates it with the right version', async () => {
-    const { refs, cr, svc } = await setup();
+  it('saves a case then updates it with the right version, and audits both', async () => {
+    const { repos, refs, cr, svc } = await setup();
     const first = await svc.save(sampleCaseInput(cr.id, refs), null);
     expect(first.version).toBe(1);
     const second = await svc.save(sampleCaseInput(cr.id, refs, { caseType: 'warrant' }), 1);
     expect(second.version).toBe(2);
     expect(second.caseType).toBe('warrant');
+    expect(repos.store.audit.map((e) => [e.table, e.action])).toEqual([
+      ['cases', 'create'],
+      ['cases', 'update'],
+    ]);
+    expect(repos.store.audit[1]).toMatchObject({
+      before: { caseType: 'trial' },
+      after: { caseType: 'warrant' },
+    });
   });
 
   it('rejects a stale save', async () => {

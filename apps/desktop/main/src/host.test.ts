@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { LABELS } from '@excise/labels';
+import { ReportType } from '@excise/schemas';
 import { describe, expect, it } from 'vitest';
 import { createDevRepositories, DEV_PASSWORD } from './dev-seed.js';
 import { createServiceHost, dispatch } from './host.js';
@@ -92,5 +94,23 @@ describe('IPC dispatch', () => {
     const r = await dispatch(handlers, 'cr.create', [{}]);
     expect(r.ok).toBe(false);
     expect(!r.ok && Array.isArray(r.error.issues)).toBe(true);
+  });
+
+  it('every report column and report type has a caption in the labels file', async () => {
+    const { handlers } = await setup();
+    await dispatch(handlers, 'auth.login', ['oic', DEV_PASSWORD]);
+    for (const type of ReportType.options) {
+      expect(LABELS, type).toHaveProperty([`reportType.${type}`]);
+      const r = await dispatch(handlers, 'reports.run', [
+        {
+          scope: { kind: 'year', officeId: randomUUID(), year: 2026 },
+          person: { kind: 'none' },
+          type,
+        },
+      ]);
+      if (!r.ok) throw new Error(r.error.message);
+      const result = r.value as { columns: { labelKey: string }[] };
+      for (const c of result.columns) expect(LABELS, c.labelKey).toHaveProperty([c.labelKey]);
+    }
   });
 });

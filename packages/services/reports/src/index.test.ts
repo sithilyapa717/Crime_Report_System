@@ -150,8 +150,18 @@ describe('ReportService', () => {
     const groups = await svc.summary(params(refs, 'register'), 'offence');
     const upg = groups.find((g) => g.key === 'UPG')!;
     const puds = groups.find((g) => g.key === 'PUDS')!;
-    expect(upg).toMatchObject({ count: 1, fineTotal: 250000, quantities: { cannabis: 250 } });
-    expect(puds).toMatchObject({ count: 4, fineTotal: 500000, quantities: { spirit: 14 } });
+    expect(upg).toMatchObject({
+      count: 1,
+      fineTotal: 250000,
+      quantityTotal: 3500,
+      quantities: { cannabis: 250 },
+    });
+    expect(puds).toMatchObject({
+      count: 4,
+      fineTotal: 500000,
+      quantityTotal: 14000,
+      quantities: { spirit: 14 },
+    });
   });
 
   it('observation officers cannot run per-officer reports', async () => {

@@ -3,6 +3,7 @@
 import { DefaultAuthService, SessionHolder, assertCan } from '@excise/auth';
 import { DefaultCaseService } from '@excise/case';
 import type {
+  AuditSink,
   CaseRepository,
   CrQueryRepository,
   CrRepository,
@@ -13,6 +14,7 @@ import type {
 import type { ReportParams } from '@excise/contract';
 import { DefaultCrService } from '@excise/cr';
 import { DefaultDocDataService } from '@excise/docdata';
+import { label } from '@excise/labels';
 import { DefaultReportService } from '@excise/reports';
 import { DefaultSearchService } from '@excise/search';
 import { ARG_SCHEMAS } from './args.js';
@@ -24,12 +26,13 @@ export interface Repositories {
   reportRows: ReportRowRepository;
   users: UserRepository;
   refs: ReferenceLookup;
+  audit: AuditSink;
 }
 
 export interface HostOptions {
   /** Asks the user where to save an export; null when cancelled. */
   pickSavePath: (defaultName: string) => Promise<string | null>;
-  /** Sinhala caption for a label key (packages/shared/labels). */
+  /** Caption for a label key; defaults to packages/shared/labels. */
   label?: (key: string) => string;
 }
 
@@ -37,11 +40,11 @@ export function createServiceHost(repos: Repositories, opts: HostOptions) {
   const sessions = new SessionHolder();
   const current = sessions.current;
 
-  const auth = new DefaultAuthService(repos.users, sessions);
-  const cr = new DefaultCrService(repos.crs, current);
-  const cases = new DefaultCaseService(repos.cases, repos.crs, current);
+  const auth = new DefaultAuthService(repos.users, sessions, repos.audit);
+  const cr = new DefaultCrService(repos.crs, current, repos.audit);
+  const cases = new DefaultCaseService(repos.cases, repos.crs, current, repos.audit);
   const search = new DefaultSearchService(repos.queries, current);
-  const reports = new DefaultReportService(repos.reportRows, current, opts.label);
+  const reports = new DefaultReportService(repos.reportRows, current, opts.label ?? label);
   const docdata = new DefaultDocDataService(repos.crs, repos.cases, repos.refs, current);
 
   const handlers = {
