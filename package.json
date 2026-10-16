@@ -6,10 +6,11 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "lint": "eslint .",
-    "format": "prettier --write --ignore-unknown \"packages/shared/**\" \"packages/services/**\" \"!packages/services/reference/**\" \"!packages/services/audit/**\" \"apps/desktop/main/**\" \"apps/desktop/preload/**\" \"tests/reports-parity/**\" \"*.{json,mjs,ts,yaml}\"",
+    "format": "prettier --write --ignore-unknown \"packages/shared/**\" \"packages/services/**\" \"!packages/services/reference/**\" \"!packages/services/audit/**\" \"apps/desktop/main/**\" \"apps/desktop/preload/**\" \"tests/reports-parity/**\" \"scripts/**\" \".githooks/**\" \"*.{json,mjs,ts,yaml}\"",
     "build": "pnpm --filter @excise/desktop-main run build",
     "start": "pnpm --filter @excise/desktop-main run start",
-    "format:check": "prettier --check --ignore-unknown \"packages/shared/**\" \"packages/services/**\" \"!packages/services/reference/**\" \"!packages/services/audit/**\" \"apps/desktop/main/**\" \"apps/desktop/preload/**\" \"tests/reports-parity/**\" \"*.{json,mjs,ts,yaml}\""
+    "format:check": "prettier --check --ignore-unknown \"packages/shared/**\" \"packages/services/**\" \"!packages/services/reference/**\" \"!packages/services/audit/**\" \"apps/desktop/main/**\" \"apps/desktop/preload/**\" \"tests/reports-parity/**\" \"scripts/**\" \".githooks/**\" \"*.{json,mjs,ts,yaml}\"",
+    "prepare": "git config core.hooksPath .githooks || exit 0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

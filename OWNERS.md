@@ -2,7 +2,14 @@
 
 Every folder has one owner. **Only edit files in your own folders.** To change something in someone else's folder, ask the owner (open an issue or a draft pull request labelled `request`). `CODEOWNERS` enforces this on GitHub.
 
-- **A** = Database  ·  **B** = Logical system  ·  **C** = UI / UX  ·  **D** = Documents
+| Member | Role | GitHub |
+|---|---|---|
+| **A** | Database | [@yohanruchitha2-star](https://github.com/yohanruchitha2-star) |
+| **B** | Logical system | [@senanayakenithikas-ux](https://github.com/senanayakenithikas-ux) |
+| **C** | UI / UX | [@methuliH](https://github.com/methuliH) |
+| **D** | Documents | [@sithilyapa717](https://github.com/sithilyapa717) |
+| **Project owner** | Plans, read-only material, `CODEOWNERS` | [@sithilyapa717](https://github.com/sithilyapa717) |
+
 - Full rules and the reasons are in `TEAM_WORK_SPLIT.md` ("File system and ownership").
 
 | Folder | Owner | Notes |

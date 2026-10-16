@@ -153,9 +153,13 @@ export class DefaultReportService implements ReportService {
             ? [r.detectingOfficerId ?? '', r.detectingOfficerName ?? '']
             : [r.informantId ?? '', r.informantName ?? ''];
       let g = groups.get(key);
-      if (!g) groups.set(key, (g = { key, label, count: 0, quantities: {}, fineTotal: 0 }));
+      if (!g) {
+        g = { key, label, count: 0, quantities: {}, quantityTotal: 0, fineTotal: 0 };
+        groups.set(key, g);
+      }
       g.count += 1;
       g.fineTotal += r.fineAmount ?? 0;
+      g.quantityTotal += r.quantity ?? 0;
       for (const s of r.seized)
         g.quantities[s.itemType] = (g.quantities[s.itemType] ?? 0) + s.quantity;
     }

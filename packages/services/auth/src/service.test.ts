@@ -10,11 +10,12 @@ import {
 
 let auth: DefaultAuthService;
 let sessions: SessionHolder;
+let repos: ReturnType<typeof createMemoryRepositories>;
 
 beforeEach(async () => {
-  const repos = createMemoryRepositories();
+  repos = createMemoryRepositories();
   sessions = new SessionHolder();
-  auth = new DefaultAuthService(repos.users, sessions);
+  auth = new DefaultAuthService(repos.users, sessions, repos.audit);
   await repos.users.create({
     username: 'oic',
     passwordHash: await hashPassword('correct-horse'),
@@ -24,6 +25,20 @@ beforeEach(async () => {
 });
 
 describe('AuthService', () => {
+  it('audits logins and user changes without password hashes', async () => {
+    await auth.login('oic', 'wrong').catch(() => undefined);
+    await auth.login('nobody', 'x').catch(() => undefined);
+    const s = await auth.login('oic', 'correct-horse');
+    await auth.createUser('det1', 'longenough', 'detecting');
+    expect(repos.store.audit.map((e) => [e.action, e.userId])).toEqual([
+      ['login_failed', null],
+      ['login_failed', null],
+      ['login', s.userId],
+      ['user_create', s.userId],
+    ]);
+    expect(JSON.stringify(repos.store.audit)).not.toMatch(/\$argon2|longenough|correct-horse/);
+  });
+
   it('logs in and out', async () => {
     const s = await auth.login('oic', 'correct-horse');
     expect(s.role).toBe('oic');

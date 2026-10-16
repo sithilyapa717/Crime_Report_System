@@ -202,6 +202,9 @@ importers:
       '@excise/docdata':
         specifier: workspace:*
         version: link:../../../packages/services/docdata
+      '@excise/labels':
+        specifier: workspace:*
+        version: link:../../../packages/shared/labels
       '@excise/mocks':
         specifier: workspace:*
         version: link:../../../packages/services/mocks
@@ -378,6 +381,8 @@ importers:
       '@excise/schemas':
         specifier: workspace:*
         version: link:../schemas
+
+  packages/shared/labels: {}
 
   packages/shared/schemas:
     dependencies:

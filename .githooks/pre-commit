@@ -1,0 +1,3 @@
+#!/bin/sh
+# Refuses commits that touch another member's files. See scripts/owner-guard.mjs.
+exec node scripts/owner-guard.mjs

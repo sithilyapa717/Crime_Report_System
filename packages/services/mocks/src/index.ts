@@ -2,6 +2,8 @@
 // They follow the contract in packages/shared/contract; replace them with packages/db when ready.
 import { randomUUID } from 'node:crypto';
 import type {
+  AuditEntry,
+  AuditSink,
   CaseRepository,
   ConvictFilter,
   ConvictRow,
@@ -29,6 +31,7 @@ export class MemoryStore {
   crs = new Map<string, CrimeReport>();
   cases = new Map<string, CaseRecord>();
   users = new Map<string, UserRecord>();
+  audit: (AuditEntry & { at: string })[] = [];
 
   addRef(entry: RefEntry): string {
     const id = randomUUID();
@@ -71,7 +74,9 @@ export class MemoryCrRepository implements CrRepository {
 
   async findByNumber(officeId: string, crYear: number, crNumber: string) {
     for (const r of this.s.crs.values()) {
-      if (r.officeId === officeId && r.crYear === crYear && r.crNumber === crNumber) return r;
+      if (!r.deleted && r.officeId === officeId && r.crYear === crYear && r.crNumber === crNumber) {
+        return r;
+      }
     }
     return null;
   }
@@ -79,6 +84,14 @@ export class MemoryCrRepository implements CrRepository {
   async setDeleted(id: string, deleted: boolean) {
     const cur = this.s.crs.get(id);
     if (cur) this.s.crs.set(id, { ...cur, deleted, version: cur.version + 1, updatedAt: now() });
+  }
+}
+
+export class MemoryAuditSink implements AuditSink {
+  constructor(private readonly s: MemoryStore) {}
+
+  async record(entry: AuditEntry) {
+    this.s.audit.push({ ...entry, at: now() });
   }
 }
 
@@ -290,6 +303,7 @@ export interface MemoryRepositories {
   reportRows: MemoryReportRowRepository;
   users: MemoryUserRepository;
   refs: MemoryReferenceLookup;
+  audit: MemoryAuditSink;
 }
 
 export function createMemoryRepositories(store = new MemoryStore()): MemoryRepositories {
@@ -301,6 +315,7 @@ export function createMemoryRepositories(store = new MemoryStore()): MemoryRepos
     reportRows: new MemoryReportRowRepository(store),
     users: new MemoryUserRepository(store),
     refs: new MemoryReferenceLookup(store),
+    audit: new MemoryAuditSink(store),
   };
 }
 export * from './fixtures.js';

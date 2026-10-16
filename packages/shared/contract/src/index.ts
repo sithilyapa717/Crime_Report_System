@@ -124,6 +124,8 @@ export interface SummaryGroup {
   count: number;
   /** Total per seized item type (sp1-sp15). */
   quantities: Record<string, number>;
+  /** Sum of the CRs' `Quantity` field. */
+  quantityTotal: number;
   fineTotal: number;
 }
 
@@ -145,8 +147,11 @@ export interface CrRepository {
   insert(input: CrimeReportInput): Promise<CrimeReport>;
   /** Returns null when the stored version differs from `expectedVersion`. */
   update(id: string, expectedVersion: number, input: CrimeReportInput): Promise<CrimeReport | null>;
+  /** Returns deleted CRs too (`deleted: true`), so they can be shown and restored. */
   getById(id: string): Promise<CrimeReport | null>;
+  /** The live (not deleted) CR with this number, or null. */
   findByNumber(officeId: string, crYear: number, crNumber: string): Promise<CrimeReport | null>;
+  /** Sets the flag and bumps `version` / `updatedAt`, so `updatedAt` of a deleted CR is its deletion time. */
   setDeleted(id: string, deleted: boolean): Promise<void>;
 }
 
@@ -216,6 +221,34 @@ export interface UserRepository {
   create(user: Omit<UserRecord, 'id' | 'failedAttempts'>): Promise<UserRecord>;
   setFailedAttempts(id: string, count: number): Promise<void>;
   setPasswordHash(id: string, hash: string): Promise<void>;
+}
+
+export type AuditAction =
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'restore'
+  | 'login'
+  | 'login_failed'
+  | 'user_create'
+  | 'user_unlock'
+  | 'password_change';
+
+/** One change for the audit log (who, what, old and new values). The sink adds the time. */
+export interface AuditEntry {
+  /** Null for a failed login, where nobody is logged in. */
+  userId: string | null;
+  action: AuditAction;
+  /** `crime_reports`, `cases` or `users`. */
+  table: 'crime_reports' | 'cases' | 'users';
+  rowId: string | null;
+  before: unknown;
+  after: unknown;
+}
+
+/** A's audit service implements this; services call it after every change. */
+export interface AuditSink {
+  record(entry: AuditEntry): Promise<void>;
 }
 
 /** Reference names by id (A's reference service implements this). */
