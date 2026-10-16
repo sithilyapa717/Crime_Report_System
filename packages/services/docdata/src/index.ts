@@ -8,22 +8,14 @@ import type {
 } from '@excise/contract';
 import type { CaseRecord, CrimeReport } from '@excise/schemas';
 
-/** Old Access format for dates in documents: `YYYY.MM.DD`. */
-export const formatDate = (iso?: string | null): string => (iso ? iso.replaceAll('-', '.') : '');
-
-/** Cents to rupees with thousands separators: 150050 -> "1,500.50". */
-export const formatMoney = (cents?: number | null): string =>
-  cents === undefined || cents === null
-    ? ''
-    : (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-const formatNumber = (n?: number) => (n === undefined ? '' : String(n));
-
 /**
- * Merge fields whose meaning is not settled yet. They are returned empty until D and B agree
- * on them in packages/documents/mapping (D2).
+ * Merge fields that stay empty on purpose. `type` is the "add to convicts register" Yes/No flag,
+ * placed by mistake in the UMA quantity line; empty matches what those documents printed.
  */
-export const UNRESOLVED_FIELDS = ['type'] as const;
+export const EMPTY_FIELDS = ['type'] as const;
+
+/** Old cash boxes, in form order: `Cash 5000`..`Cash 10` used, `Cash1 5000`..`Cash7 10` left. */
+const DENOMINATIONS = [5000, 1000, 500, 100, 50, 20, 10] as const;
 
 export class DocDataNotFoundError extends Error {}
 
@@ -67,44 +59,39 @@ export class DefaultDocDataService implements DocDataService {
 
 type Names = Awaited<ReturnType<DefaultDocDataService['names']>>;
 
-/** Every merge field found in the original templates (docs/document-catalogue/MERGE_FIELDS.md). */
+/**
+ * Every merge field found in the original templates (docs/document-catalogue/MERGE_FIELDS.md),
+ * as raw values: ISO dates (`2026-01-02`), money in cents, numbers as digits, text as typed.
+ * All formatting for print is done once, in packages/documents/mapping (D).
+ * Field names are matched without regard to case, so each name appears once here.
+ */
 export function buildFields(
   cr: CrimeReport,
   c: CaseRecord | null,
   n: Names,
 ): Record<string, string> {
   const s = (v?: string | null) => v ?? '';
-  const cash = (kind: 'used' | 'left', denomination: number) =>
-    formatNumber(
-      cr.cashNotes.find((x) => x.kind === kind && x.denomination === denomination)?.count,
-    );
+  const num = (v?: number | null) => (v === undefined || v === null ? '' : String(v));
   const fine = c?.outcomes.find((o) => o.outcomeType === 'fine');
   const convicted = c?.outcomes.find((o) => o.convictedDate)?.convictedDate;
   const warrant = c?.hearings.find((h) => h.kind === 'warrant')?.date;
-  const beer = cr.seizedItems.find((i) => i.itemType === 'beer')?.quantity;
-
-  const crNo = cr.crNumber;
-  const courtDate = formatDate(c?.courtDate);
-  const detectionDate = formatDate(cr.detectionDate);
 
   const fields: Record<string, string> = {
     // CR and office
-    CR_NO_2017: crNo,
-    CR_NO_2015: crNo,
-    CR_No: crNo,
+    CR_NO_2017: cr.crNumber,
+    CR_NO_2015: cr.crNumber,
+    CR_No: cr.crNumber,
     office: n.office,
     Offence: n.offenceCode,
     // Case
     Case_no: s(c?.caseNumber),
     Name_of_Court: n.court,
-    Name_of_court: n.court,
-    Date_of_Court: courtDate,
-    Date_of_court: courtDate,
-    Courts_Date: courtDate,
+    Date_of_Court: s(c?.courtDate),
+    Courts_Date: s(c?.courtDate),
     court_officer: n.prosecutor,
-    WT_date: formatDate(warrant),
-    result: formatMoney(fine?.fineAmount),
-    fine_date: formatDate(convicted),
+    WT_date: s(warrant),
+    result: num(fine?.fineAmount),
+    fine_date: s(convicted),
     // Accused and surety
     Name_of_Accused: cr.accused.name,
     Accused_Name: cr.accused.name,
@@ -112,49 +99,53 @@ export function buildFields(
     Accused_Address: s(cr.accused.address),
     NIC_No_of_Accused: s(cr.accused.nic),
     Name_of_Suerty: s(cr.surety?.name),
-    name_of_Suerty: s(cr.surety?.name),
     Address_of_Suerty: s(cr.surety?.address),
     NIC_Suerty: s(cr.surety?.nic),
     // Detection
-    Date_of_Detection: detectionDate,
-    Detection_Date: detectionDate,
+    Date_of_Detection: cr.detectionDate,
+    Detection_Date: cr.detectionDate,
     Place_of_Detection: s(cr.place),
     Informan: n.informant,
     infor_help: s(cr.informantHelp),
     detection_officer: n.detecting,
-    Detection_Officer: n.detecting,
     ග්රහණ_නිළධාරි: n.detecting,
     Ac: n.ac,
     Sc: n.sc,
     oic: n.oic,
     Drive: n.driver,
-    // Times
+    // Times, as typed
     Time_of_Arraival: s(cr.times?.arrival),
     Time_of_BC_leaving: s(cr.times?.bcLeaving),
     Time_of_IPR_leaving: s(cr.times?.iprLeaving),
     Time_of_Detection: s(cr.times?.detection),
-    // Quantities and productions
-    Quantity: s(cr.quantityText),
-    Quantity_Full: s(cr.quantityText),
-    Quantity1: s(cr.quantityExtraText),
-    Over_Quantity: s(cr.overQuantityText),
-    sp5: beer === undefined ? '' : String(beer),
+    // Quantities (whole numbers) and productions
+    Quantity: num(cr.quantity),
+    // GOLD LEAF beedi count; came from the lost `Table1`, same value as Quantity.
+    Quantity_Full: num(cr.quantity),
+    Quantity1: num(cr.quantityExtra),
+    Over_Quantity: num(cr.overQuantity),
+    sp5: num(cr.seizedItems.find((i) => i.itemType === 'beer')?.quantity),
+    Production: s(cr.productions[0]),
     Production1: s(cr.productions[1]),
     Production2: s(cr.productions[2]),
-    // Cash: "Cash 1000" = notes used; "Cash2 1000" / "Cash3 500" = notes left (old Cash1..Cash7 = 5000..10)
-    Cash_1000: cash('used', 1000),
-    Cash_500: cash('used', 500),
-    Cash_100: cash('used', 100),
-    Cash2_1000: cash('left', 1000),
-    Cash3_500: cash('left', 500),
+    // Note serials
     Cash_Number: s(cr.cashSerials),
     Cash_Number_1: s(cr.cashSerials1),
   };
+
+  // The 14 cash boxes, as typed (staff entered note serial numbers in them).
+  DENOMINATIONS.forEach((d, i) => {
+    const typed = (kind: 'used' | 'left') =>
+      s(cr.cashNotes.find((x) => x.kind === kind && x.denomination === d)?.text);
+    fields[`Cash_${d}`] = typed('used');
+    fields[`Cash${i + 1}_${d}`] = typed('left');
+  });
+
   // Support officers: dh1-dh5 are positions 1-5, inh1-inh5 are positions 6-10.
   for (let i = 0; i < 5; i++) {
     fields[`dh${i + 1}`] = n.support[i] ?? '';
     fields[`inh${i + 1}`] = n.support[i + 5] ?? '';
   }
-  for (const f of UNRESOLVED_FIELDS) fields[f] = '';
+  for (const f of EMPTY_FIELDS) fields[f] = '';
   return fields;
 }

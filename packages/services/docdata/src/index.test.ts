@@ -9,7 +9,7 @@ import {
 } from '@excise/mocks';
 import type { Role } from '@excise/schemas';
 import { describe, expect, it } from 'vitest';
-import { DefaultDocDataService, formatMoney } from './index.js';
+import { DefaultDocDataService } from './index.js';
 
 const session = (role: Role) => (): Session => ({ userId: 'u', username: 'u', role });
 
@@ -33,10 +33,12 @@ async function setup(role: Role = 'detecting') {
         { officerId: support, position: 6 },
       ],
       cashNotes: [
-        { kind: 'used', denomination: 1000, count: 2 },
-        { kind: 'left', denomination: 500, count: 1 },
+        { kind: 'used', denomination: 1000, text: 'S/426 672487' },
+        { kind: 'left', denomination: 500, text: 'U/257 391858 , U/274 099769' },
       ],
-      times: { arrival: '09:15' },
+      times: { arrival: '14.45' },
+      quantity: 3450,
+      productions: ['list', 'first', 'second'],
       surety: { name: 'Surety One' },
     }),
   );
@@ -63,21 +65,24 @@ describe('DocDataService', () => {
     const data = await svc.buildFor(cr.id);
     const expected = catalogueFields();
     expect(expected.length).toBeGreaterThanOrEqual(60);
-    expect(expected.filter((f) => !(f in data))).toEqual([]);
+    // D matches field names without regard to case.
+    const keys = new Set(Object.keys(data).map((k) => k.toLowerCase()));
+    expect(expected.filter((f) => !keys.has(f.toLowerCase()))).toEqual([]);
+    expect(Object.keys(data).length).toBe(keys.size);
   });
 
-  it('fills values in the old formats', async () => {
+  it('returns raw values for D to format', async () => {
     const { svc, cr } = await setup();
     const d = await svc.buildFor(cr.id);
     expect(d).toMatchObject({
       CR_NO_2017: '1/2026',
       office: 'Negombo',
       Offence: 'PUDS',
-      Date_of_Detection: '2026.01.02',
-      Date_of_Court: '2026.01.10',
-      WT_date: '2026.02.03',
-      fine_date: '2026.01.20',
-      result: '15,000.50',
+      Date_of_Detection: '2026-01-02',
+      Date_of_Court: '2026-01-10',
+      WT_date: '2026-02-03',
+      fine_date: '2026-01-20',
+      result: '1500050',
       Name_of_Court: 'Negombo Magistrate Court',
       court_officer: 'Prosecutor One',
       detection_officer: 'Officer One',
@@ -85,22 +90,25 @@ describe('DocDataService', () => {
       dh1: 'Officer Three',
       inh1: 'Support Six',
       dh2: '',
-      Cash_1000: '2',
-      Cash3_500: '1',
+      Cash_1000: 'S/426 672487',
+      Cash3_500: 'U/257 391858 , U/274 099769',
       Cash_100: '',
-      Time_of_Arraival: '09:15',
+      Cash1_5000: '',
+      Cash7_10: '',
+      Time_of_Arraival: '14.45',
       Name_of_Suerty: 'Surety One',
-      Quantity: '3.5 L',
+      Quantity: '3450',
+      Quantity_Full: '3450',
+      Quantity1: '',
+      Production: 'list',
+      Production1: 'first',
+      Production2: 'second',
+      type: '',
     });
   });
 
   it('needs the document permission', async () => {
     const { svc, cr } = await setup('observation');
     await expect(svc.buildFor(cr.id)).rejects.toThrow(/lacks permission/);
-  });
-
-  it('formats money', () => {
-    expect(formatMoney(0)).toBe('0.00');
-    expect(formatMoney(null)).toBe('');
   });
 });

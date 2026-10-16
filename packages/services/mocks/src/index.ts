@@ -138,7 +138,7 @@ function reportRow(s: MemoryStore, cr: CrimeReport): ReportRow {
     fineAmount: fines.length ? fines.reduce((sum, o) => sum + (o.fineAmount ?? 0), 0) : null,
     rewardVoucherReceived: c?.rewardVoucherReceived ?? false,
     addToConvictRegister: c?.outcomes.some((o) => o.addToConvictRegister) ?? false,
-    quantityText: cr.quantityText ?? null,
+    quantity: cr.quantity ?? null,
     seized: cr.seizedItems.map((i) => ({ itemType: i.itemType, quantity: i.quantity })),
   };
 }
@@ -225,7 +225,7 @@ export class MemoryCrQueryRepository implements CrQueryRepository {
         accusedNic: cr.accused.nic ?? null,
         offenceCode: this.s.refs.get(cr.offenceTypeId)?.code ?? '',
         offenceName: this.s.refs.get(cr.offenceTypeId)?.name ?? '',
-        quantityText: cr.quantityText ?? null,
+        quantity: cr.quantity ?? null,
         courtId: c.courtId,
         courtName: this.s.refs.get(c.courtId)?.name ?? null,
         caseNumber: c.caseNumber ?? null,

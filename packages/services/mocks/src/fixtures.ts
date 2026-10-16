@@ -44,7 +44,7 @@ export function sampleCrInput(
     place: 'Kochchikade',
     detectingOfficerId: refs.detectingOfficer,
     informantId: refs.informant,
-    quantityText: '3.5 L',
+    quantity: 3500,
     accused: { name: 'Sample Accused', address: 'No 1, Negombo', nic: '851234567V' },
     supportOfficers: [],
     seizedItems: [{ itemType: 'spirit', quantity: 3.5, unit: 'L' }],
