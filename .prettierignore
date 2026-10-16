@@ -1,0 +1,7 @@
+node_modules/
+dist/
+pnpm-lock.yaml
+prototype/
+packages/documents/templates/
+docs/LEGACY_*
+docs/legacy-screenshots/

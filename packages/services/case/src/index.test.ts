@@ -1,10 +1,17 @@
 import type { Session } from '@excise/contract';
-import { createMemoryRepositories, sampleCaseInput, sampleCrInput, seedReferences } from '@excise/mocks';
+import {
+  createMemoryRepositories,
+  sampleCaseInput,
+  sampleCrInput,
+  seedReferences,
+} from '@excise/mocks';
 import type { Role } from '@excise/schemas';
 import { describe, expect, it } from 'vitest';
 import { CaseConflictError, CaseValidationError, DefaultCaseService } from './index.js';
 
-const session = (role: Role): (() => Session) => () => ({ userId: 'u', username: 'u', role });
+const session =
+  (role: Role): (() => Session) =>
+  () => ({ userId: 'u', username: 'u', role });
 
 async function setup(role: Role = 'oic') {
   const repos = createMemoryRepositories();
@@ -28,7 +35,9 @@ describe('CaseService', () => {
     const { refs, cr, svc } = await setup();
     await svc.save(sampleCaseInput(cr.id, refs), null);
     await svc.save(sampleCaseInput(cr.id, refs), 1);
-    await expect(svc.save(sampleCaseInput(cr.id, refs), 1)).rejects.toBeInstanceOf(CaseConflictError);
+    await expect(svc.save(sampleCaseInput(cr.id, refs), 1)).rejects.toBeInstanceOf(
+      CaseConflictError,
+    );
   });
 
   it('does not allow an outcome without a case number', async () => {

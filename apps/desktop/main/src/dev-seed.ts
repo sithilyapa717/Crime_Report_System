@@ -29,7 +29,12 @@ export async function createDevRepositories(): Promise<MemoryRepositories> {
   await repos.cases.save(
     sampleCaseInput(cr.id, refs, {
       outcomes: [
-        { outcomeType: 'fine', fineAmount: 500000, convictedDate: '2026-01-20', addToConvictRegister: true },
+        {
+          outcomeType: 'fine',
+          fineAmount: 500000,
+          convictedDate: '2026-01-20',
+          addToConvictRegister: true,
+        },
       ],
     }),
     null,

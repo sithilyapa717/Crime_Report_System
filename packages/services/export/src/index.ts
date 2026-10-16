@@ -19,16 +19,23 @@ function csvField(v: string | number | null): string {
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
+/** Byte-order mark, written as a code so editors and formatters cannot hide it. */
+const BOM = String.fromCharCode(0xfeff);
+
 /** CSV with a UTF-8 BOM so Excel opens Sinhala text correctly. */
 export function toCsv(result: ReportResult, label: LabelResolver): string {
   const lines = [result.columns.map((c) => csvField(label(c.labelKey))).join(',')];
   for (const row of result.rows) {
     lines.push(result.columns.map((c) => csvField(cellValue(c.key, row[c.key] ?? null))).join(','));
   }
-  return '﻿' + lines.join('\r\n') + '\r\n';
+  return BOM + lines.join('\r\n') + '\r\n';
 }
 
-export async function writeCsv(result: ReportResult, label: LabelResolver, filePath: string): Promise<void> {
+export async function writeCsv(
+  result: ReportResult,
+  label: LabelResolver,
+  filePath: string,
+): Promise<void> {
   await writeFile(filePath, toCsv(result, label), 'utf8');
 }
 
@@ -44,11 +51,17 @@ export async function toXlsxBuffer(result: ReportResult, label: LabelResolver): 
   ws.getRow(1).font = { bold: true };
   ws.views = [{ state: 'frozen', ySplit: 1 }];
   for (const row of result.rows) {
-    ws.addRow(Object.fromEntries(result.columns.map((c) => [c.key, cellValue(c.key, row[c.key] ?? null)])));
+    ws.addRow(
+      Object.fromEntries(result.columns.map((c) => [c.key, cellValue(c.key, row[c.key] ?? null)])),
+    );
   }
   return Buffer.from(await wb.xlsx.writeBuffer());
 }
 
-export async function writeXlsx(result: ReportResult, label: LabelResolver, filePath: string): Promise<void> {
+export async function writeXlsx(
+  result: ReportResult,
+  label: LabelResolver,
+  filePath: string,
+): Promise<void> {
   await writeFile(filePath, await toXlsxBuffer(result, label));
 }

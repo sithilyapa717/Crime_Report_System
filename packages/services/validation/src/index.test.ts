@@ -13,7 +13,12 @@ describe('validation', () => {
   });
   it('flags future detection date, early hearing and year mismatch', () => {
     const issues = validateCrDates(
-      { detectionDate: '2026-05-01', crYear: 2025, crNumber: '3/2026', hearingDates: ['2026-04-01'] },
+      {
+        detectionDate: '2026-05-01',
+        crYear: 2025,
+        crNumber: '3/2026',
+        hearingDates: ['2026-04-01'],
+      },
       '2026-01-01',
     );
     expect(issues.map((i) => i.code).sort()).toEqual([

@@ -3,10 +3,28 @@ import type {
   CaseInput,
   CaseRecord,
   CaseType,
+  ConvictFilter,
   CrimeReport,
   CrimeReportInput,
+  CrSearchFilter,
   OutcomeType,
+  PreviousOffenceQuery,
+  ReportParams,
+  ReportScope,
   Role,
+  SummaryGroupBy,
+} from '@excise/schemas';
+
+// Parameter types are defined once, as Zod schemas in packages/shared/schemas.
+export type {
+  ConvictFilter,
+  CrSearchFilter,
+  PreviousOffenceQuery,
+  ReportParams,
+  ReportPerson,
+  ReportScope,
+  ReportType,
+  SummaryGroupBy,
 } from '@excise/schemas';
 
 // ============================ Service interfaces (UI and D code against these) ============================
@@ -58,14 +76,6 @@ export interface CrListRow {
   caseNumber: string | null;
 }
 
-export type CrSearchFilter =
-  | { kind: 'year'; officeId: string; year: number }
-  | { kind: 'court_date'; officeId: string; date: string }
-  | { kind: 'detection_date'; officeId: string; date: string }
-  | { kind: 'court_case'; courtId: string; caseNumber: string }
-  /** Name is a partial, case-insensitive match; NIC is exact. */
-  | { kind: 'name_nic'; name?: string; nic?: string };
-
 /** One convicted outcome line (convicts register, previous-offence check, certificate ඊ 48). */
 export interface ConvictRow {
   crimeReportId: string;
@@ -87,48 +97,11 @@ export interface ConvictRow {
   prisonDays: number | null;
 }
 
-export interface ConvictFilter {
-  officeId?: string;
-  year?: number;
-  month?: number;
-  name?: string;
-  nic?: string;
-  courtId?: string;
-}
-
 export interface SearchService {
   crimeReports(filter: CrSearchFilter): Promise<CrListRow[]>;
   convicts(filter: ConvictFilter): Promise<ConvictRow[]>;
   /** Previous-offence check: needs a name or NIC; court is optional. */
-  previousOffences(query: { name?: string; nic?: string; courtId?: string }): Promise<ConvictRow[]>;
-}
-
-export type ReportScope =
-  | { kind: 'year'; officeId: string; year: number }
-  | { kind: 'month'; officeId: string; year: number; month: number }
-  /** Uses the half chosen at data entry (open question 6). */
-  | { kind: 'half_year'; officeId: string; year: number; half: 'first' | 'second' };
-
-export type ReportPerson =
-  | { kind: 'none' }
-  | { kind: 'detecting_officer' | 'informant'; officerId: string };
-
-export type ReportType =
-  | 'register'
-  | 'warrant'
-  | 'trial'
-  | 'summons'
-  | 'not_filed'
-  | 'fines_not_collected'
-  | 'rewards_due'
-  | 'resolved'
-  | 'fines_earned'
-  | 'convicts';
-
-export interface ReportParams {
-  scope: ReportScope;
-  person: ReportPerson;
-  type: ReportType;
+  previousOffences(query: PreviousOffenceQuery): Promise<ConvictRow[]>;
 }
 
 /** `labelKey` points into packages/shared/labels; the UI shows the Sinhala caption. */
@@ -143,8 +116,6 @@ export interface ReportResult {
   /** Sum of fines (cents) over the rows. */
   fineTotal: number;
 }
-
-export type SummaryGroupBy = 'offence' | 'detecting_officer' | 'informant';
 
 export interface SummaryGroup {
   key: string;

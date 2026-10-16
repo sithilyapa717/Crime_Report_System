@@ -61,10 +61,18 @@ export class DefaultSearchService implements SearchService {
 
   async convicts(filter: ConvictFilter): Promise<ConvictRow[]> {
     assertCan(this.session().role, 'search');
-    return this.queries.convicts({ ...filter, name: cleanName(filter.name), nic: cleanNic(filter.nic) });
+    return this.queries.convicts({
+      ...filter,
+      name: cleanName(filter.name),
+      nic: cleanNic(filter.nic),
+    });
   }
 
-  async previousOffences(query: { name?: string; nic?: string; courtId?: string }): Promise<ConvictRow[]> {
+  async previousOffences(query: {
+    name?: string;
+    nic?: string;
+    courtId?: string;
+  }): Promise<ConvictRow[]> {
     assertCan(this.session().role, 'search');
     const name = cleanName(query.name);
     const nic = cleanNic(query.nic);

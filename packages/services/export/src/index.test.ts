@@ -19,7 +19,7 @@ const label = (k: string) => (k === 'report.col.fineAmount' ? 'දඩ මුද�
 describe('export', () => {
   it('writes CSV with BOM, Sinhala headers, quoting and rupees', () => {
     const csv = toCsv(result, label);
-    expect(csv.startsWith('﻿නම,දඩ මුදල\r\n')).toBe(true);
+    expect(csv.startsWith(String.fromCharCode(0xfeff) + 'නම,දඩ මුදල\r\n')).toBe(true);
     expect(csv).toContain('"කමල්, ""පෙරේරා""",1500.5\r\n');
     expect(csv).toContain('Nimal,\r\n');
   });
