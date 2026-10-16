@@ -1,0 +1,52 @@
+# Who must approve changes to each folder. In this file the LAST matching line wins,
+# so general folders come first and specific folders after them.
+# Replace @A, @B, @C, @D and @project-owner with the real GitHub usernames before pushing.
+#   @A = Database   @B = Logical system   @C = UI / UX   @D = Documents
+
+# Root config and ownership files
+*                                                @B
+/CODEOWNERS                                      @project-owner
+/OWNERS.md                                       @B
+
+# Desktop app
+/apps/desktop/main/                              @B
+/apps/desktop/preload/                           @B
+/apps/desktop/renderer/                          @C
+/apps/desktop/renderer/screens/cr-entry-tabs/    @A
+/apps/desktop/renderer/screens/reference-lists/  @A
+/apps/desktop/renderer/screens/admin/            @A
+/apps/desktop/renderer/documents-dialog/         @D
+
+# Packages
+/packages/shared/                                @B
+/packages/shared/labels/                         @A @B @C @D
+/packages/shared/contract/                       @A @B @C @D
+/packages/services/                              @B
+/packages/services/reference/                    @A
+/packages/services/audit/                        @A
+/packages/db/                                    @A
+/packages/migration/                             @A
+/packages/documents/                             @D
+
+# Tests
+/tests/e2e/                                      @C
+/tests/reports-parity/                           @B
+/tests/documents-fidelity/                       @D
+/tests/migration/                                @A
+
+# Read-only reference material
+/prototype/                                      @project-owner
+/packages/documents/templates/original/          @project-owner
+/docs/legacy-screenshots/                        @project-owner
+/docs/LEGACY_SCREEN_INVENTORY.md                 @project-owner
+/docs/LEGACY_QUERY_CATALOG.md                    @project-owner
+/REWRITE_PLAN.md                                 @project-owner
+/TEAM_WORK_SPLIT.md                              @project-owner
+
+# Documentation
+/docs/database-design/                           @A
+/docs/document-catalogue/                        @D
+/docs/user-guide/                                @D
+/docs/admin-guide/                               @D
+/docs/engine-notes/                              @D
+/docs/ui-guidelines/                             @C
