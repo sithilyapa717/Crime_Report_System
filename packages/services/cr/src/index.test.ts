@@ -4,7 +4,9 @@ import type { Role } from '@excise/schemas';
 import { describe, expect, it } from 'vitest';
 import { CrConflictError, CrValidationError, DefaultCrService } from './index.js';
 
-const session = (role: Role): (() => Session) => () => ({ userId: 'u', username: 'u', role });
+const session =
+  (role: Role): (() => Session) =>
+  () => ({ userId: 'u', username: 'u', role });
 
 function setup(role: Role) {
   const repos = createMemoryRepositories();

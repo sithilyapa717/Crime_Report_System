@@ -6,9 +6,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "lint": "eslint .",
-    "format": "prettier --write .",
+    "format": "prettier --write --ignore-unknown \"packages/shared/**\" \"packages/services/**\" \"!packages/services/reference/**\" \"!packages/services/audit/**\" \"apps/desktop/main/**\" \"apps/desktop/preload/**\" \"tests/reports-parity/**\" \"*.{json,mjs,ts,yaml}\"",
     "build": "pnpm --filter @excise/desktop-main run build",
-    "start": "pnpm --filter @excise/desktop-main run start"
+    "start": "pnpm --filter @excise/desktop-main run start",
+    "format:check": "prettier --check --ignore-unknown \"packages/shared/**\" \"packages/services/**\" \"!packages/services/reference/**\" \"!packages/services/audit/**\" \"apps/desktop/main/**\" \"apps/desktop/preload/**\" \"tests/reports-parity/**\" \"*.{json,mjs,ts,yaml}\""
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

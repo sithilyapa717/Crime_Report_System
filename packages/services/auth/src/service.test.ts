@@ -1,6 +1,12 @@
 import { createMemoryRepositories } from '@excise/mocks';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { DefaultAuthService, hashPassword, LoginError, PasswordPolicyError, SessionHolder } from './index.js';
+import {
+  DefaultAuthService,
+  hashPassword,
+  LoginError,
+  PasswordPolicyError,
+  SessionHolder,
+} from './index.js';
 
 let auth: DefaultAuthService;
 let sessions: SessionHolder;
@@ -38,9 +44,13 @@ describe('AuthService', () => {
   });
 
   it('only the OIC creates users, with a password policy', async () => {
-    await expect(auth.createUser('x', 'longenough', 'detecting')).rejects.toBeInstanceOf(LoginError);
+    await expect(auth.createUser('x', 'longenough', 'detecting')).rejects.toBeInstanceOf(
+      LoginError,
+    );
     await auth.login('oic', 'correct-horse');
-    await expect(auth.createUser('det1', 'short', 'detecting')).rejects.toBeInstanceOf(PasswordPolicyError);
+    await expect(auth.createUser('det1', 'short', 'detecting')).rejects.toBeInstanceOf(
+      PasswordPolicyError,
+    );
     await auth.createUser('det1', 'longenough', 'detecting');
     await expect(auth.createUser('det1', 'longenough', 'detecting')).rejects.toMatchObject({
       code: 'username_taken',

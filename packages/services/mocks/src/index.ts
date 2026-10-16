@@ -45,7 +45,14 @@ export class MemoryCrRepository implements CrRepository {
 
   async insert(input: CrimeReportInput): Promise<CrimeReport> {
     const t = now();
-    const row: CrimeReport = { ...input, id: randomUUID(), version: 1, createdAt: t, updatedAt: t, deleted: false };
+    const row: CrimeReport = {
+      ...input,
+      id: randomUUID(),
+      version: 1,
+      createdAt: t,
+      updatedAt: t,
+      deleted: false,
+    };
     this.s.crs.set(row.id, row);
     return row;
   }
@@ -101,7 +108,8 @@ function reportRow(s: MemoryStore, cr: CrimeReport): ReportRow {
   const c = s.cases.get(cr.id);
   const ref = (id?: string) => (id ? (s.refs.get(id) ?? null) : null);
   const offence = ref(cr.offenceTypeId);
-  const fines = c?.outcomes.filter((o) => o.outcomeType === 'fine' && o.fineAmount !== undefined) ?? [];
+  const fines =
+    c?.outcomes.filter((o) => o.outcomeType === 'fine' && o.fineAmount !== undefined) ?? [];
   return {
     crimeReportId: cr.id,
     crNumber: cr.crNumber,

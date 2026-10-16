@@ -24,7 +24,8 @@ export const TYPE_FILTERS: Record<ReportType, (r: ReportRow) => boolean> = {
   trial: (r) => r.caseType === 'trial',
   summons: (r) => r.caseType === 'summons',
   // Case no IS NULL AND nochage = false AND samatha = false
-  not_filed: (r) => r.caseNumber === null && !r.permissionPending && !r.outcomes.includes('settlement'),
+  not_filed: (r) =>
+    r.caseNumber === null && !r.permissionPending && !r.outcomes.includes('settlement'),
   // Case no NOT NULL AND result NULL
   fines_not_collected: (r) => r.caseNumber !== null && r.fineAmount === null,
   // result NOT NULL AND rewardgive = false
@@ -66,7 +67,16 @@ const CONVICT_OUTCOME_COLUMNS: [string, OutcomeType][] = [
 ];
 
 const CONVICT_COLUMNS = [
-  ...['accusedName', 'offenceCode', 'quantityText', 'accusedAddress', 'courtName', 'convictedDate', 'caseNumber', 'fineAmount'].map(col),
+  ...[
+    'accusedName',
+    'offenceCode',
+    'quantityText',
+    'accusedAddress',
+    'courtName',
+    'convictedDate',
+    'caseNumber',
+    'fineAmount',
+  ].map(col),
   ...CONVICT_OUTCOME_COLUMNS.map(([key]) => col(key)),
   col('accusedNic'),
 ];
@@ -98,7 +108,8 @@ function toRow(r: ReportRow, type: ReportType): Record<string, string | number |
     fineAmount: r.fineAmount,
   };
   if (type === 'convicts') {
-    for (const [key, outcome] of CONVICT_OUTCOME_COLUMNS) base[key] = r.outcomes.includes(outcome) ? 1 : null;
+    for (const [key, outcome] of CONVICT_OUTCOME_COLUMNS)
+      base[key] = r.outcomes.includes(outcome) ? 1 : null;
   }
   return base;
 }
@@ -117,7 +128,9 @@ export class DefaultReportService implements ReportService {
     const person = byPerson(params);
     const type = TYPE_FILTERS[params.type];
     const rows = await this.rows.rowsFor(params.scope);
-    return rows.filter((r) => person(r) && type(r)).sort((a, b) => a.crYear - b.crYear || crSeq(a) - crSeq(b));
+    return rows
+      .filter((r) => person(r) && type(r))
+      .sort((a, b) => a.crYear - b.crYear || crSeq(a) - crSeq(b));
   }
 
   async run(params: ReportParams): Promise<ReportResult> {
@@ -143,12 +156,17 @@ export class DefaultReportService implements ReportService {
       if (!g) groups.set(key, (g = { key, label, count: 0, quantities: {}, fineTotal: 0 }));
       g.count += 1;
       g.fineTotal += r.fineAmount ?? 0;
-      for (const s of r.seized) g.quantities[s.itemType] = (g.quantities[s.itemType] ?? 0) + s.quantity;
+      for (const s of r.seized)
+        g.quantities[s.itemType] = (g.quantities[s.itemType] ?? 0) + s.quantity;
     }
     return [...groups.values()].sort((a, b) => a.label.localeCompare(b.label));
   }
 
-  async exportToFile(params: ReportParams, format: 'xlsx' | 'csv', filePath: string): Promise<string> {
+  async exportToFile(
+    params: ReportParams,
+    format: 'xlsx' | 'csv',
+    filePath: string,
+  ): Promise<string> {
     const result = await this.run(params);
     await (format === 'csv' ? writeCsv : writeXlsx)(result, this.label, filePath);
     return filePath;

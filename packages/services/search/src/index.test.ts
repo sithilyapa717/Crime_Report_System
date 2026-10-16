@@ -1,5 +1,10 @@
 import type { Session } from '@excise/contract';
-import { createMemoryRepositories, sampleCaseInput, sampleCrInput, seedReferences } from '@excise/mocks';
+import {
+  createMemoryRepositories,
+  sampleCaseInput,
+  sampleCrInput,
+  seedReferences,
+} from '@excise/mocks';
 import { describe, expect, it } from 'vitest';
 import { DefaultSearchService, SearchInputError } from './index.js';
 
@@ -18,11 +23,21 @@ async function setup() {
   );
   await repos.cases.save(
     sampleCaseInput(a.id, refs, {
-      outcomes: [{ outcomeType: 'fine', fineAmount: 1000000, convictedDate: '2026-01-20', addToConvictRegister: true }],
+      outcomes: [
+        {
+          outcomeType: 'fine',
+          fineAmount: 1000000,
+          convictedDate: '2026-01-20',
+          addToConvictRegister: true,
+        },
+      ],
     }),
     null,
   );
-  await repos.cases.save(sampleCaseInput(b.id, refs, { courtId: refs.otherCourt, caseNumber: 'C/5' }), null);
+  await repos.cases.save(
+    sampleCaseInput(b.id, refs, { courtId: refs.otherCourt, caseNumber: 'C/5' }),
+    null,
+  );
   return { svc: new DefaultSearchService(repos.queries, session), refs };
 }
 
@@ -41,7 +56,11 @@ describe('SearchService', () => {
 
   it('finds by court and case number', async () => {
     const { svc, refs } = await setup();
-    const rows = await svc.crimeReports({ kind: 'court_case', courtId: refs.otherCourt, caseNumber: ' C/5 ' });
+    const rows = await svc.crimeReports({
+      kind: 'court_case',
+      courtId: refs.otherCourt,
+      caseNumber: ' C/5 ',
+    });
     expect(rows.map((r) => r.crNumber)).toEqual(['2/2026']);
   });
 
@@ -58,6 +77,8 @@ describe('SearchService', () => {
     const { svc, refs } = await setup();
     expect(await svc.previousOffences({ name: 'sample' })).toHaveLength(1);
     expect(await svc.previousOffences({ name: 'kamal' })).toHaveLength(0);
-    expect(await svc.previousOffences({ name: 'sample', courtId: refs.otherCourt })).toHaveLength(0);
+    expect(await svc.previousOffences({ name: 'sample', courtId: refs.otherCourt })).toHaveLength(
+      0,
+    );
   });
 });

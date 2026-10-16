@@ -3,10 +3,13 @@ import { z } from 'zod';
 export const Uuid = z.string().uuid();
 
 /** Real calendar date, ISO `YYYY-MM-DD`. Display format `YYYY.MM.DD` is a UI/document concern. */
-export const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine((s) => {
-  const d = new Date(`${s}T00:00:00Z`);
-  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
-}, 'Invalid date');
+export const IsoDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .refine((s) => {
+    const d = new Date(`${s}T00:00:00Z`);
+    return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
+  }, 'Invalid date');
 
 /** `HH:mm` 24-hour time. */
 export const TimeOfDay = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
