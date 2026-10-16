@@ -6,7 +6,7 @@
 //   2. the Access mail-merge link (<w:mailMerge> in settings.xml) is removed, so Word does not
 //      ask for the old .accdb when the file is opened;
 //   3. the matching mailMergeSource relationships are removed from settings.xml.rels.
-import { lookupField, formatValue, type DocumentValue } from '../mapping/fields.ts';
+import { lookupField, formatValue, type DocumentValue, type FieldDef } from '../mapping/fields.ts';
 import { replaceMergeFields } from './fields.ts';
 import { DocxZip } from './zip.ts';
 
@@ -41,7 +41,42 @@ export interface FillResult {
 
 const CONTENT_PART = /^word\/(document|header\d*|footer\d*|footnotes|endnotes)\.xml$/;
 
+/** Fill from raw values keyed by canonical field name; the mapping formats them (D4). */
 export function fillTemplate(template: Buffer, data: DocumentData, options: FillOptions = {}): FillResult {
+  return fillWith(template, (def) => formatValue(def, data[def.name]), options);
+}
+
+/**
+ * Fill from ready-made strings keyed by merge-field name, the shape the document-data service
+ * (B8, `DocDataService.buildFor`) returns. Values are used as given. A template field is matched
+ * by its exact name first, then by any key that maps to the same canonical field (case, aliases).
+ * An empty string counts as "no value" in the report.
+ */
+export function fillTemplateFromFields(
+  template: Buffer,
+  fields: Record<string, string>,
+  options: FillOptions = {},
+): FillResult {
+  const byCanonical = new Map<string, string>();
+  for (const [key, value] of Object.entries(fields)) {
+    const def = lookupField(key);
+    if (def && value !== '' && !byCanonical.has(def.name)) byCanonical.set(def.name, value);
+  }
+  return fillWith(
+    template,
+    (def, templateName) => {
+      const value = fields[templateName] || byCanonical.get(def.name);
+      return value === '' ? undefined : value;
+    },
+    options,
+  );
+}
+
+function fillWith(
+  template: Buffer,
+  valueFor: (def: FieldDef, templateName: string) => string | undefined,
+  options: FillOptions,
+): FillResult {
   const { onMissing = 'empty', failOnUnknownField = true } = options;
   const zip = DocxZip.read(template);
   const templateFields: string[] = [];
@@ -58,7 +93,7 @@ export function fillTemplate(template: Buffer, data: DocumentData, options: Fill
       unknown.add(name);
       return undefined;
     }
-    const value = formatValue(def, data[def.name]);
+    const value = valueFor(def, name);
     if (value === undefined) missing.add(def.name);
     else filled.add(def.name);
     return value;

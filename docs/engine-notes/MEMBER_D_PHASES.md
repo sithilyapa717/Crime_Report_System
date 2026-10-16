@@ -167,6 +167,44 @@ Everything lives in `tests/documents-fidelity/` and runs in CI's Documents job.
   - The first run found 2 differences. Both turned out to be a bug in the test reader, which didn't count Word's short form `<w:p/>` as a paragraph; the engine was correct.
 - **Still open:** comparing against documents Word merged from **real Access data**. This needs the real `.accdb` data (§10 Q1).
 
+### Phase 4: registry, generation and logging done (against a mock of A's table)
+
+**Registry** (`packages/documents/registry/`):
+
+- `templates.json` has one entry per frozen template, holding its family, offence codes, variant and status. It was seeded from folder and file names by `scripts/seed-registry.ts` and is maintained by hand from now on.
+  - Every entry starts as `unconfirmed`. Staff set `current` or `archived` (§10 Q3).
+  - Variants read from the names: can or bottle, sample or no sample, 180/375/750 ml, Rs 500/1000 (only when `රු` is written), 2–4 offences.
+  - Things to confirm are written in `notes`: GOLD LEAF offence codes, whether a bare "500"/"1000" means a note value or a volume, and file names that look like copies.
+- `TemplateRegistry.forOffence(code)` gives the templates the dialog offers:
+  - archived templates are never offered;
+  - current templates come first, then templates for this offence, then general ones.
+  - An empty offence list means "any offence" only for general documents (vouchers, motion sheets and similar). A plaint without an offence code isn't offered at all, so the 12 cigarette/beedi plaints wait for staff to set their codes.
+- `TemplateSource` is the interface A's `document_templates` table implements later. `JsonTemplateSource` is the stand-in until then.
+
+**Generation** (`packages/documents/generation/`):
+
+- `DocumentGenerator.generate()` takes the CR, the template and the field strings, which are exactly what `DocDataService.buildFor` (B8) returns.
+- It refuses:
+  - archived templates;
+  - templates for a different offence, unless `allowOtherOffence` is set, in which case it warns;
+  - template files that no longer match `MANIFEST.json`.
+- Output file names look like `CR 12-2026 - <template title>.docx` and are Windows-safe. A file is never overwritten: a regenerated document is saved as ` (2)`, ` (3)` and so on.
+- The log records who, what, when, the template hash, the output hash and which fields were left empty.
+  - `InMemoryGenerationLog` and `JsonLinesGenerationLog` stand in until A's `generated_documents` table exists.
+- Optional PDF export through Word (`exportPdfWithWord`, Windows only). If the PDF fails, the `.docx` is kept and a warning is shown.
+
+**Engine:** `fillTemplateFromFields()` fills from ready-made strings. It tries the exact field name first, then falls back to case-insensitive and alias matches.
+
+**Checks:**
+
+- 215 tests pass: 30 in the documents package, plus 185 fidelity tests.
+- A real run on the dev PC produced the CR-named `.docx`, the PDF through Word, and a log line.
+
+**To agree with B:**
+
+- Who formats values. `@excise/docdata` already formats them, so `formatMoney` gives `1,500.50` and times are passed through as `14:45`. D4's formatters give `1500` and `14.45`. Both are guesses until a real Word-merged document is checked.
+- My proposal: B returns raw values, and D's mapping does the formatting in one place.
+
 ## Notes to raise with the team
 
 - **The real folders differ from REWRITE_PLAN §1.7.** There are no `UPA` or `UPFL` folders: those templates live in `USA-UPA/`. There is an extra `PUMB 2021.02.11/` folder (7 files), and `GOLD LEAF/` has 15 files. The catalogue follows the real folders.
