@@ -2,7 +2,16 @@
 export * from './engine/index.ts';
 export * from './generation/index.ts';
 export * from './print-layouts/index.ts';
-export { JsonTemplateSource, TemplateRegistry, type TemplateEntry, type TemplateFamily, type TemplateSource } from './registry/registry.ts';
+export {
+  JsonTemplateSource,
+  REGISTRY_FILE,
+  TemplateRegistry,
+  type TemplateEntry,
+  type TemplateFamily,
+  type TemplateSource,
+  type TemplateStatus,
+  type TemplateVariant,
+} from './registry/registry.ts';
 export {
   DocumentsService,
   type DialogData,

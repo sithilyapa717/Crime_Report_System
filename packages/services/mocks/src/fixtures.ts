@@ -1,6 +1,7 @@
 // Sample reference data and CRs for tests and for running the app on mocks.
 // Names are placeholders, not real officers; A's seed data replaces them.
-import type { CaseInput, CrimeReportInput } from '@excise/schemas';
+import type { ReferenceRepository } from '@excise/contract';
+import type { CaseInput, CrimeReportInput, ReferenceKind } from '@excise/schemas';
 import type { MemoryStore } from './index.js';
 
 export interface SampleRefs {
@@ -17,15 +18,15 @@ export interface SampleRefs {
 
 export function seedReferences(store: MemoryStore): SampleRefs {
   return {
-    office: store.addRef({ name: 'Negombo' }),
-    offencePuds: store.addRef({ name: 'Illegal spirit possession', code: 'PUDS' }),
-    offenceUpg: store.addRef({ name: 'Cannabis possession', code: 'UPG' }),
-    detectingOfficer: store.addRef({ name: 'Officer One' }),
-    informant: store.addRef({ name: 'Officer Two' }),
-    otherOfficer: store.addRef({ name: 'Officer Three' }),
-    court: store.addRef({ name: 'Negombo Magistrate Court' }),
-    otherCourt: store.addRef({ name: 'Colombo Magistrate Court' }),
-    prosecutor: store.addRef({ name: 'Prosecutor One' }),
+    office: store.addRef({ kind: 'office', name: 'Negombo' }),
+    offencePuds: store.addRef({ kind: 'offence', name: 'Illegal spirit possession', code: 'PUDS' }),
+    offenceUpg: store.addRef({ kind: 'offence', name: 'Cannabis possession', code: 'UPG' }),
+    detectingOfficer: store.addRef({ kind: 'detecting_officer', name: 'Officer One' }),
+    informant: store.addRef({ kind: 'informant', name: 'Officer Two' }),
+    otherOfficer: store.addRef({ kind: 'detecting_officer', name: 'Officer Three' }),
+    court: store.addRef({ kind: 'court', name: 'Negombo Magistrate Court' }),
+    otherCourt: store.addRef({ kind: 'court', name: 'Colombo Magistrate Court' }),
+    prosecutor: store.addRef({ kind: 'prosecuting_officer', name: 'Prosecutor One' }),
   };
 }
 
@@ -74,5 +75,22 @@ export function sampleCaseInput(
     outcomes: [],
     rewardVoucherReceived: false,
     ...overrides,
+  };
+}
+
+/** The same sample lists through any `ReferenceRepository` (mocks or SQLite). */
+export async function seedSampleReferences(r: ReferenceRepository): Promise<SampleRefs> {
+  const add = async (kind: ReferenceKind, value: string, code?: string) =>
+    (await r.insert(kind, { value, ...(code ? { code } : {}) })).id;
+  return {
+    office: await add('office', 'Negombo'),
+    offencePuds: await add('offence', 'Illegal spirit possession', 'PUDS'),
+    offenceUpg: await add('offence', 'Cannabis possession', 'UPG'),
+    detectingOfficer: await add('detecting_officer', 'Officer One'),
+    informant: await add('informant', 'Officer Two'),
+    otherOfficer: await add('detecting_officer', 'Officer Three'),
+    court: await add('court', 'Negombo Magistrate Court'),
+    otherCourt: await add('court', 'Colombo Magistrate Court'),
+    prosecutor: await add('prosecuting_officer', 'Prosecutor One'),
   };
 }

@@ -3,6 +3,9 @@
 import { randomUUID } from 'node:crypto';
 import type {
   AuditEntry,
+  AuditFilter,
+  AuditQueryRepository,
+  AuditRecord,
   AuditSink,
   CaseRepository,
   ConvictFilter,
@@ -11,19 +14,33 @@ import type {
   CrQueryRepository,
   CrRepository,
   CrSearchFilter,
+  FileRepository,
+  ReferenceItem,
   ReferenceLookup,
+  ReferenceRepository,
   ReportRow,
   ReportRowRepository,
   ReportScope,
+  StoredFile,
   UserRecord,
   UserRepository,
 } from '@excise/contract';
-import type { CaseInput, CaseRecord, CrimeReport, CrimeReportInput } from '@excise/schemas';
+import type {
+  CaseInput,
+  CaseRecord,
+  CrimeReport,
+  CrimeReportInput,
+  ReferenceInput,
+  ReferenceKind,
+} from '@excise/schemas';
 
 export interface RefEntry {
+  kind: ReferenceKind;
   name: string;
   /** Offence code (offence entries only). */
   code?: string;
+  rank?: string;
+  active?: boolean;
 }
 
 export class MemoryStore {
@@ -31,7 +48,8 @@ export class MemoryStore {
   crs = new Map<string, CrimeReport>();
   cases = new Map<string, CaseRecord>();
   users = new Map<string, UserRecord>();
-  audit: (AuditEntry & { at: string })[] = [];
+  audit: (AuditEntry & { id: string; at: string })[] = [];
+  files = new Map<string, StoredFile & { storedName: string; deleted: boolean }>();
 
   addRef(entry: RefEntry): string {
     const id = randomUUID();
@@ -91,7 +109,30 @@ export class MemoryAuditSink implements AuditSink {
   constructor(private readonly s: MemoryStore) {}
 
   async record(entry: AuditEntry) {
-    this.s.audit.push({ ...entry, at: now() });
+    this.s.audit.push({ ...entry, id: randomUUID(), at: now() });
+  }
+}
+
+export class MemoryAuditQueryRepository implements AuditQueryRepository {
+  constructor(private readonly s: MemoryStore) {}
+
+  async search(filter: AuditFilter): Promise<AuditRecord[]> {
+    // `from`/`to` are calendar dates; compare on the date part of the timestamp.
+    return this.s.audit
+      .filter(
+        (e) =>
+          (!filter.table || e.table === filter.table) &&
+          (!filter.rowId || e.rowId === filter.rowId) &&
+          (!filter.userId || e.userId === filter.userId) &&
+          (!filter.from || e.at.slice(0, 10) >= filter.from) &&
+          (!filter.to || e.at.slice(0, 10) <= filter.to),
+      )
+      .reverse()
+      .slice(0, filter.limit ?? 200)
+      .map((e) => ({
+        ...e,
+        username: e.userId ? (this.s.users.get(e.userId)?.username ?? null) : null,
+      }));
   }
 }
 
@@ -276,9 +317,136 @@ export class MemoryUserRepository implements UserRepository {
     if (u) this.s.users.set(id, { ...u, failedAttempts: count });
   }
 
-  async setPasswordHash(id: string, hash: string) {
+  async setPasswordHash(id: string, hash: string, mustChangePassword: boolean) {
     const u = this.s.users.get(id);
-    if (u) this.s.users.set(id, { ...u, passwordHash: hash });
+    if (u) this.s.users.set(id, { ...u, passwordHash: hash, mustChangePassword });
+  }
+
+  async list() {
+    return [...this.s.users.values()];
+  }
+
+  async setActive(id: string, active: boolean) {
+    const u = this.s.users.get(id);
+    if (u) this.s.users.set(id, { ...u, active });
+  }
+
+  async count() {
+    return this.s.users.size;
+  }
+}
+
+const toItem = (id: string, r: RefEntry): ReferenceItem => ({
+  id,
+  kind: r.kind,
+  value: r.name,
+  code: r.code ?? null,
+  rank: r.rank ?? null,
+  active: r.active ?? true,
+});
+
+export class MemoryReferenceRepository implements ReferenceRepository {
+  constructor(private readonly s: MemoryStore) {}
+
+  async list(kind: ReferenceKind, includeInactive: boolean) {
+    return [...this.s.refs.entries()]
+      .filter(([, r]) => r.kind === kind && (includeInactive || r.active !== false))
+      .map(([id, r]) => toItem(id, r))
+      .sort((a, b) => a.value.localeCompare(b.value));
+  }
+
+  async getById(id: string) {
+    const r = this.s.refs.get(id);
+    return r ? toItem(id, r) : null;
+  }
+
+  async findByValue(kind: ReferenceKind, value: string) {
+    for (const [id, r] of this.s.refs) {
+      if (r.kind === kind && lower(r.name) === lower(value)) return toItem(id, r);
+    }
+    return null;
+  }
+
+  async insert(kind: ReferenceKind, input: ReferenceInput, active = true) {
+    const id = this.s.addRef({
+      kind,
+      name: input.value,
+      ...(input.code ? { code: input.code } : {}),
+      ...(input.rank ? { rank: input.rank } : {}),
+      active,
+    });
+    return toItem(id, this.s.refs.get(id)!);
+  }
+
+  async update(id: string, input: ReferenceInput) {
+    const r = this.s.refs.get(id);
+    if (!r) return null;
+    const next: RefEntry = { ...r, name: input.value, code: input.code, rank: input.rank };
+    this.s.refs.set(id, next);
+    return toItem(id, next);
+  }
+
+  async setActive(id: string, active: boolean) {
+    const r = this.s.refs.get(id);
+    if (r) this.s.refs.set(id, { ...r, active });
+  }
+
+  async delete(id: string) {
+    this.s.refs.delete(id);
+  }
+
+  /** Mocks only: any CR (deleted ones too) or case whose stored JSON mentions the id. */
+  async usageCount(id: string) {
+    let n = 0;
+    for (const cr of this.s.crs.values()) {
+      if (JSON.stringify(cr).includes(id)) n++;
+      else if (JSON.stringify(this.s.cases.get(cr.id) ?? {}).includes(id)) n++;
+    }
+    return n;
+  }
+}
+
+export class MemoryFileRepository implements FileRepository {
+  constructor(private readonly s: MemoryStore) {}
+
+  async insert(file: StoredFile & { storedName: string }) {
+    this.s.files.set(file.id, { ...file, deleted: false });
+  }
+
+  async listFor(crimeReportId: string) {
+    return [...this.s.files.values()]
+      .filter((f) => f.crimeReportId === crimeReportId && !f.deleted)
+      .map((f) => ({
+        id: f.id,
+        crimeReportId: f.crimeReportId,
+        originalName: f.originalName,
+        mimeType: f.mimeType,
+        sizeBytes: f.sizeBytes,
+        createdAt: f.createdAt,
+      }));
+  }
+
+  async get(id: string) {
+    const f = this.s.files.get(id);
+    if (!f || f.deleted) return null;
+    return {
+      id: f.id,
+      crimeReportId: f.crimeReportId,
+      originalName: f.originalName,
+      mimeType: f.mimeType,
+      sizeBytes: f.sizeBytes,
+      createdAt: f.createdAt,
+      storedName: f.storedName,
+    };
+  }
+
+  async setDeleted(id: string) {
+    const f = this.s.files.get(id);
+    if (f) this.s.files.set(id, { ...f, deleted: true });
+  }
+
+  async liveStoredNames() {
+    return new Set([...this.s.files.values()].filter((f) => !f.deleted).map((f) => f.storedName));
   }
 }
 
@@ -304,6 +472,9 @@ export interface MemoryRepositories {
   users: MemoryUserRepository;
   refs: MemoryReferenceLookup;
   audit: MemoryAuditSink;
+  references: MemoryReferenceRepository;
+  auditQuery: MemoryAuditQueryRepository;
+  files: MemoryFileRepository;
 }
 
 export function createMemoryRepositories(store = new MemoryStore()): MemoryRepositories {
@@ -316,6 +487,9 @@ export function createMemoryRepositories(store = new MemoryStore()): MemoryRepos
     users: new MemoryUserRepository(store),
     refs: new MemoryReferenceLookup(store),
     audit: new MemoryAuditSink(store),
+    references: new MemoryReferenceRepository(store),
+    auditQuery: new MemoryAuditQueryRepository(store),
+    files: new MemoryFileRepository(store),
   };
 }
 export * from './fixtures.js';

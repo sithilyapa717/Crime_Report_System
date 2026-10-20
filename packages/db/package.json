@@ -1,0 +1,17 @@
+{
+  "name": "@excise/db",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@excise/contract": "workspace:*",
+    "@excise/schemas": "workspace:*",
+    "better-sqlite3": "^13.0.3",
+    "kysely": "^0.29.7",
+    "@excise/documents": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0"
+  }
+}

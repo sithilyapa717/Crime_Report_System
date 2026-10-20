@@ -57,7 +57,11 @@ export interface TemplateSource {
   list(): Promise<TemplateEntry[]>;
 }
 
-export const REGISTRY_FILE = join(import.meta.dirname, 'templates.json');
+/**
+ * registry/templates.json next to this file. When the package is bundled into the Electron main
+ * process `import.meta.dirname` is not set; the main process then passes its own path.
+ */
+export const REGISTRY_FILE = join(import.meta.dirname ?? '.', 'templates.json');
 
 /** Reads registry/templates.json. */
 export class JsonTemplateSource implements TemplateSource {

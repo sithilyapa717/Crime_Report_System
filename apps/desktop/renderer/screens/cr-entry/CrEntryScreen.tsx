@@ -1,0 +1,533 @@
+// C4: CR entry and edit (old `Detection` form, §1.4). Header strip (office, year, CR n/year,
+// month, half-year), then the old sections as tabs: Detection · Accused · Surety · Times · Cash ·
+// Seized items · Court. Save is explicit; leaving with unsaved changes asks first; delete is soft
+// and can be restored. The Court tab is saved to the CR's case.
+import type { CaseRecord, CrimeReport } from '@excise/schemas';
+import { label } from '@excise/labels';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  Actions,
+  Alert,
+  Button,
+  ConfirmDialog,
+  DateField,
+  FieldGrid,
+  FormSection,
+  NumberField,
+  RadioGroup,
+  Select,
+  Spinner,
+  Tabs,
+  TextArea,
+  TextField,
+  useToast,
+} from '../../design-system/index.js';
+import { useLeaveGuard, useNav } from '../../shell/navigation.js';
+import { call, IpcError } from '../../src/ipc.js';
+import { useRefOptions } from '../../src/references.js';
+import { CashTab, SeizedTab, TimesTab, type TabProps } from '../cr-entry-tabs/tabs.js';
+import { CrPicker, lastOffice, rememberOffice } from '../shared/CrPicker.js';
+import {
+  caseBody,
+  emptyDraft,
+  fromReport,
+  newCase,
+  tabOf,
+  toInput,
+  type CrDraft,
+} from '../shared/cr-model.js';
+import { Pictures } from './Pictures.js';
+import './cr-entry.css';
+
+const MONTHS = Array.from({ length: 12 }, (_, i) => ({
+  value: String(i + 1),
+  label: label(`month.${i + 1}`),
+}));
+
+interface Loaded {
+  cr: CrimeReport;
+  case: CaseRecord | null;
+}
+
+export function CrEntryScreen() {
+  const { route, replace } = useNav();
+  const id = route.params?.id;
+  const [loaded, setLoaded] = useState<Loaded | null>(null);
+  const [draft, setDraft] = useState<CrDraft>(() => emptyDraft({ officeId: lastOffice() }));
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [message, setMessage] = useState<string | null>(null);
+  const [tab, setTab] = useState('detection');
+  const [busy, setBusy] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const toast = useToast();
+
+  const baseline = useMemo(() => (loaded ? fromReport(loaded.cr, loaded.case) : null), [loaded]);
+  const dirty = baseline
+    ? JSON.stringify(baseline) !== JSON.stringify(draft)
+    : JSON.stringify(draft) !== JSON.stringify(emptyDraft({ officeId: draft.officeId }));
+  useLeaveGuard(dirty);
+
+  const load = async (crId: string) => {
+    const [cr, c] = await Promise.all([call('cr.get', crId), call('case.getByCrimeReport', crId)]);
+    if (!cr) return setMessage(label('cr.notFound'));
+    setLoaded({ cr, case: c });
+    setDraft(fromReport(cr, c));
+    setErrors({});
+  };
+
+  useEffect(() => {
+    if (id)
+      void load(id).catch((e: unknown) =>
+        setMessage(e instanceof IpcError ? e.caption : String(e)),
+      );
+  }, [id]);
+
+  const set = (change: (d: CrDraft) => CrDraft) => setDraft(change);
+
+  const save = async () => {
+    setBusy(true);
+    setErrors({});
+    setMessage(null);
+    try {
+      const input = toInput(draft);
+      const saved = loaded
+        ? await call('cr.update', loaded.cr.id, loaded.cr.version, input)
+        : await call('cr.create', input);
+      rememberOffice(saved.officeId);
+      let savedCase = loaded?.case ?? null;
+      const courtChanged =
+        draft.courtId !== savedCase?.courtId ||
+        draft.courtDate !== savedCase?.courtDate ||
+        draft.prosecutingOfficerId !== savedCase?.prosecutingOfficerId;
+      if (draft.courtId && courtChanged) {
+        const current = await call('case.getByCrimeReport', saved.id);
+        const base = current ? caseBody(current) : newCase(saved.id, draft.courtId);
+        try {
+          savedCase = await call(
+            'case.save',
+            {
+              ...base,
+              courtId: draft.courtId,
+              courtDate: draft.courtDate,
+              prosecutingOfficerId: draft.prosecutingOfficerId,
+            },
+            current?.version ?? null,
+          );
+        } catch (err) {
+          // The CR itself is saved; show the court problem on the Court tab.
+          if (err instanceof IpcError) {
+            setErrors(
+              Object.fromEntries(
+                Object.entries(err.fieldErrors()).map(([k, v]) => [
+                  k === 'courtDate' ? k : 'courtId',
+                  v,
+                ]),
+              ),
+            );
+            setTab('court');
+            setMessage(err.caption);
+          }
+        }
+      }
+      setLoaded({ cr: saved, case: savedCase });
+      setDraft(fromReport(saved, savedCase));
+      toast(label('cr.saved'));
+      if (!loaded) replace('crEntry', { id: saved.id });
+    } catch (err) {
+      if (err instanceof IpcError) {
+        const fields = err.fieldErrors();
+        setErrors(fields);
+        setMessage(Object.keys(fields).length ? label('error.checkFields') : err.caption);
+        const first = Object.keys(fields)[0];
+        if (first && tabOf(first) !== 'header') setTab(tabOf(first));
+      } else setMessage(label('error.unknown'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const remove = async () => {
+    setConfirmDelete(false);
+    if (!loaded) return;
+    try {
+      await call('cr.softDelete', loaded.cr.id);
+      await load(loaded.cr.id);
+    } catch (err) {
+      setMessage(err instanceof IpcError ? err.caption : label('error.unknown'));
+    }
+  };
+
+  const restore = async () => {
+    if (!loaded) return;
+    try {
+      await call('cr.restore', loaded.cr.id);
+      await load(loaded.cr.id);
+    } catch (err) {
+      setMessage(err instanceof IpcError ? err.caption : label('error.unknown'));
+    }
+  };
+
+  if (id && !loaded && !message) return <Spinner />;
+  const deleted = loaded?.cr.deleted ?? false;
+  const invalid = new Set(Object.keys(errors).map(tabOf));
+  const props: TabProps = { draft, set, errors };
+
+  return (
+    <div className="cr-entry">
+      <h1>{label('form.crEntry')}</h1>
+      {!loaded && <CrPicker onFound={(cr) => replace('crEntry', { id: cr.id })} />}
+      {message && <Alert kind="error">{message}</Alert>}
+      {deleted && (
+        <Alert kind="warn">
+          {label('cr.deleted')} <Button onClick={restore}>{label('cr.restore')}</Button>
+        </Alert>
+      )}
+
+      <fieldset className="ex-section cr-entry__header" disabled={deleted}>
+        <legend>{loaded ? loaded.cr.crNumber : label('cr.new')}</legend>
+        <HeaderFields {...props} />
+      </fieldset>
+
+      <fieldset className="cr-entry__body" disabled={deleted}>
+        <Tabs
+          label={label('form.crEntry')}
+          active={tab}
+          onChange={setTab}
+          tabs={[
+            {
+              key: 'detection',
+              title: label('tab.detection'),
+              content: <DetectionTab {...props} />,
+              invalid: invalid.has('detection'),
+            },
+            {
+              key: 'accused',
+              title: label('tab.accused'),
+              content: <AccusedTab {...props} />,
+              invalid: invalid.has('accused'),
+            },
+            {
+              key: 'surety',
+              title: label('tab.surety'),
+              content: <SuretyTab {...props} />,
+              invalid: invalid.has('surety'),
+            },
+            {
+              key: 'times',
+              title: label('tab.times'),
+              content: <TimesTab {...props} />,
+              invalid: invalid.has('times'),
+            },
+            {
+              key: 'cash',
+              title: label('tab.cash'),
+              content: <CashTab {...props} />,
+              invalid: invalid.has('cash'),
+            },
+            {
+              key: 'seized',
+              title: label('tab.seized'),
+              content: <SeizedTab {...props} />,
+              invalid: invalid.has('seized'),
+            },
+            {
+              key: 'court',
+              title: label('tab.court'),
+              content: <CourtTab {...props} />,
+              invalid: invalid.has('court'),
+            },
+          ]}
+        />
+      </fieldset>
+
+      {loaded && !deleted && <Pictures crimeReportId={loaded.cr.id} />}
+
+      <Actions>
+        {loaded && !deleted && (
+          <Button variant="danger" onClick={() => setConfirmDelete(true)}>
+            {label('cr.delete')}
+          </Button>
+        )}
+        <Button
+          onClick={() =>
+            baseline ? setDraft(baseline) : setDraft(emptyDraft({ officeId: draft.officeId }))
+          }
+          disabled={!dirty}
+        >
+          {label('cr.undo')}
+        </Button>
+        <Button variant="primary" onClick={save} busy={busy} disabled={deleted || !dirty}>
+          {label('common.save')}
+        </Button>
+      </Actions>
+      <ConfirmDialog
+        open={confirmDelete}
+        title={label('cr.delete')}
+        message={label('cr.confirmDelete')}
+        danger
+        onConfirm={remove}
+        onCancel={() => setConfirmDelete(false)}
+      />
+    </div>
+  );
+}
+
+function HeaderFields({ draft, set, errors }: TabProps) {
+  const offices = useRefOptions('office');
+  return (
+    <FieldGrid>
+      <Select
+        label={label('cr.office')}
+        tag="pink"
+        value={draft.officeId}
+        error={errors.officeId}
+        options={offices}
+        onChange={(v) => set((d) => ({ ...d, officeId: v }))}
+      />
+      <NumberField
+        label={label('cr.year')}
+        tag="pink"
+        value={draft.crYear}
+        error={errors.crYear}
+        onChange={(v) => set((d) => ({ ...d, crYear: v }))}
+      />
+      <NumberField
+        label={label('cr.number')}
+        tag="pink"
+        value={draft.crSeq}
+        error={errors.crNumber}
+        hint={draft.crSeq && draft.crYear ? `${draft.crSeq}/${draft.crYear}` : 'n/yyyy'}
+        onChange={(v) => set((d) => ({ ...d, crSeq: v }))}
+      />
+      <Select
+        label={label('cr.month')}
+        tag="pink"
+        value={draft.month ? String(draft.month) : undefined}
+        error={errors.month}
+        options={MONTHS}
+        onChange={(v) => set((d) => ({ ...d, month: v ? Number(v) : undefined }))}
+      />
+      <RadioGroup
+        label={label('cr.halfYear')}
+        name="halfYear"
+        value={draft.halfYear}
+        onChange={(v) => set((d) => ({ ...d, halfYear: v }))}
+        options={[
+          { value: 'first', label: label('cr.halfYear.first') },
+          { value: 'second', label: label('cr.halfYear.second') },
+        ]}
+      />
+    </FieldGrid>
+  );
+}
+
+function DetectionTab({ draft, set, errors }: TabProps) {
+  const offences = useRefOptions('offence');
+  const police = useRefOptions('police_area');
+  const secretariats = useRefOptions('divisional_secretariat');
+  const detecting = useRefOptions('detecting_officer');
+  const informants = useRefOptions('informant');
+  const support = useRefOptions('support_officer');
+  const ac = useRefOptions('ac');
+  const sc = useRefOptions('sc');
+  const oic = useRefOptions('oic');
+  const drivers = useRefOptions('driver');
+  const pick = (key: keyof CrDraft) => (v: string | undefined) => set((d) => ({ ...d, [key]: v }));
+  return (
+    <>
+      <FormSection title={label('tab.detection')}>
+        <FieldGrid>
+          <DateField
+            label={label('cr.detectionDate')}
+            value={draft.detectionDate}
+            error={errors.detectionDate}
+            onChange={pick('detectionDate')}
+          />
+          <TextField
+            label={label('cr.place')}
+            value={draft.place}
+            error={errors.place}
+            onChange={(v) => set((d) => ({ ...d, place: v }))}
+          />
+          <Select
+            label={label('cr.offence')}
+            value={draft.offenceTypeId}
+            error={errors.offenceTypeId}
+            options={offences}
+            onChange={pick('offenceTypeId')}
+          />
+          <Select
+            label={label('cr.policeArea')}
+            value={draft.policeAreaId}
+            options={police}
+            onChange={pick('policeAreaId')}
+          />
+          <Select
+            label={label('cr.divisionalSecretariat')}
+            value={draft.divisionalSecretariatId}
+            options={secretariats}
+            onChange={pick('divisionalSecretariatId')}
+          />
+          <Select
+            label={label('cr.detectingOfficer')}
+            value={draft.detectingOfficerId}
+            options={detecting}
+            onChange={pick('detectingOfficerId')}
+          />
+          <Select
+            label={label('cr.informant')}
+            value={draft.informantId}
+            options={informants}
+            onChange={pick('informantId')}
+          />
+          <Select label={label('cr.ac')} value={draft.acId} options={ac} onChange={pick('acId')} />
+          <Select label={label('cr.sc')} value={draft.scId} options={sc} onChange={pick('scId')} />
+          <Select
+            label={label('cr.oic')}
+            value={draft.oicId}
+            options={oic}
+            onChange={pick('oicId')}
+          />
+          <Select
+            label={label('cr.driver')}
+            value={draft.driverId}
+            options={drivers}
+            onChange={pick('driverId')}
+          />
+        </FieldGrid>
+      </FormSection>
+      <FormSection title={label('cr.supportOfficer')}>
+        <FieldGrid>
+          {Array.from({ length: 10 }, (_, i) => i + 1).map((pos) => (
+            <Select
+              key={pos}
+              label={`${label('cr.supportOfficer')} ${pos}`}
+              value={draft.support[pos]}
+              options={support}
+              onChange={(v) => set((d) => ({ ...d, support: { ...d.support, [pos]: v } }))}
+            />
+          ))}
+        </FieldGrid>
+      </FormSection>
+      <FormSection title={label('cr.notes')}>
+        <TextArea
+          label={label('cr.informantHelp')}
+          value={draft.informantHelp}
+          onChange={(v) => set((d) => ({ ...d, informantHelp: v }))}
+        />
+        <TextArea
+          label={label('cr.informantNote2')}
+          value={draft.informantNote2}
+          onChange={(v) => set((d) => ({ ...d, informantNote2: v }))}
+        />
+        <TextArea
+          label={label('cr.notes')}
+          value={draft.notes}
+          onChange={(v) => set((d) => ({ ...d, notes: v }))}
+        />
+      </FormSection>
+    </>
+  );
+}
+
+function AccusedTab({ draft, set, errors }: TabProps) {
+  const a = draft.accused;
+  const text = (key: Exclude<keyof CrDraft['accused'], 'age' | 'sex'>, caption: string) => (
+    <TextField
+      label={label(caption)}
+      value={a[key]}
+      error={errors[`accused.${key}`]}
+      onChange={(v) => set((d) => ({ ...d, accused: { ...d.accused, [key]: v } }))}
+    />
+  );
+  return (
+    <FormSection title={label('tab.accused')}>
+      <FieldGrid>
+        {text('name', 'accused.name')}
+        {text('address', 'accused.address')}
+        {text('nic', 'accused.nic')}
+        <NumberField
+          label={label('accused.age')}
+          value={a.age}
+          error={errors['accused.age']}
+          onChange={(v) => set((d) => ({ ...d, accused: { ...d.accused, age: v } }))}
+        />
+        {text('height', 'accused.height')}
+        <RadioGroup
+          label={label('accused.sex')}
+          name="sex"
+          value={a.sex}
+          onChange={(v) => set((d) => ({ ...d, accused: { ...d.accused, sex: v } }))}
+          options={[
+            { value: 'male', label: label('accused.sex.male') },
+            { value: 'female', label: label('accused.sex.female') },
+          ]}
+        />
+        {text('phone', 'accused.phone')}
+        {text('drivingLicenceNo', 'accused.drivingLicence')}
+        {text('passportNo', 'accused.passport')}
+      </FieldGrid>
+      <TextArea
+        label={label('accused.features')}
+        value={a.features}
+        onChange={(v) => set((d) => ({ ...d, accused: { ...d.accused, features: v } }))}
+      />
+      <TextArea
+        label={label('accused.note')}
+        value={draft.accusedNote}
+        onChange={(v) => set((d) => ({ ...d, accusedNote: v }))}
+      />
+    </FormSection>
+  );
+}
+
+function SuretyTab({ draft, set, errors }: TabProps) {
+  const field = (key: keyof CrDraft['surety'], caption: string) => (
+    <TextField
+      label={label(caption)}
+      value={draft.surety[key]}
+      error={errors[`surety.${key}`]}
+      onChange={(v) => set((d) => ({ ...d, surety: { ...d.surety, [key]: v } }))}
+    />
+  );
+  return (
+    <FormSection title={label('tab.surety')}>
+      <FieldGrid>
+        {field('name', 'surety.name')}
+        {field('address', 'surety.address')}
+        {field('nic', 'surety.nic')}
+        {field('phone', 'surety.phone')}
+      </FieldGrid>
+    </FormSection>
+  );
+}
+
+function CourtTab({ draft, set, errors }: TabProps) {
+  const courts = useRefOptions('court');
+  const prosecutors = useRefOptions('prosecuting_officer');
+  return (
+    <FormSection title={label('tab.court')}>
+      <FieldGrid>
+        <Select
+          label={label('case.court')}
+          value={draft.courtId}
+          error={errors.courtId}
+          options={courts}
+          onChange={(v) => set((d) => ({ ...d, courtId: v }))}
+        />
+        <DateField
+          label={label('case.courtDate')}
+          value={draft.courtDate}
+          error={errors.courtDate}
+          onChange={(v) => set((d) => ({ ...d, courtDate: v }))}
+        />
+        <Select
+          label={label('case.prosecutor')}
+          value={draft.prosecutingOfficerId}
+          options={prosecutors}
+          onChange={(v) => set((d) => ({ ...d, prosecutingOfficerId: v }))}
+        />
+      </FieldGrid>
+    </FormSection>
+  );
+}

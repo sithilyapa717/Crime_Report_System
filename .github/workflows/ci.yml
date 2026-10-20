@@ -71,7 +71,7 @@ jobs:
           node .github/scripts/run-tests.ts unit
           packages/db packages/migration packages/services/reference packages/services/audit
           apps/desktop/renderer/screens/cr-entry-tabs apps/desktop/renderer/screens/reference-lists
-          apps/desktop/renderer/screens/admin tests/migration
+          apps/desktop/renderer/screens/admin tests/migration tests/database
 
   services:
     name: Logic and services (B)
@@ -96,6 +96,8 @@ jobs:
           node .github/scripts/run-tests.ts unit apps/desktop/renderer
           --exclude apps/desktop/renderer/screens/cr-entry-tabs apps/desktop/renderer/screens/reference-lists
           apps/desktop/renderer/screens/admin apps/desktop/renderer/documents-dialog
+      - name: Build the app (renderer + main)
+        run: pnpm build
       - name: Playwright flows
         run: node .github/scripts/run-tests.ts playwright tests/e2e
 

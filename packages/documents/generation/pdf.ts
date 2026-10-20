@@ -18,8 +18,14 @@ const exists = (p: string) =>
     () => false,
   );
 
+/**
+ * generation/docx-to-pdf.ps1 next to this file. PowerShell cannot read inside an asar archive, so
+ * the packaged app ships the script unpacked and passes its path to `wordPdfExporter`.
+ */
+export const DOCX_TO_PDF_SCRIPT = join(import.meta.dirname ?? '.', 'docx-to-pdf.ps1');
+
 /** Converts with Word; throws PdfExportUnavailableError when not on Windows or Word is missing. */
-export const exportPdfWithWord: PdfExporter = async (docxPath) => {
+export const wordPdfExporter = (scriptPath: string = DOCX_TO_PDF_SCRIPT): PdfExporter => async (docxPath) => {
   if (process.platform !== 'win32') throw new PdfExportUnavailableError('PDF export needs Windows and Microsoft Word');
   const base = basename(docxPath).replace(/\.docx$/i, '.pdf');
   let pdfPath = join(dirname(docxPath), base);
@@ -27,7 +33,7 @@ export const exportPdfWithWord: PdfExporter = async (docxPath) => {
   try {
     await run(
       'powershell.exe',
-      ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', join(import.meta.dirname, 'docx-to-pdf.ps1'), docxPath, pdfPath],
+      ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath, docxPath, pdfPath],
       { timeout: 120_000, windowsHide: true },
     );
   } catch (e) {
@@ -39,3 +45,5 @@ export const exportPdfWithWord: PdfExporter = async (docxPath) => {
   }
   return pdfPath;
 };
+
+export const exportPdfWithWord: PdfExporter = wordPdfExporter();

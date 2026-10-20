@@ -1,7 +1,7 @@
 // The typed API the renderer sees as `window.excise`. Renderer code imports these types only.
 import type { CallResult, Channel, Handlers } from '@excise/desktop-main/src/host';
 
-export type { CallResult, Channel };
+export type { CallResult, Channel, Handlers };
 
 export interface ExciseApi {
   /**

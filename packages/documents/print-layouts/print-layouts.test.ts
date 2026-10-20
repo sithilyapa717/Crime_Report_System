@@ -17,7 +17,7 @@ const row = (extra: Partial<ConvictRow> = {}): ConvictRow => ({
   accusedNic: '851234567V',
   offenceCode: 'PUDS',
   offenceName: 'ස්ප්‍රිතු සතුව තබා ගැනීම',
-  quantityText: 'මිලි ලීටර් 750',
+  quantity: 750,
   courtId: 'c',
   courtName: 'මීගමුව මහේස්ත්‍රාත් අධිකරණය',
   caseNumber: '45678/26',
@@ -92,6 +92,7 @@ test('convicts list: title from the old report, columns in the old order', () =>
   const rows = html.split('<tbody>')[1]!.split('</tr>').slice(0, 2);
   // row 1: fine 25000, community service ticked (first sentence column)
   assert.match(rows[0]!, /25000/);
+  assert.match(rows[0]!, /<td class="num">750<\/td>/); // `quantity` from ConvictRow
   assert.equal(rows[0]!.match(/☑/g)?.length, 1);
   // row 2: no fine, imprisonment + suspended ticked
   assert.equal(rows[1]!.match(/☑/g)?.length, 2);

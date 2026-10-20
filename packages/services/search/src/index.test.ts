@@ -8,7 +8,12 @@ import {
 import { describe, expect, it } from 'vitest';
 import { DefaultSearchService, SearchInputError } from './index.js';
 
-const session = (): Session => ({ userId: 'u', username: 'u', role: 'observation' });
+const session = (): Session => ({
+  userId: 'u',
+  username: 'u',
+  role: 'observation',
+  mustChangePassword: false,
+});
 
 async function setup() {
   const repos = createMemoryRepositories();

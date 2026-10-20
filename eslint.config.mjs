@@ -3,7 +3,7 @@ import tseslint from 'typescript-eslint';
 // Layer rules (TEAM_WORK_SPLIT.md): UI must not import packages/db; services must not
 // contain SQL; db must not import UI or services.
 export default tseslint.config(
-  { ignores: ['**/node_modules/**', '**/dist/**', 'prototype/**'] },
+  { ignores: ['**/node_modules/**', '**/dist/**', '**/.cache/**', 'prototype/**'] },
   ...tseslint.configs.recommended,
   {
     files: ['apps/desktop/renderer/**/*.{ts,tsx}'],

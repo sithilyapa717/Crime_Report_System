@@ -8,18 +8,27 @@
     "start": "node build.mjs && electron ."
   },
   "dependencies": {
+    "@excise/audit": "workspace:*",
     "@excise/auth": "workspace:*",
+    "@excise/backup": "workspace:*",
     "@excise/case": "workspace:*",
     "@excise/contract": "workspace:*",
     "@excise/cr": "workspace:*",
+    "@excise/db": "workspace:*",
     "@excise/docdata": "workspace:*",
+    "@excise/documents": "workspace:*",
+    "@excise/files": "workspace:*",
     "@excise/labels": "workspace:*",
+    "@excise/migration": "workspace:*",
     "@excise/mocks": "workspace:*",
+    "@excise/reference": "workspace:*",
     "@excise/reports": "workspace:*",
     "@excise/schemas": "workspace:*",
     "@excise/search": "workspace:*",
     "@node-rs/argon2": "^2.2.2",
+    "better-sqlite3": "^13.0.3",
     "exceljs": "^4.4.0",
+    "kysely": "^0.29.7",
     "zod": "^3.25.76"
   },
   "devDependencies": {

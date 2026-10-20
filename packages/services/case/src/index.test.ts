@@ -11,7 +11,7 @@ import { CaseConflictError, CaseValidationError, DefaultCaseService } from './in
 
 const session =
   (role: Role): (() => Session) =>
-  () => ({ userId: 'u', username: 'u', role });
+  () => ({ userId: 'u', username: 'u', role, mustChangePassword: false });
 
 async function setup(role: Role = 'oic') {
   const repos = createMemoryRepositories();

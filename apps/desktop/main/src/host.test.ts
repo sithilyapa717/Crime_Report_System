@@ -2,11 +2,11 @@ import { randomUUID } from 'node:crypto';
 import { LABELS } from '@excise/labels';
 import { ReportType } from '@excise/schemas';
 import { describe, expect, it } from 'vitest';
-import { createDevRepositories, DEV_PASSWORD } from './dev-seed.js';
+import { BACKENDS, createDevData, DEV_PASSWORD, type Backend } from './dev-seed.js';
 import { createServiceHost, dispatch } from './host.js';
 
-async function setup() {
-  const repos = await createDevRepositories();
+async function setup(backend: Backend) {
+  const { repos } = await createDevData(backend);
   const saved: string[] = [];
   const { handlers } = createServiceHost(repos, {
     pickSavePath: async (name) => {
@@ -17,9 +17,9 @@ async function setup() {
   return { handlers, saved };
 }
 
-describe('IPC dispatch', () => {
+describe.each(BACKENDS)('IPC dispatch (%s)', (backend) => {
   it('rejects unknown channels and prototype keys', async () => {
-    const { handlers } = await setup();
+    const { handlers } = await setup(backend);
     expect(await dispatch(handlers, 'fs.readFile', [])).toMatchObject({
       ok: false,
       error: { name: 'UnknownChannel' },
@@ -29,7 +29,7 @@ describe('IPC dispatch', () => {
   });
 
   it('requires login before any service call', async () => {
-    const { handlers } = await setup();
+    const { handlers } = await setup(backend);
     const r = await dispatch(handlers, 'search.crimeReports', [
       { kind: 'name_nic', name: 'sample' },
     ]);
@@ -37,7 +37,7 @@ describe('IPC dispatch', () => {
   });
 
   it('runs a full flow: login, search, report, export cancelled', async () => {
-    const { handlers, saved } = await setup();
+    const { handlers, saved } = await setup(backend);
     const login = await dispatch(handlers, 'auth.login', ['observation', DEV_PASSWORD]);
     expect(login).toMatchObject({ ok: true, value: { role: 'observation' } });
 
@@ -61,8 +61,55 @@ describe('IPC dispatch', () => {
     expect(saved).toEqual(['report-register.csv']);
   });
 
+  it('a user who must change the password can do nothing else first', async () => {
+    const { handlers } = await setup(backend);
+    await dispatch(handlers, 'auth.login', ['oic', DEV_PASSWORD]);
+    await dispatch(handlers, 'auth.createUser', ['newdet', 'temporary1', 'detecting']);
+    await dispatch(handlers, 'auth.logout', []);
+    const login = await dispatch(handlers, 'auth.login', ['newdet', 'temporary1']);
+    expect(login).toMatchObject({ ok: true, value: { mustChangePassword: true } });
+    const blocked = await dispatch(handlers, 'reference.list', ['court']);
+    expect(blocked).toMatchObject({ error: { code: 'password_change_required' } });
+    await dispatch(handlers, 'auth.changePassword', ['temporary1', 'my-password']);
+    expect(await dispatch(handlers, 'reference.list', ['court'])).toMatchObject({ ok: true });
+  });
+
+  it('first run is refused once accounts exist', async () => {
+    const { handlers } = await setup(backend);
+    expect(await dispatch(handlers, 'auth.needsFirstUser', [])).toEqual({ ok: true, value: false });
+    expect(await dispatch(handlers, 'auth.createFirstUser', ['boss', 'longenough'])).toMatchObject({
+      ok: false,
+      error: { code: 'already_set_up' },
+    });
+  });
+
+  it('reference lists, users and audit go through role checks', async () => {
+    const { handlers } = await setup(backend);
+    await dispatch(handlers, 'auth.login', ['observation', DEV_PASSWORD]);
+    expect(await dispatch(handlers, 'reference.list', ['offence'])).toMatchObject({ ok: true });
+    for (const [channel, args] of [
+      ['reference.add', ['court', { value: 'X' }]],
+      ['users.list', []],
+      ['audit.search', [{}]],
+    ] as const) {
+      expect(await dispatch(handlers, channel, args), channel).toMatchObject({
+        ok: false,
+        error: { name: 'PermissionError' },
+      });
+    }
+    await dispatch(handlers, 'auth.logout', []);
+    await dispatch(handlers, 'auth.login', ['oic', DEV_PASSWORD]);
+    const added = await dispatch(handlers, 'reference.add', ['court', { value: 'Gampaha' }]);
+    expect(added).toMatchObject({ ok: true, value: { kind: 'court', value: 'Gampaha' } });
+    const audit = await dispatch(handlers, 'audit.search', [{ table: 'reference_items' }]);
+    expect(audit.ok && (audit.value as unknown[]).length).toBe(1);
+    expect(await dispatch(handlers, 'reference.list', ['nonsense'])).toMatchObject({
+      error: { name: 'InvalidArguments' },
+    });
+  });
+
   it('rejects arguments of the wrong shape before the service runs', async () => {
-    const { handlers } = await setup();
+    const { handlers } = await setup(backend);
     await dispatch(handlers, 'auth.login', ['oic', DEV_PASSWORD]);
     const bad = [
       ['cr.get', ['not-a-uuid']],
@@ -89,7 +136,7 @@ describe('IPC dispatch', () => {
   });
 
   it('keeps validation issues on errors', async () => {
-    const { handlers } = await setup();
+    const { handlers } = await setup(backend);
     await dispatch(handlers, 'auth.login', ['oic', DEV_PASSWORD]);
     const r = await dispatch(handlers, 'cr.create', [{}]);
     expect(r.ok).toBe(false);
@@ -97,7 +144,7 @@ describe('IPC dispatch', () => {
   });
 
   it('every report column and report type has a caption in the labels file', async () => {
-    const { handlers } = await setup();
+    const { handlers } = await setup(backend);
     await dispatch(handlers, 'auth.login', ['oic', DEV_PASSWORD]);
     for (const type of ReportType.options) {
       expect(LABELS, type).toHaveProperty([`reportType.${type}`]);
