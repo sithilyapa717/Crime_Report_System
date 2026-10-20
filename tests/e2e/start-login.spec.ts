@@ -38,7 +38,9 @@ test('first run: the station head creates the first account and sees the full me
   await page.screenshot({ path: join(SHOTS, 'home-oic.png'), fullPage: true });
 
   await page.getByRole('button', { name: label('menu.convicts'), exact: true }).click();
-  await expect(page.getByText(label('menu.notBuilt'))).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: label('menu.convicts'), exact: true }),
+  ).toBeVisible();
   await page.getByRole('button', { name: label('shell.home'), exact: true }).click();
 
   await page.getByRole('button', { name: label('shell.logout'), exact: true }).click();

@@ -1,0 +1,55 @@
+# Windows installer (REMAINING_WORK "Packaging (A)"). Build: `pnpm dist` from the repo root.
+#
+# - The main process is one bundle (dist/main.cjs); workspace packages are inside it, so only the
+#   npm packages it loads at run time are shipped (the `dependencies` of this package).
+# - D's templates, registry and PowerShell scripts, and the Access reader script, are real files
+#   under resources/ (PowerShell cannot read inside the asar archive). main.ts finds them through
+#   process.resourcesPath.
+# - better-sqlite3 13 and @node-rs/argon2 are N-API prebuilt binaries: no rebuild for Electron.
+appId: lk.gov.excise.crimereports
+productName: Excise Crime Reports
+# The installed app keeps its data in %APPDATA%\Excise Crime Reports (development builds use
+# their own folder, so a developer's PC never mixes test data with an installed copy).
+extraMetadata:
+  productName: Excise Crime Reports
+copyright: Department of Excise, Sri Lanka
+directories:
+  output: ../../../release
+  buildResources: build
+files:
+  - dist/**/*
+  - package.json
+  - '!dist/**/*.map'
+asar: true
+asarUnpack:
+  - '**/*.node'
+npmRebuild: false
+nodeGypRebuild: false
+extraResources:
+  - from: ../renderer/dist
+    to: renderer/dist
+  - from: ../../../packages/documents/templates/original
+    to: documents/templates/original
+  - from: ../../../packages/documents/registry
+    to: documents/registry
+    filter:
+      - templates.json
+      - template-inventory.json
+  - from: ../../../packages/documents/generation/docx-to-pdf.ps1
+    to: documents/generation/docx-to-pdf.ps1
+  - from: ../../../packages/migration/src/reader/read-accdb.ps1
+    to: migration/read-accdb.ps1
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  artifactName: Excise-Crime-Reports-Setup-${version}.${ext}
+nsis:
+  oneClick: false
+  perMachine: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Excise Crime Reports
+  # Data stays when the app is removed or upgraded (it lives in the user's AppData).
+  deleteAppDataOnUninstall: false

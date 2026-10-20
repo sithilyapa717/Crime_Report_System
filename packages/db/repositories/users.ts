@@ -11,7 +11,7 @@ import type {
 import type { Role } from '@excise/schemas';
 import { sql } from 'kysely';
 import type { UsersTable } from '../schema/tables.js';
-import type { ExciseDb } from '../src/connection.js';
+import type { DbHandle } from '../src/handle.js';
 import { created, newId, now } from './common.js';
 
 const toUser = (r: UsersTable): UserRecord => ({
@@ -25,7 +25,7 @@ const toUser = (r: UsersTable): UserRecord => ({
 });
 
 export class SqliteUserRepository implements UserRepository {
-  constructor(private readonly db: ExciseDb) {}
+  constructor(private readonly db: DbHandle) {}
 
   private touch() {
     return {
@@ -114,7 +114,7 @@ export class SqliteUserRepository implements UserRepository {
 }
 
 export class SqliteAuditSink implements AuditSink {
-  constructor(private readonly db: ExciseDb) {}
+  constructor(private readonly db: DbHandle) {}
 
   async record(entry: AuditEntry) {
     await this.db.q
@@ -136,7 +136,7 @@ export class SqliteAuditSink implements AuditSink {
 }
 
 export class SqliteAuditQueryRepository implements AuditQueryRepository {
-  constructor(private readonly db: ExciseDb) {}
+  constructor(private readonly db: DbHandle) {}
 
   async search(filter: AuditFilter): Promise<AuditRecord[]> {
     let q = this.db.q
@@ -161,7 +161,8 @@ export class SqliteAuditQueryRepository implements AuditQueryRepository {
     if (filter.to) q = q.where(sql<string>`substr(a.at, 1, 10)`, '<=', filter.to);
     const rows = await q
       .orderBy('a.at', 'desc')
-      .orderBy('a.rowid' as never, 'desc')
+      // Same millisecond: SQLite keeps insertion order in rowid; PostgreSQL has none (see the spike).
+      .orderBy((this.db.dialect === 'sqlite' ? 'a.rowid' : 'a.id') as never, 'desc')
       .limit(filter.limit ?? 200)
       .execute();
     return rows.map((r) => ({

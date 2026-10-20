@@ -40,6 +40,7 @@ import { DefaultReferenceService } from '@excise/reference';
 import { DefaultReportService } from '@excise/reports';
 import { DefaultSearchService } from '@excise/search';
 import { ARG_SCHEMAS } from './args.js';
+import type { FontStatus } from './fonts.js';
 import { DefaultPrintService, type PrintOutput } from './print.js';
 
 export interface Repositories {
@@ -76,6 +77,8 @@ export interface HostOptions {
   onRestored?: () => void;
   /** The main-process log file, for "show the log file" (support). */
   logFile?: string;
+  /** Template fonts and whether this PC has them; null where it cannot be checked. */
+  fontCheck?: () => Promise<FontStatus[] | null>;
   /** Access import (Windows): the reader, and where the last report is kept. */
   importer?: {
     read: AccdbReader;
@@ -349,6 +352,11 @@ export function createServiceHost(repos: Repositories, opts: HostOptions) {
       return path;
     },
 
+    /** OIC: which template fonts are missing on this PC. */
+    'support.fontCheck': async () => {
+      assertCan(current().role, 'admin');
+      return opts.fontCheck ? opts.fontCheck() : null;
+    },
     'support.showLogFile': async () => {
       need(opts.showItemInFolder, 'shell')(need(opts.logFile, 'log'));
     },

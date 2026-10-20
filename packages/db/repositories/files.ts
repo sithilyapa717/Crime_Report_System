@@ -8,7 +8,7 @@ import type {
 } from '@excise/documents';
 import { sql } from 'kysely';
 import type { FilesTable } from '../schema/tables.js';
-import type { ExciseDb } from '../src/connection.js';
+import type { DbHandle } from '../src/handle.js';
 import { created, now } from './common.js';
 
 const toFile = (r: FilesTable): StoredFile => ({
@@ -21,7 +21,7 @@ const toFile = (r: FilesTable): StoredFile => ({
 });
 
 export class SqliteFileRepository implements FileRepository {
-  constructor(private readonly db: ExciseDb) {}
+  constructor(private readonly db: DbHandle) {}
 
   async insert(file: StoredFile & { storedName: string }) {
     await this.db.q
@@ -84,7 +84,7 @@ export class SqliteFileRepository implements FileRepository {
 
 /** D's registry from the `document_templates` table (seeded once from templates.json). */
 export class SqliteTemplateSource implements TemplateSource {
-  constructor(private readonly db: ExciseDb) {}
+  constructor(private readonly db: DbHandle) {}
 
   async list(): Promise<TemplateEntry[]> {
     const rows = await this.db.q
@@ -129,7 +129,7 @@ export class SqliteTemplateSource implements TemplateSource {
 
 /** D's generation log in `generated_documents` (append-only). */
 export class SqliteGenerationLog implements GenerationLog {
-  constructor(private readonly db: ExciseDb) {}
+  constructor(private readonly db: DbHandle) {}
 
   async append(e: GenerationLogEntry): Promise<void> {
     await this.db.q

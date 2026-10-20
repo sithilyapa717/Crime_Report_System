@@ -1,0 +1,23 @@
+.ex-dialog--wide {
+  width: min(980px, 94vw);
+}
+.documents__groups {
+  max-height: 55vh;
+  overflow: auto;
+}
+.documents__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.documents__list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border);
+}
+.documents__title {
+  flex: 1;
+}

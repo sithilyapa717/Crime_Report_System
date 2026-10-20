@@ -1,8 +1,9 @@
 // The logged-in app: header (title, user, role, log out) and the current screen. Screens register
 // in SCREENS; the ones not built yet show a placeholder.
 import { label } from '@excise/labels';
-import type { ComponentType } from 'react';
-import { BigMenuButton, Button, MenuGrid } from '../design-system/index.js';
+import { useEffect, useState, type ComponentType } from 'react';
+import { Alert, BigMenuButton, Button, MenuGrid } from '../design-system/index.js';
+import { call } from '../src/ipc.js';
 import { useNav } from './navigation.js';
 import { MENUS, type RouteName } from './routes.js';
 import './shell.css';
@@ -65,6 +66,22 @@ const TONE: Partial<Record<string, number>> = {
   referenceLists: 3,
 };
 
+/** The station head is told once per start when the templates' fonts are missing here. */
+function FontWarning() {
+  const [missing, setMissing] = useState<string[]>([]);
+  useEffect(() => {
+    call('support.fontCheck')
+      .then((list) => setMissing((list ?? []).filter((f) => !f.installed).map((f) => f.font)))
+      .catch(() => undefined);
+  }, []);
+  if (!missing.length) return null;
+  return (
+    <Alert kind="warn">
+      {label('fonts.missing')} {missing.join(', ')}
+    </Alert>
+  );
+}
+
 function HomeMenu() {
   const { session, go } = useNav();
   const menu = MENUS[session.role];
@@ -80,6 +97,7 @@ function HomeMenu() {
   return (
     <>
       <h1>{label(`role.${session.role}`)}</h1>
+      {session.role === 'oic' && <FontWarning />}
       <div className="home">
         <MenuGrid label={label('shell.home')}>
           {menu.main.filter((i) => !SIDE.has(i.route)).map(button)}

@@ -1,0 +1,16 @@
+.backup__folder {
+  font-family: ui-monospace, Consolas, monospace;
+  word-break: break-all;
+}
+.import__numbers {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-4);
+  margin: 0 0 var(--space-3);
+}
+.import__numbers dt {
+  font-weight: 600;
+}
+.import__numbers dd {
+  margin: 0;
+}

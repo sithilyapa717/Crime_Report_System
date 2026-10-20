@@ -9,13 +9,15 @@ import Database from 'better-sqlite3';
 import { Kysely, SqliteDialect, type Transaction } from 'kysely';
 import { MIGRATIONS } from '../migrations/index.js';
 import type { DB } from '../schema/tables.js';
+import type { DbHandle } from './handle.js';
 
 export interface OpenOptions {
   /** Who is making changes, for `updated_by` (the session's user id). */
   currentUser?: () => string | null;
 }
 
-export class ExciseDb {
+export class ExciseDb implements DbHandle {
+  readonly dialect = 'sqlite' as const;
   private conn!: Database.Database;
   private kysely!: Kysely<DB>;
   private readonly tx = new AsyncLocalStorage<Transaction<DB>>();

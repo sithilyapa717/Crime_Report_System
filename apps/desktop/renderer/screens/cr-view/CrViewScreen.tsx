@@ -16,6 +16,7 @@ import { allowed } from '../../shell/routes.js';
 import { useNav } from '../../shell/navigation.js';
 import { call, IpcError } from '../../src/ipc.js';
 import { useRefNames } from '../../src/references.js';
+import { DocumentsButton } from '../../documents-dialog/DocumentsDialog.js';
 import { Pictures } from '../cr-entry/Pictures.js';
 import { CrPicker } from '../shared/CrPicker.js';
 import { SEIZED } from '../shared/cr-model.js';
@@ -93,6 +94,7 @@ export function CrViewScreen() {
       {cr.deleted && <Alert kind="warn">{label('cr.deleted')}</Alert>}
       <Actions>
         <Button onClick={() => window.print()}>{label('cr.print')}</Button>
+        {!cr.deleted && <DocumentsButton crimeReportId={cr.id} role={session.role} />}
         {allowed(session.role, 'caseProgress') && (
           <Button onClick={() => go('caseProgress', { id: cr.id })}>
             {label('menu.caseProgress')}

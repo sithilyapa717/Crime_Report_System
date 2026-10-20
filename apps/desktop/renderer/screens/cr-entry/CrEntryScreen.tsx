@@ -36,6 +36,7 @@ import {
   toInput,
   type CrDraft,
 } from '../shared/cr-model.js';
+import { DocumentsButton } from '../../documents-dialog/DocumentsDialog.js';
 import { Pictures } from './Pictures.js';
 import './cr-entry.css';
 
@@ -50,7 +51,7 @@ interface Loaded {
 }
 
 export function CrEntryScreen() {
-  const { route, replace } = useNav();
+  const { route, replace, session } = useNav();
   const id = route.params?.id;
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [draft, setDraft] = useState<CrDraft>(() => emptyDraft({ officeId: lastOffice() }));
@@ -243,6 +244,7 @@ export function CrEntryScreen() {
       {loaded && !deleted && <Pictures crimeReportId={loaded.cr.id} />}
 
       <Actions>
+        {loaded && !deleted && <DocumentsButton crimeReportId={loaded.cr.id} role={session.role} />}
         {loaded && !deleted && (
           <Button variant="danger" onClick={() => setConfirmDelete(true)}>
             {label('cr.delete')}

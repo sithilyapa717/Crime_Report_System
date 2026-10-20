@@ -12,14 +12,14 @@ import type {
 import type { CaseType, OutcomeType } from '@excise/schemas';
 import { sql, type SelectQueryBuilder } from 'kysely';
 import type { DB } from '../schema/tables.js';
-import type { ExciseDb } from '../src/connection.js';
+import type { DbHandle } from '../src/handle.js';
 import { chunks } from './common.js';
 
 /** Case-insensitive "contains" on a column, with LIKE wildcards in the input escaped. */
 const contains = (column: string, text: string) =>
   sql<boolean>`lower(${sql.ref(column)}) LIKE ${'%' + text.toLowerCase().replace(/[\\%_]/g, (c) => '\\' + c) + '%'} ESCAPE '\\'`;
 
-async function outcomesByCase(db: ExciseDb, caseIds: string[]) {
+async function outcomesByCase(db: DbHandle, caseIds: string[]) {
   const map = new Map<
     string,
     {
@@ -61,7 +61,7 @@ async function outcomesByCase(db: ExciseDb, caseIds: string[]) {
 }
 
 export class SqliteCrQueryRepository implements CrQueryRepository {
-  constructor(private readonly db: ExciseDb) {}
+  constructor(private readonly db: DbHandle) {}
 
   private base() {
     return this.db.q
@@ -237,7 +237,7 @@ interface ReportViewRow {
 }
 
 export class SqliteReportRowRepository implements ReportRowRepository {
-  constructor(private readonly db: ExciseDb) {}
+  constructor(private readonly db: DbHandle) {}
 
   async rowsFor(scope: ReportScope): Promise<ReportRow[]> {
     let q = (
@@ -301,7 +301,8 @@ export class SqliteReportRowRepository implements ReportRowRepository {
       accusedDied: r.accused_died === 1,
       outcomes: (r.case_id ? (outcomes.get(r.case_id) ?? []) : []).map((o) => o.type),
       convictedDate: r.convicted_date,
-      fineAmount: r.fine_amount,
+      // PostgreSQL returns SUM over integers as a bigint string.
+      fineAmount: r.fine_amount === null ? null : Number(r.fine_amount),
       rewardVoucherReceived: r.reward_voucher_received === 1,
       addToConvictRegister: r.add_to_convict_register === 1,
       quantity: r.quantity,

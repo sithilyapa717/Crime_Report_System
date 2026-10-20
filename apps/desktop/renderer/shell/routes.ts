@@ -21,7 +21,10 @@ export type RouteName =
   | 'backup'
   | 'audit'
   | 'import'
-  | 'changePassword';
+  | 'changePassword'
+  | 'caseNumberSearch'
+  | 'nameNicSearch'
+  | 'previousByCourt';
 
 export interface Route {
   name: RouteName;
@@ -33,7 +36,19 @@ export interface MenuItem {
   label: LabelKey;
 }
 
-const ITEM: Record<Exclude<RouteName, 'home' | 'changePassword'>, LabelKey> = {
+/** Screens opened from inside another screen; allowed when that screen is. */
+const SUB_ROUTES: Partial<Record<RouteName, RouteName>> = {
+  caseNumberSearch: 'reports',
+  nameNicSearch: 'reports',
+  previousByCourt: 'reports',
+};
+
+type MenuRoute = Exclude<
+  RouteName,
+  'home' | 'changePassword' | 'caseNumberSearch' | 'nameNicSearch' | 'previousByCourt'
+>;
+
+const ITEM: Record<MenuRoute, LabelKey> = {
   crEntry: 'menu.crEntry',
   crView: 'menu.crView',
   caseProgress: 'menu.caseProgress',
@@ -85,6 +100,8 @@ export const MENUS: Record<Role, { main: MenuItem[]; admin: MenuItem[] }> = {
 /** May this role open the screen at all (also hides direct navigation to it)? */
 export function allowed(role: Role, route: RouteName): boolean {
   if (route === 'home' || route === 'changePassword') return true;
+  const parent = SUB_ROUTES[route];
+  if (parent) return allowed(role, parent);
   const m = MENUS[role];
   return [...m.main, ...m.admin].some((i) => i.route === route);
 }

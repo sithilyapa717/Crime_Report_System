@@ -4,11 +4,11 @@
 import type { CaseRepository } from '@excise/contract';
 import { CaseRecord, type CaseInput } from '@excise/schemas';
 import { sql } from 'kysely';
-import type { ExciseDb } from '../src/connection.js';
+import type { DbHandle } from '../src/handle.js';
 import { compact, created, flag, now } from './common.js';
 
 export class SqliteCaseRepository implements CaseRepository {
-  constructor(private readonly db: ExciseDb) {}
+  constructor(private readonly db: DbHandle) {}
 
   private columns(input: CaseInput) {
     return {

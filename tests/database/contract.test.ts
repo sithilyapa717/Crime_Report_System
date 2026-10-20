@@ -1,24 +1,44 @@
-// The repository contract (packages/shared/contract), run against BOTH the in-memory mocks the
-// services were built on and the SQLite repositories. Whatever the services relied on in the
-// mocks must hold on the real database.
+// The repository contract (packages/shared/contract), run against the in-memory mocks the
+// services were built on, the SQLite repositories, and (A15 spike, when EXCISE_PG_URL is set by
+// `pnpm db:pg-spike`) the same repositories on PostgreSQL. Whatever the services relied on in
+// the mocks must hold on every real database.
 import {
   createMemoryRepositories,
   sampleCaseInput,
   sampleCrInput,
   seedSampleReferences as seedRefs,
 } from '@excise/mocks';
-import { describe, expect, it } from 'vitest';
-import { createSqliteRepositories, openDatabase } from '@excise/db';
+import { afterAll, describe, expect, it } from 'vitest';
+import { createRepositories, createSqliteRepositories, openDatabase } from '@excise/db';
+import { openPostgres, type PgDb } from '@excise/db/postgres-spike/pg-db.ts';
 
-const IMPLEMENTATIONS = {
-  memory: () => createMemoryRepositories(),
-  sqlite: () => createSqliteRepositories(openDatabase(':memory:')),
+const PG_URL = process.env.EXCISE_PG_URL;
+const pgDbs: PgDb[] = [];
+afterAll(async () => {
+  for (const db of pgDbs) await db.close();
+});
+
+const IMPLEMENTATIONS: Record<
+  string,
+  () => Promise<ReturnType<typeof createMemoryRepositories> | ReturnType<typeof createRepositories>>
+> = {
+  memory: async () => createMemoryRepositories(),
+  sqlite: async () => createSqliteRepositories(openDatabase(':memory:')),
+  ...(PG_URL
+    ? {
+        postgres: async () => {
+          const db = await openPostgres(PG_URL, `t_${crypto.randomUUID().replace(/-/g, '')}`);
+          pgDbs.push(db);
+          return createRepositories(db);
+        },
+      }
+    : {}),
 };
 
 for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
   describe(`repository contract: ${name}`, () => {
     async function setup() {
-      const repos = make();
+      const repos = await make();
       const refs = await seedRefs(repos.references);
       return { repos, refs };
     }

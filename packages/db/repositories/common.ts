@@ -1,14 +1,14 @@
 // Helpers shared by the SQLite repositories.
 import { randomUUID } from 'node:crypto';
 import type { ReferenceKind } from '@excise/schemas';
-import type { ExciseDb } from '../src/connection.js';
+import type { DbHandle } from '../src/handle.js';
 
 export const now = () => new Date().toISOString();
 export const newId = () => randomUUID();
 export const flag = (b: boolean | undefined) => (b ? 1 : 0);
 
 /** The sync columns for a new row. */
-export function created(db: ExciseDb, id: string = newId(), at: string = now()) {
+export function created(db: DbHandle, id: string = newId(), at: string = now()) {
   return {
     id,
     created_at: at,
