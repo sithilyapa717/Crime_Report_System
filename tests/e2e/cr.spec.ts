@@ -216,7 +216,10 @@ test('another user saving first gives the "changed by someone else" message', as
   await field(page, 'cr.office').last().selectOption({ label: 'මීගමුව' });
   await field(page, 'cr.number').first().fill('9');
   await button(page, 'cr.find').click();
+  // Wait for the CR to be open: typing earlier lands in the new-CR form that it replaces.
+  await expect(page.getByRole('group', { name: '9/2026' })).toBeVisible();
   await field(page, 'cr.place').fill('Mine');
+  await expect(button(page, 'common.save')).toBeEnabled();
   // Someone else saves the same CR meanwhile.
   await page.evaluate(async (crId) => {
     const cur = await window.excise.call('cr.get', crId);
