@@ -60,7 +60,7 @@ export function renderConvictsList(rows: ConvictRow[], period: ConvictsListPerio
         .map(
           (r) => `<tr>
 <td class="nw">${esc(r.crNumber)}</td><td>${esc(r.accusedName)}</td><td class="nw">${esc(r.accusedNic)}</td>
-<td class="nw">${esc(r.offenceCode)}</td><td>${esc(r.quantityText)}</td>
+<td class="nw">${esc(r.offenceCode)}</td><td class="num">${esc(r.quantity)}</td>
 <td class="num">${esc(r.fineAmount === null ? '' : formatMoney(r.fineAmount))}</td>
 <td>${esc(r.accusedAddress)}</td><td>${esc(r.courtName)}</td><td class="nw">${esc(r.caseNumber)}</td>
 <td class="nw">${esc(r.convictedDate ? formatDate(r.convictedDate) : '')}</td>

@@ -11,7 +11,12 @@ import type { Role } from '@excise/schemas';
 import { describe, expect, it } from 'vitest';
 import { DefaultDocDataService } from './index.js';
 
-const session = (role: Role) => (): Session => ({ userId: 'u', username: 'u', role });
+const session = (role: Role) => (): Session => ({
+  userId: 'u',
+  username: 'u',
+  role,
+  mustChangePassword: false,
+});
 
 /** Field names from D's generated catalogue (read-only here). */
 function catalogueFields(): string[] {
@@ -25,7 +30,7 @@ function catalogueFields(): string[] {
 async function setup(role: Role = 'detecting') {
   const repos = createMemoryRepositories();
   const refs = seedReferences(repos.store);
-  const support = repos.store.addRef({ name: 'Support Six' });
+  const support = repos.store.addRef({ kind: 'support_officer', name: 'Support Six' });
   const cr = await repos.crs.insert(
     sampleCrInput(refs, {
       supportOfficers: [

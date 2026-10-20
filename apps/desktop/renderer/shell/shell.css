@@ -1,0 +1,124 @@
+.shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.shell__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-5);
+  background: var(--primary);
+  color: var(--primary-text);
+}
+.shell__header .ex-button--ghost {
+  color: var(--primary-text);
+}
+.shell__header .ex-muted {
+  color: #cfe0f5;
+  margin-left: var(--space-3);
+}
+.shell__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.shell__crumbs {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5) 0;
+}
+.shell > main {
+  width: 100%;
+}
+/* Old main menu (03_menu.png): two columns of colour-coded buttons, reports and list editing on
+   the right. */
+.home {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+.home .ex-menu-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.home__side .ex-menu-grid {
+  grid-template-columns: 1fr;
+}
+.ex-menu-button.tone-0 {
+  border-color: #0b5394;
+  color: #0b5394;
+}
+.ex-menu-button.tone-1 {
+  border-color: #1e7b34;
+  color: #1e7b34;
+}
+.ex-menu-button.tone-2 {
+  border-color: #b35c00;
+  color: #8a4600;
+}
+.ex-menu-button.tone-3 {
+  border-color: #8a4fc4;
+  color: #6b34a3;
+}
+.ex-menu-button.tone-0:hover {
+  background: #dfeaf8;
+}
+.ex-menu-button.tone-1:hover {
+  background: #e3f3e7;
+}
+.ex-menu-button.tone-2:hover {
+  background: #fdeedd;
+}
+.ex-menu-button.tone-3:hover {
+  background: #f1e7fa;
+}
+@media (max-width: 900px) {
+  .home {
+    grid-template-columns: 1fr;
+  }
+}
+.shell__section {
+  margin-top: var(--space-6);
+}
+
+/* Start screen */
+.start {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  background: linear-gradient(180deg, #0b3d6b 0%, #0b5394 45%, var(--bg) 45%);
+}
+.start__banner {
+  text-align: center;
+  color: #fff;
+}
+.start__banner h1 {
+  font-size: 34px;
+  margin: 0;
+}
+.start__banner p {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-lg);
+}
+.start__roles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 240px));
+  gap: var(--space-4);
+}
+.start__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+@media (max-width: 1000px) {
+  .start__roles {
+    grid-template-columns: repeat(2, minmax(160px, 240px));
+  }
+}

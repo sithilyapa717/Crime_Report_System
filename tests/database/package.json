@@ -1,0 +1,12 @@
+{
+  "name": "@excise/tests-database",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@excise/backup": "workspace:*",
+    "@excise/db": "workspace:*",
+    "@excise/mocks": "workspace:*",
+    "@excise/reports": "workspace:*",
+    "@excise/search": "workspace:*"
+  }
+}

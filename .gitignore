@@ -6,3 +6,6 @@ out/
 *.db-journal
 .DS_Store
 coverage/
+*.sqlite
+*.sqlite-*
+.cache/

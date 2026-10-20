@@ -15,7 +15,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 function setup(role: Role, clock?: () => number) {
   const repos = createMemoryRepositories();
   const refs = seedReferences(repos.store);
-  const session: Session = { userId: 'u1', username: 'u1', role };
+  const session: Session = { userId: 'u1', username: 'u1', role, mustChangePassword: false };
   const svc = new DefaultCrService(repos.crs, () => session, repos.audit, clock);
   return { svc, repos, input: sampleCrInput(refs) };
 }
@@ -85,7 +85,7 @@ describe('CrService', () => {
 
     const oic = new DefaultCrService(
       det.repos.crs,
-      () => ({ userId: 'o', username: 'o', role: 'oic' }),
+      () => ({ userId: 'o', username: 'o', role: 'oic', mustChangePassword: false }),
       det.repos.audit,
       () => now,
     );

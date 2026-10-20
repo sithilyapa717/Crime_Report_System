@@ -9,7 +9,12 @@ import type { Role } from '@excise/schemas';
 import { describe, expect, it } from 'vitest';
 import { DefaultReportService } from './index.js';
 
-const session = (role: Role) => (): Session => ({ userId: 'u', username: 'u', role });
+const session = (role: Role) => (): Session => ({
+  userId: 'u',
+  username: 'u',
+  role,
+  mustChangePassword: false,
+});
 
 async function setup(role: Role = 'oic') {
   const repos = createMemoryRepositories();

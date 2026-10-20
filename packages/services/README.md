@@ -6,7 +6,7 @@ The rules of the app: no UI, no SQL. Screens call these through IPC (`apps/deskt
 
 | Package      | Plan item | What it does                                                                                                                                                                                                       |
 | ------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `auth`       | B2        | Roles and permissions (`assertCan` in every service method), Argon2 login, lock after 5 failed attempts, change password, OIC creates and unlocks users                                                            |
+| `auth`       | B2        | Roles and permissions (`assertCan` in every service method), Argon2 login, lock after 5 failed attempts, change password, first-run OIC set-up, forced password change, OIC users screen (list, deactivate, reset) |
 | `cr`         | B3        | Create, update, find, soft delete, restore. CR number `n/year` unique per office and year; a deleted CR's number can be reused; restore within 30 days (later: OIC only)                                           |
 | `case`       | B4        | Court, case number, case type, hearings, outcomes, reward voucher, register references, hand-over. Optimistic locking by `version`                                                                                 |
 | `validation` | B5        | §4.3 rules: NIC format, CR number, no future detection date, hearings not before detection, no outcome without a case number                                                                                       |
@@ -14,6 +14,10 @@ The rules of the app: no UI, no SQL. Screens call these through IPC (`apps/deskt
 | `reports`    | B7        | Scope (year / month / half-year) × person (none / detecting officer / informant) × type (the 10 old report filters); summaries per offence or officer with counts, quantities per item, `Quantity` total and fines |
 | `docdata`    | B8        | All merge fields of the 92 templates as raw values (ISO dates, cents, typed text); D formats them                                                                                                                  |
 | `export`     | B9        | Excel and CSV (UTF-8 with BOM, Sinhala headers from the labels file)                                                                                                                                               |
+| `reference`  | A11       | The 14 lookup lists: everyone reads, the OIC adds, renames, deactivates; delete only when unused; offence codes unique                                                                                             |
+| `audit`      | A10       | Audit viewer search (OIC only); filters by table, row, user and date                                                                                                                                               |
+| `files`      | A9        | Pictures attached to a CR: copied into the app folder under random names, previews, soft remove, orphan clean-up after backups                                                                                     |
+| `backup`     | A8        | Backup folder with manifest and checksum, daily automatic backup with pruning, verify, restore with a safety copy first. Database-specific steps go through `DatabaseFiles` (packages/db)                          |
 | `mocks`      | –         | In-memory repositories and sample data, so the app runs before A's database exists                                                                                                                                 |
 
 `tests/reports-parity` (B10) has the comparison tools; the tests wait for real data.

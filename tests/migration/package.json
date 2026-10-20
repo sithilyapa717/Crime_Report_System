@@ -1,0 +1,11 @@
+{
+  "name": "@excise/tests-migration",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@excise/contract": "workspace:*",
+    "@excise/migration": "workspace:*",
+    "@excise/mocks": "workspace:*",
+    "esbuild": "^0.25.12"
+  }
+}

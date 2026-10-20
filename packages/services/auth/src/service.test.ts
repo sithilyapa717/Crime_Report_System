@@ -2,6 +2,7 @@ import { createMemoryRepositories } from '@excise/mocks';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   DefaultAuthService,
+  DefaultUserAdminService,
   hashPassword,
   LoginError,
   PasswordPolicyError,
@@ -21,6 +22,7 @@ beforeEach(async () => {
     passwordHash: await hashPassword('correct-horse'),
     role: 'oic',
     active: true,
+    mustChangePassword: false,
   });
 });
 
@@ -82,5 +84,70 @@ describe('AuthService', () => {
     await auth.changePassword('correct-horse', 'new-password');
     await auth.logout();
     await expect(auth.login('oic', 'new-password')).resolves.toBeTruthy();
+  });
+
+  it('new users must change their password at first login', async () => {
+    await auth.login('oic', 'correct-horse');
+    await auth.createUser('det1', 'temporary1', 'detecting');
+    await auth.logout();
+    const s = await auth.login('det1', 'temporary1');
+    expect(s.mustChangePassword).toBe(true);
+    await expect(auth.changePassword('temporary1', 'temporary1')).rejects.toMatchObject({
+      code: 'same_password',
+    });
+    await auth.changePassword('temporary1', 'my-own-password');
+    expect((await auth.currentSession())?.mustChangePassword).toBe(false);
+    await auth.logout();
+    expect((await auth.login('det1', 'my-own-password')).mustChangePassword).toBe(false);
+  });
+});
+
+describe('first run', () => {
+  it('creates the first OIC once, then refuses', async () => {
+    const fresh = createMemoryRepositories();
+    const s = new SessionHolder();
+    const a = new DefaultAuthService(fresh.users, s, fresh.audit);
+    expect(await a.needsFirstUser()).toBe(true);
+    await expect(a.createFirstUser('x', 'longenough')).rejects.toMatchObject({
+      code: 'bad_username',
+    });
+    const session = await a.createFirstUser('station.head', 'longenough');
+    expect(session).toMatchObject({ role: 'oic', mustChangePassword: false });
+    expect(await a.currentSession()).toEqual(session);
+    expect(await a.needsFirstUser()).toBe(false);
+    await expect(a.createFirstUser('second', 'longenough')).rejects.toMatchObject({
+      code: 'already_set_up',
+    });
+  });
+});
+
+describe('UserAdminService', () => {
+  it('lists, deactivates and resets passwords (OIC only), never its own account', async () => {
+    const admin = new DefaultUserAdminService(repos.users, sessions, repos.audit);
+    await expect(admin.list()).rejects.toBeInstanceOf(LoginError);
+    const me = await auth.login('oic', 'correct-horse');
+    await auth.createUser('det1', 'longenough', 'detecting');
+    const det = (await admin.list()).find((u) => u.username === 'det1')!;
+    expect(det).toMatchObject({ role: 'detecting', active: true, locked: false });
+
+    await expect(admin.setActive(me.userId, false)).rejects.toMatchObject({ code: 'own_account' });
+    await admin.setActive(det.id, false);
+    await auth.logout();
+    await expect(auth.login('det1', 'longenough')).rejects.toMatchObject({
+      code: 'invalid_credentials',
+    });
+
+    // Lock det1, then reset: unlocked and must change the password.
+    await auth.login('oic', 'correct-horse');
+    await admin.setActive(det.id, true);
+    await auth.logout();
+    for (let i = 0; i < 5; i++) await auth.login('det1', 'wrong').catch(() => undefined);
+    await auth.login('oic', 'correct-horse');
+    expect((await admin.list()).find((u) => u.id === det.id)?.locked).toBe(true);
+    await admin.resetPassword(det.id, 'temporary2');
+    await auth.logout();
+    expect(await auth.login('det1', 'temporary2')).toMatchObject({ mustChangePassword: true });
+    await expect(admin.list()).rejects.toThrow(/lacks permission/);
+    expect(JSON.stringify(repos.store.audit)).not.toMatch(/temporary2|\$argon2/);
   });
 });

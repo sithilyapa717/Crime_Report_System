@@ -14,7 +14,7 @@ const row = (extra: Partial<ConvictRow> = {}): ConvictRow => ({
   accusedNic: null,
   offenceCode: 'UPH',
   offenceName: '',
-  quantityText: null,
+  quantity: null,
   courtId: null,
   courtName: null,
   caseNumber: null,
@@ -40,7 +40,7 @@ test('convicts list with missing data prints empty cells, never "null"', () => {
 });
 
 test('convicts list escapes values', () => {
-  const html = renderConvictsList([row({ accusedName: '<b>x</b>', quantityText: 'a & b' })], { year: 2026 }).html;
+  const html = renderConvictsList([row({ accusedName: '<b>x</b>', offenceCode: 'a & b' })], { year: 2026 }).html;
   assert.ok(html.includes('&lt;b&gt;x&lt;/b&gt;'));
   assert.ok(html.includes('a &amp; b'));
 });

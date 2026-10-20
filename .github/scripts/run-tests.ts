@@ -42,7 +42,9 @@ if (runner === 'unit') {
   console.log(`Running ${tests.length} Playwright file(s).`);
   run('pnpm', ['exec', 'playwright', 'install', '--with-deps', 'chromium']);
   // Electron needs a display on the Linux runner.
-  const cmd = ['pnpm', 'exec', 'playwright', 'test', ...include];
+  // A folder with its own playwright.config.ts (tests/e2e) runs with that config.
+  const configs = include.map((d) => `${d}/playwright.config.ts`).filter((f) => existsSync(f));
+  const cmd = ['pnpm', 'exec', 'playwright', 'test', ...(configs.length ? configs.flatMap((c) => ['-c', c]) : include)];
   if (process.platform === 'linux' && !process.env.DISPLAY) run('xvfb-run', ['-a', ...cmd]);
   else run(cmd[0], cmd.slice(1));
 }

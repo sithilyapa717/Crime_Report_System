@@ -7,6 +7,10 @@
     "packages/services/*/src",
     "apps/desktop/main/src",
     "apps/desktop/preload/src",
-    "tests/reports-parity"
+    "tests/reports-parity",
+    "packages/migration/src",
+    "packages/db",
+    "tests/migration",
+    "tests/database"
   ]
 }

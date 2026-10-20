@@ -1,0 +1,85 @@
+.cr-picker__title {
+  font-size: var(--text-md);
+  margin-bottom: var(--space-2);
+}
+.cr-entry__body {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.cr-entry__header {
+  background: #fff8fb;
+}
+.pictures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.pictures__item {
+  margin: 0;
+  width: 180px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-2);
+  background: var(--surface);
+}
+.pictures__item img {
+  display: block;
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.pictures__item figcaption {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Read-only CR view, also used for printing. */
+.cr-view dl {
+  display: grid;
+  grid-template-columns: minmax(180px, max-content) 1fr;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+}
+.cr-view__row {
+  display: contents;
+}
+.cr-view dt {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.cr-view dd {
+  margin: 0;
+  white-space: pre-wrap;
+}
+@media print {
+  .shell__header,
+  .shell__crumbs,
+  .ex-actions,
+  .no-print {
+    display: none !important;
+  }
+  .ex-page {
+    padding: 0;
+  }
+  .ex-section {
+    break-inside: avoid;
+  }
+}
+
+/* Case progress: outcome grid and hearing rows. */
+.case-outcomes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.case-hearing {
+  display: grid;
+  grid-template-columns: 220px 1fr auto;
+  gap: var(--space-3);
+  align-items: end;
+}

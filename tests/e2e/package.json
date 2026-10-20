@@ -1,0 +1,9 @@
+{
+  "name": "@excise/tests-e2e",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@excise/desktop-preload": "workspace:*",
+    "@excise/labels": "workspace:*"
+  }
+}
