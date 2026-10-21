@@ -40,7 +40,7 @@ export function ConvictsRegisterScreen() {
             onChange={setMonth}
           />
           <Button type="submit" variant="primary" busy={s.busy} disabled={!officeId || !year}>
-            {label('search.go')}
+            {label('menu.convicts')}
           </Button>
         </form>
       </Card>
@@ -82,7 +82,7 @@ export function ConvictsCheckScreen() {
             busy={s.busy}
             disabled={!name.trim() && !nic.trim()}
           >
-            {label('search.go')}
+            {label('menu.convictsCheck')}
           </Button>
         </form>
       </Card>

@@ -39,7 +39,7 @@ function SearchForm({
       <form className="ex-filters" onSubmit={submit} aria-label={title}>
         {fields}
         <Button type="submit" variant="primary" busy={busy} disabled={!canSearch}>
-          {label('search.go')}
+          {title}
         </Button>
       </form>
     </Card>
