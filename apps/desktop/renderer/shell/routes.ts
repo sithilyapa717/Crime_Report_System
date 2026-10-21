@@ -24,7 +24,8 @@ export type RouteName =
   | 'changePassword'
   | 'caseNumberSearch'
   | 'nameNicSearch'
-  | 'previousByCourt';
+  | 'previousByCourt'
+  | 'adminHub';
 
 export interface Route {
   name: RouteName;
@@ -41,6 +42,10 @@ const SUB_ROUTES: Partial<Record<RouteName, RouteName>> = {
   caseNumberSearch: 'reports',
   nameNicSearch: 'reports',
   previousByCourt: 'reports',
+  users: 'adminHub',
+  backup: 'adminHub',
+  audit: 'adminHub',
+  import: 'adminHub',
 };
 
 type MenuRoute = Exclude<
@@ -64,6 +69,7 @@ const ITEM: Record<MenuRoute, LabelKey> = {
   backup: 'admin.backup',
   audit: 'admin.audit',
   import: 'admin.import',
+  adminHub: 'menu.adminHub',
 };
 
 /** The screen title shown in the top bar: the menu caption that opened it. */
@@ -97,7 +103,7 @@ const SEARCHES = [
 export const MENUS: Record<Role, { main: MenuItem[]; admin: MenuItem[] }> = {
   oic: {
     main: items('crEntry', 'crView', 'caseProgress', ...SEARCHES, 'reports', 'referenceLists'),
-    admin: items('users', 'backup', 'audit', 'import'),
+    admin: items('adminHub'),
   },
   detecting: {
     main: items('crEntry', 'crView', 'caseProgress', ...SEARCHES, 'reports'),

@@ -96,7 +96,7 @@ const GROUPS: { title: string; routes: RouteName[] }[] = [
   { title: 'menu.group.convicts', routes: ['convicts', 'convictsCheck', 'previousOffences'] },
   {
     title: 'menu.group.reportsAdmin',
-    routes: ['reports', 'referenceLists', 'users', 'backup', 'audit', 'import'],
+    routes: ['reports', 'referenceLists', 'adminHub'],
   },
 ];
 
@@ -116,6 +116,7 @@ const ICONS: Partial<Record<RouteName, IconName>> = {
   backup: 'db',
   audit: 'history',
   import: 'upload',
+  adminHub: 'db',
 };
 
 /** The station head is told once per start when the templates' fonts are missing here. */
@@ -135,7 +136,7 @@ function FontWarning() {
 }
 
 /** Items only the station head has (Figma "OIC only" badge). */
-const OIC_ONLY = new Set<RouteName>(['referenceLists', 'users', 'backup', 'audit', 'import']);
+const OIC_ONLY = new Set<RouteName>(['referenceLists', 'adminHub']);
 
 function HomeMenu({ onLogout }: { onLogout: () => void }) {
   const { session, go } = useNav();

@@ -30,8 +30,7 @@ test('first run: the station head creates the first account and sees the full me
     'menu.crEntry',
     'menu.reports',
     'menu.referenceLists',
-    'admin.users',
-    'admin.backup',
+    'menu.adminHub',
   ] as const) {
     await expect(page.getByRole('button', { name: label(key), exact: true })).toBeVisible();
   }
@@ -100,7 +99,7 @@ test('login must match the role button; new users must change their password; ob
   await expect(page.getByRole('button', { name: label('menu.crEntry'), exact: true })).toHaveCount(
     0,
   );
-  await expect(page.getByRole('button', { name: label('admin.users'), exact: true })).toHaveCount(
+  await expect(page.getByRole('button', { name: label('menu.adminHub'), exact: true })).toHaveCount(
     0,
   );
   // The service refuses too, not only the menu.
