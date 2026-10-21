@@ -17,6 +17,7 @@ import {
   RadioGroup,
   Select,
   Spinner,
+  TextArea,
   TextField,
   formatDate,
   useToast,
@@ -63,6 +64,18 @@ const RELEASES: OutcomeType[] = [
 const STATUSES: OutcomeType[] = ['admonished', 'remanded', 'handed_to_court', 'ag_advice'];
 
 const MAX_TRIALS = 21;
+
+/** The CR's own notes, shown and edited on this screen too (Figma "සටහන්" card). */
+interface CrNotes {
+  accusedNote: string;
+  informantHelp: string;
+  notes: string;
+}
+const crNotes = (cr: CrimeReport | null): CrNotes => ({
+  accusedNote: cr?.accusedNote ?? '',
+  informantHelp: cr?.informantHelp ?? '',
+  notes: cr?.notes ?? '',
+});
 
 interface Hearing {
   date?: string;
@@ -214,13 +227,16 @@ export function CaseProgressScreen() {
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(!!id);
+  const [notes, setNotes] = useState<CrNotes>(crNotes(null));
   const toast = useToast();
   const courts = useRefOptions('court');
   const prosecutors = useRefOptions('prosecuting_officer');
   const name = useRefNames(['offence', 'office']);
 
   const baseline = useMemo(() => caseDraft(saved), [saved]);
-  const dirty = !!cr && JSON.stringify(baseline) !== JSON.stringify(draft);
+  const caseDirty = !!cr && JSON.stringify(baseline) !== JSON.stringify(draft);
+  const notesDirty = !!cr && JSON.stringify(crNotes(cr)) !== JSON.stringify(notes);
+  const dirty = caseDirty || notesDirty;
   useLeaveGuard(dirty);
 
   useEffect(() => {
@@ -228,6 +244,7 @@ export function CaseProgressScreen() {
     Promise.all([call('cr.get', id), call('case.getByCrimeReport', id)])
       .then(([c, k]) => {
         setCr(c);
+        setNotes(crNotes(c));
         setSaved(k);
         setDraft(caseDraft(k));
         if (!c) setMessage(label('cr.notFound'));
@@ -258,9 +275,23 @@ export function CaseProgressScreen() {
     setErrors({});
     setMessage(null);
     try {
-      const next = await call('case.save', caseInput(cr.id, draft), saved?.version ?? null);
-      setSaved(next);
-      setDraft(caseDraft(next));
+      if (notesDirty) {
+        const { id: _id, version, createdAt: _c, updatedAt: _u, deleted: _d, ...body } = cr;
+        void [_id, _c, _u, _d];
+        const updated = await call('cr.update', cr.id, version, {
+          ...body,
+          accusedNote: notes.accusedNote.trim() || undefined,
+          informantHelp: notes.informantHelp.trim() || undefined,
+          notes: notes.notes.trim() || undefined,
+        });
+        setCr(updated);
+        setNotes(crNotes(updated));
+      }
+      if (caseDirty) {
+        const next = await call('case.save', caseInput(cr.id, draft), saved?.version ?? null);
+        setSaved(next);
+        setDraft(caseDraft(next));
+      }
       toast(label('cr.saved'));
     } catch (err) {
       if (err instanceof IpcError) {
@@ -507,14 +538,42 @@ export function CaseProgressScreen() {
               />
             </div>
           </FormSection>
+          <FormSection title={label('case.notes')}>
+            <TextArea
+              label={label('case.note.accused')}
+              value={notes.accusedNote}
+              onChange={(accusedNote) => setNotes({ ...notes, accusedNote })}
+            />
+            <TextArea
+              label={label('case.note.informant')}
+              value={notes.informantHelp}
+              onChange={(informantHelp) => setNotes({ ...notes, informantHelp })}
+            />
+            <TextArea
+              label={label('case.note.other')}
+              value={notes.notes}
+              onChange={(text) => setNotes({ ...notes, notes: text })}
+            />
+          </FormSection>
         </div>
       </div>
 
       <Actions>
-        <Button onClick={() => setDraft(baseline)} disabled={!dirty}>
+        <Button
+          onClick={() => {
+            setDraft(baseline);
+            setNotes(crNotes(cr));
+          }}
+          disabled={!dirty}
+        >
           {label('cr.undo')}
         </Button>
-        <Button variant="primary" onClick={save} busy={busy} disabled={!dirty || !draft.courtId}>
+        <Button
+          variant="primary"
+          onClick={save}
+          busy={busy}
+          disabled={!dirty || (caseDirty && !draft.courtId)}
+        >
           {label('common.save')}
         </Button>
       </Actions>

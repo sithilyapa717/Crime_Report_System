@@ -29,6 +29,7 @@ async function firstRun(page: Page) {
 test('users: add, reset password, deactivate; own account cannot be deactivated', async () => {
   const { page } = run;
   await firstRun(page);
+  await button(page, 'menu.adminHub').click();
   await button(page, 'admin.users').click();
   const form = page.getByRole('form', { name: label('users.add') });
   await form.getByLabel(label('login.username'), { exact: true }).fill('det1');
@@ -144,6 +145,7 @@ test('backup: choose folder, back up now, check it; change history shows what ha
   await firstRun(page);
   const usb = join(run.userData, 'usb');
   mkdirSync(usb);
+  await button(page, 'menu.adminHub').click();
   await button(page, 'admin.backup').click();
   await expect(page.getByText(label('backup.noFolder'))).toBeVisible();
   await answerNextOpen(run, usb);
@@ -157,6 +159,7 @@ test('backup: choose folder, back up now, check it; change history shows what ha
   await page.screenshot({ path: join(SHOTS, 'backup.png'), fullPage: true });
 
   await button(page, 'shell.home').click();
+  await button(page, 'menu.adminHub').click();
   await button(page, 'admin.audit').click();
   await expect(page.getByRole('cell', { name: 'backup', exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'user_create', exact: true })).toBeVisible();
@@ -238,6 +241,7 @@ test('import from Access: dry run, then import the checked file', async () => {
   }
 
   await firstRun(page);
+  await button(page, 'menu.adminHub').click();
   await button(page, 'admin.import').click();
   await answerNextOpen(run, accdb);
   await button(page, 'import.dryRun').click();

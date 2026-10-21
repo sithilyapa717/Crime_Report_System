@@ -186,7 +186,7 @@ export function DateField({
       id={id}
       label={label}
       error={error ?? (bad ? caption('error.invalid_string') : undefined)}
-      hint={hint ?? 'YYYY.MM.DD'}
+      hint={hint}
       tag={tag}
     >
       <input
@@ -204,7 +204,7 @@ export function DateField({
           const iso = parseDateInput(text);
           if (iso) setText(formatDate(iso));
         }}
-        {...aria(id, error ?? (bad ? 'x' : undefined), hint ?? 'x')}
+        {...aria(id, error ?? (bad ? 'x' : undefined), hint)}
         {...rest}
       />
     </Field>

@@ -150,9 +150,21 @@ test('enter a CR through every tab, then record the case and see it everywhere',
     .getByLabel(`${label('outcome.imprisonment')} – ${label('case.prisonMonths')}`)
     .fill('6');
   await page.getByLabel(label('case.addToConvicts')).check();
+  await page.getByLabel(label('case.note.other')).fill('Handed to the court clerk');
   await page.screenshot({ path: join(SHOTS, 'case-progress.png'), fullPage: true });
   await button(page, 'common.save').click();
   await expect(page.getByText(label('cr.saved')).last()).toBeVisible();
+
+  const noted = await page.evaluate(async () => {
+    const list = await window.excise.call('search.crimeReports', {
+      kind: 'name_nic',
+      name: 'කුමාර',
+    });
+    if (!list.ok || !list.value[0]) return null;
+    const cr = await window.excise.call('cr.get', list.value[0].id);
+    return cr.ok ? cr.value?.notes : null;
+  });
+  expect(noted).toBe('Handed to the court clerk');
 
   const convicts = await page.evaluate(() => window.excise.call('search.convicts', { year: 2026 }));
   expect(convicts).toMatchObject({
