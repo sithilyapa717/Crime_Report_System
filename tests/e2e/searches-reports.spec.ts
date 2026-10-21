@@ -179,10 +179,12 @@ test('reports: monthly register, fines earned, Excel export and the summary by o
   await button(page, 'menu.reports').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
   await field(page, 'cr.month').selectOption({ label: label('month.1') });
-  await page.getByRole('button', { name: label('reportType.register'), exact: true }).click();
+  await page.getByRole('button', { name: label('report.typeChip.register'), exact: true }).click();
   await expect(page.getByRole('cell', { name: '2/2026', exact: true })).toBeVisible();
 
-  await page.getByRole('button', { name: label('reportType.fines_earned'), exact: true }).click();
+  await page
+    .getByRole('button', { name: label('report.typeChip.fines_earned'), exact: true })
+    .click();
   await expect(page.getByRole('cell', { name: '1/2026', exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: '2/2026', exact: true })).toHaveCount(0);
   await expect(page.getByText(`${label('report.fineTotal')}: 5,000.00`)).toBeVisible();
