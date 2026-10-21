@@ -66,6 +66,16 @@ const ITEM: Record<MenuRoute, LabelKey> = {
   import: 'admin.import',
 };
 
+/** The screen title shown in the top bar: the menu caption that opened it. */
+export function routeTitle(route: RouteName): LabelKey {
+  if (route === 'home') return 'shell.home';
+  if (route === 'changePassword') return 'admin.changePassword';
+  if (route === 'caseNumberSearch') return 'reports.byCaseNumber';
+  if (route === 'nameNicSearch') return 'reports.byNameNic';
+  if (route === 'previousByCourt') return 'reports.previousByCourt';
+  return ITEM[route];
+}
+
 const items = (...routes: (keyof typeof ITEM)[]): MenuItem[] =>
   routes.map((route) => ({ route, label: ITEM[route] }));
 
@@ -106,5 +116,5 @@ export function allowed(role: Role, route: RouteName): boolean {
   return [...m.main, ...m.admin].some((i) => i.route === route);
 }
 
-/** Start-screen order of the four yellow buttons (§1.8, 01_start.png). */
-export const START_ROLES: Role[] = ['supervising', 'oic', 'detecting', 'observation'];
+/** Sign-in screen order of the four role cards (Figma "01 Start + Login"; number keys 1-4). */
+export const START_ROLES: Role[] = ['oic', 'detecting', 'observation', 'supervising'];

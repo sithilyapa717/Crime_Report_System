@@ -24,7 +24,7 @@ import {
 import { useLeaveGuard, useNav } from '../../shell/navigation.js';
 import { call, IpcError } from '../../src/ipc.js';
 import { useRefNames, useRefOptions } from '../../src/references.js';
-import { CrPicker } from '../shared/CrPicker.js';
+import { FindBar } from '../shared/CrPicker.js';
 import '../cr-entry/cr-entry.css';
 
 /** The outcome grid in the old form's order (§1.5). */
@@ -44,6 +44,23 @@ export const OUTCOMES: OutcomeType[] = [
   'handed_to_court',
   'ag_advice',
 ];
+
+/** Outcome groups of the Figma case-progress screen. */
+const PUNISHMENTS: OutcomeType[] = [
+  'fine',
+  'community_service',
+  'imprisonment',
+  'suspended_sentence',
+  'government_fee',
+];
+const RELEASES: OutcomeType[] = [
+  'settlement',
+  'probation',
+  'rehabilitation',
+  'released',
+  'acquitted',
+];
+const STATUSES: OutcomeType[] = ['admonished', 'remanded', 'handed_to_court', 'ag_advice'];
 
 const MAX_TRIALS = 21;
 
@@ -221,10 +238,9 @@ export function CaseProgressScreen() {
 
   if (!id) {
     return (
-      <>
-        <h1>{label('form.caseProgress')}</h1>
-        <CrPicker onFound={(c) => replace('caseProgress', { id: c.id })} />
-      </>
+      <section className="ex-card cr-head">
+        <FindBar onFound={(c) => replace('caseProgress', { id: c.id })} />
+      </section>
     );
   }
   if (loading) return <Spinner />;
@@ -279,127 +295,101 @@ export function CaseProgressScreen() {
     </div>
   );
 
+  const outcomeBoxes = (list: OutcomeType[]) =>
+    list.map((o) => (
+      <Checkbox
+        key={o}
+        label={label(`outcome.${o}`)}
+        checked={draft.outcomes.includes(o)}
+        onChange={(on) => toggle(o, on)}
+      />
+    ));
+
   return (
-    <div>
-      <h1>{label('form.caseProgress')}</h1>
-      <FormSection title={label('form.crEntry')}>
-        <p>
-          <strong>{cr.crNumber}</strong> · {name(cr.officeId)} · {label(`month.${cr.month}`)} ·{' '}
-          {name(cr.offenceTypeId)} · {cr.accused.name} · {formatDate(cr.detectionDate)}
-        </p>
-      </FormSection>
+    <div className="case-progress">
+      <section className="ex-card cr-head">
+        <FindBar onFound={(c) => replace('caseProgress', { id: c.id })}>
+          <span className="find-bar__summary">
+            {cr.crNumber} · {cr.accused.name} · {name(cr.offenceTypeId)} ·{' '}
+            {formatDate(cr.detectionDate)}
+          </span>
+        </FindBar>
+      </section>
       {message && <Alert kind="error">{message}</Alert>}
 
-      <FormSection title={label('tab.court')}>
-        <FieldGrid>
-          <Select
-            label={label('case.court')}
-            value={draft.courtId}
-            error={errors.courtId}
-            options={courts}
-            onChange={(courtId) => set({ courtId })}
-          />
-          <TextField
-            label={label('case.number')}
-            value={draft.caseNumber}
-            error={errors.caseNumber}
-            onChange={(caseNumber) => set({ caseNumber })}
-          />
-          <DateField
-            label={label('case.courtDate')}
-            value={draft.courtDate}
-            error={errors.courtDate}
-            onChange={(courtDate) => set({ courtDate })}
-          />
-          <Select
-            label={label('case.prosecutor')}
-            value={draft.prosecutingOfficerId}
-            options={prosecutors}
-            onChange={(prosecutingOfficerId) => set({ prosecutingOfficerId })}
-          />
-        </FieldGrid>
-        <RadioGroup
-          label={label('case.type')}
-          name="caseType"
-          value={draft.caseType}
-          onChange={(caseType) => set({ caseType })}
-          options={[
-            { value: 'trial', label: label('caseType.trial') },
-            { value: 'warrant', label: label('caseType.warrant') },
-            { value: 'summons', label: label('caseType.summons') },
-            { value: '', label: '—' },
-          ]}
-        />
-        <FieldGrid>
-          <Checkbox
-            label={label('case.sithasi')}
-            checked={draft.sithasi}
-            onChange={(sithasi) => set({ sithasi })}
-          />
-          <Checkbox
-            label={label('case.permissionPending')}
-            checked={draft.permissionPending}
-            onChange={(permissionPending) => set({ permissionPending })}
-          />
-          <Checkbox
-            label={label('case.withdrawn')}
-            checked={draft.withdrawn}
-            onChange={(withdrawn) => set({ withdrawn })}
-          />
-          <Checkbox
-            label={label('case.accusedDied')}
-            checked={draft.accusedDied}
-            onChange={(accusedDied) => set({ accusedDied })}
-          />
-        </FieldGrid>
-      </FormSection>
-
-      <FormSection title={label('case.hearingDate')}>
-        {errors.hearingDates && <Alert kind="error">{errors.hearingDates}</Alert>}
-        {hearingRow(label('case.summonsDate'), draft.summons, (summons) => set({ summons }))}
-        {hearingRow(label('case.warrantDate'), draft.warrant, (warrant) => set({ warrant }))}
-        {draft.trials.map((h, i) =>
-          hearingRow(
-            `${label('case.hearingDate')} ${i + 1}`,
-            h,
-            (next) => set({ trials: draft.trials.map((x, j) => (j === i ? next : x)) }),
-            () => set({ trials: draft.trials.filter((_, j) => j !== i) }),
-          ),
-        )}
-        <Button
-          disabled={draft.trials.length >= MAX_TRIALS}
-          onClick={() => set({ trials: [...draft.trials, { memo: '' }] })}
-        >
-          {label('case.addHearing')}
-        </Button>
-      </FormSection>
-
-      <FormSection title={label('case.outcomes')}>
-        <div className="case-outcomes">
-          {OUTCOMES.map((o) => (
-            <Checkbox
-              key={o}
-              label={label(`outcome.${o}`)}
-              checked={draft.outcomes.includes(o)}
-              onChange={(on) => toggle(o, on)}
-            />
-          ))}
-        </div>
-        {errors.caseNumber && <Alert kind="error">{errors.caseNumber}</Alert>}
-        <FieldGrid>
-          <DateField
-            label={label('case.convictedDate')}
-            value={draft.convictedDate}
-            onChange={(convictedDate) => set({ convictedDate })}
-          />
-          {draft.outcomes.includes('fine') && (
-            <>
-              <NumberField
-                decimals
-                label={label('case.fineAmount')}
-                value={draft.fineRupees}
-                onChange={(fineRupees) => set({ fineRupees })}
+      <div className="cr-columns">
+        <div className="cr-columns__col">
+          <FormSection title={label('case.section')}>
+            <FieldGrid>
+              <TextField
+                label={label('case.number')}
+                value={draft.caseNumber}
+                error={errors.caseNumber}
+                onChange={(caseNumber) => set({ caseNumber })}
               />
+              <Select
+                label={label('case.court')}
+                value={draft.courtId}
+                error={errors.courtId}
+                options={courts}
+                onChange={(courtId) => set({ courtId })}
+              />
+              <DateField
+                label={label('case.courtDate')}
+                value={draft.courtDate}
+                error={errors.courtDate}
+                onChange={(courtDate) => set({ courtDate })}
+              />
+              <Select
+                label={label('case.prosecutor')}
+                value={draft.prosecutingOfficerId}
+                options={prosecutors}
+                onChange={(prosecutingOfficerId) => set({ prosecutingOfficerId })}
+              />
+            </FieldGrid>
+            <div className="case-inline">
+              <RadioGroup
+                label={label('case.type')}
+                name="caseType"
+                value={draft.caseType}
+                onChange={(caseType) => set({ caseType })}
+                options={[
+                  { value: 'trial', label: label('caseType.trial') },
+                  { value: 'warrant', label: label('caseType.warrant') },
+                  { value: 'summons', label: label('caseType.summons') },
+                  { value: '', label: '—' },
+                ]}
+              />
+              <Checkbox
+                label={label('case.sithasi')}
+                checked={draft.sithasi}
+                onChange={(sithasi) => set({ sithasi })}
+              />
+            </div>
+            {hearingRow(label('case.summonsDate'), draft.summons, (summons) => set({ summons }))}
+            {hearingRow(label('case.warrantDate'), draft.warrant, (warrant) => set({ warrant }))}
+          </FormSection>
+
+          <FormSection title={label('case.hearings')}>
+            {errors.hearingDates && <Alert kind="error">{errors.hearingDates}</Alert>}
+            {draft.trials.map((h, i) =>
+              hearingRow(
+                `${label('case.hearingDate')} ${i + 1}`,
+                h,
+                (next) => set({ trials: draft.trials.map((x, j) => (j === i ? next : x)) }),
+                () => set({ trials: draft.trials.filter((_, j) => j !== i) }),
+              ),
+            )}
+            <Button
+              disabled={draft.trials.length >= MAX_TRIALS}
+              onClick={() => set({ trials: [...draft.trials, { memo: '' }] })}
+            >
+              {label('case.addHearing')}
+            </Button>
+          </FormSection>
+
+          <FormSection title={label('case.register')}>
+            <div className="case-grid3">
               <TextField
                 label={label('case.receiptNo')}
                 value={draft.receiptNo}
@@ -410,10 +400,47 @@ export function CaseProgressScreen() {
                 value={draft.receiptDate}
                 onChange={(receiptDate) => set({ receiptDate })}
               />
-            </>
-          )}
-          {draft.outcomes.includes('imprisonment') && (
-            <>
+              {(['volumeNo', 'volumePage', 'indexPage', 'indexSn'] as const).map((k) => (
+                <TextField
+                  key={k}
+                  label={label(`case.${k}`)}
+                  value={draft.register[k]}
+                  onChange={(v) => set({ register: { ...draft.register, [k]: v } })}
+                />
+              ))}
+              <TextField
+                label={label('case.handoverOfficer')}
+                value={draft.handover.officer}
+                onChange={(officer) => set({ handover: { ...draft.handover, officer } })}
+              />
+              <TextField
+                label={label('case.handoverLocation')}
+                value={draft.handover.location}
+                onChange={(location) => set({ handover: { ...draft.handover, location } })}
+              />
+              <DateField
+                label={label('case.handoverDate')}
+                value={draft.handover.date}
+                onChange={(date) => set({ handover: { ...draft.handover, date } })}
+              />
+            </div>
+          </FormSection>
+        </div>
+
+        <div className="cr-columns__col">
+          <FormSection title={label('case.outcomes')}>
+            <div className="case-grid3">
+              <NumberField
+                decimals
+                label={label('case.fineAmount')}
+                value={draft.fineRupees}
+                onChange={(fineRupees) => set({ fineRupees })}
+              />
+              <DateField
+                label={label('case.convictedDate')}
+                value={draft.convictedDate}
+                onChange={(convictedDate) => set({ convictedDate })}
+              />
               <NumberField
                 label={`${label('outcome.imprisonment')} – ${label('case.prisonMonths')}`}
                 value={draft.prisonMonths}
@@ -424,60 +451,64 @@ export function CaseProgressScreen() {
                 value={draft.prisonDays}
                 onChange={(prisonDays) => set({ prisonDays })}
               />
-            </>
-          )}
-        </FieldGrid>
-        <FieldGrid>
-          <Checkbox
-            label={label('case.addToConvicts')}
-            checked={draft.addToConvictRegister}
-            onChange={(addToConvictRegister) => set({ addToConvictRegister })}
-          />
-          <Checkbox
-            label={label('case.rewardReceived')}
-            checked={draft.rewardVoucherReceived}
-            onChange={(rewardVoucherReceived) => set({ rewardVoucherReceived })}
-          />
-          <DateField
-            label={label('case.rewardDate')}
-            value={draft.rewardVoucherDate}
-            onChange={(rewardVoucherDate) => set({ rewardVoucherDate })}
-          />
-        </FieldGrid>
-      </FormSection>
-
-      <FormSection title={label('case.register')}>
-        <FieldGrid>
-          {(['volumeNo', 'volumePage', 'indexPage', 'indexSn'] as const).map((k) => (
-            <TextField
-              key={k}
-              label={label(`case.${k}`)}
-              value={draft.register[k]}
-              onChange={(v) => set({ register: { ...draft.register, [k]: v } })}
-            />
-          ))}
-        </FieldGrid>
-      </FormSection>
-
-      <FormSection title={label('case.handover')}>
-        <FieldGrid>
-          <TextField
-            label={label('case.handoverOfficer')}
-            value={draft.handover.officer}
-            onChange={(officer) => set({ handover: { ...draft.handover, officer } })}
-          />
-          <TextField
-            label={label('case.handoverLocation')}
-            value={draft.handover.location}
-            onChange={(location) => set({ handover: { ...draft.handover, location } })}
-          />
-          <DateField
-            label={label('case.handoverDate')}
-            value={draft.handover.date}
-            onChange={(date) => set({ handover: { ...draft.handover, date } })}
-          />
-        </FieldGrid>
-      </FormSection>
+            </div>
+            <div className="case-outcomes">
+              <div className="case-outcomes__group" role="group" aria-labelledby="g-punish">
+                <span id="g-punish" className="case-outcomes__title">
+                  {label('case.group.punishment')}
+                </span>
+                {outcomeBoxes(PUNISHMENTS)}
+              </div>
+              <div className="case-outcomes__group" role="group" aria-labelledby="g-release">
+                <span id="g-release" className="case-outcomes__title">
+                  {label('case.group.release')}
+                </span>
+                {outcomeBoxes(RELEASES)}
+              </div>
+              <div className="case-outcomes__group" role="group" aria-labelledby="g-status">
+                <span id="g-status" className="case-outcomes__title">
+                  {label('case.group.status')}
+                </span>
+                {outcomeBoxes(STATUSES)}
+                <Checkbox
+                  label={label('case.accusedDied')}
+                  checked={draft.accusedDied}
+                  onChange={(accusedDied) => set({ accusedDied })}
+                />
+                <Checkbox
+                  label={label('case.withdrawn')}
+                  checked={draft.withdrawn}
+                  onChange={(withdrawn) => set({ withdrawn })}
+                />
+                <Checkbox
+                  label={label('case.permissionPending')}
+                  checked={draft.permissionPending}
+                  onChange={(permissionPending) => set({ permissionPending })}
+                />
+              </div>
+            </div>
+            <div className="case-flags">
+              <Checkbox
+                label={label('case.rewardReceived')}
+                checked={draft.rewardVoucherReceived}
+                onChange={(rewardVoucherReceived) => set({ rewardVoucherReceived })}
+              />
+              {draft.rewardVoucherReceived && (
+                <DateField
+                  label={label('case.rewardDate')}
+                  value={draft.rewardVoucherDate}
+                  onChange={(rewardVoucherDate) => set({ rewardVoucherDate })}
+                />
+              )}
+              <Checkbox
+                label={label('case.addToConvicts')}
+                checked={draft.addToConvictRegister}
+                onChange={(addToConvictRegister) => set({ addToConvictRegister })}
+              />
+            </div>
+          </FormSection>
+        </div>
+      </div>
 
       <Actions>
         <Button onClick={() => setDraft(baseline)} disabled={!dirty}>

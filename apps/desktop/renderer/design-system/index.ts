@@ -5,5 +5,6 @@ export * from './buttons.js';
 export * from './dates.js';
 export * from './feedback.js';
 export * from './fields.js';
+export * from './icons.js';
 export * from './layout.js';
 export * from './table.js';

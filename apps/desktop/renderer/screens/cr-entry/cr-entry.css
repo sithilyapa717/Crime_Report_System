@@ -1,6 +1,87 @@
+/* CR entry, CR view and case progress (Figma frames 06.x, 07, 08). */
+
+/* ---------- Header card: the beige "find a CR" strip, then the CR header fields ---------- */
+.cr-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.find-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: 16px;
+  background: var(--surface-alt);
+}
+.find-bar .cr-picker--inline {
+  flex: none;
+}
+.find-bar .ex-filters {
+  flex-wrap: nowrap;
+}
+.find-bar .ex-filters > .ex-field {
+  width: 150px;
+}
+.find-bar .ex-filters > .ex-field:first-child {
+  width: 230px;
+}
+.find-bar .ex-field__label {
+  white-space: nowrap;
+}
+.find-bar .ex-input,
+.find-bar .ex-select {
+  background-color: var(--surface);
+}
+.find-bar__end {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+.find-bar__end .ex-actions {
+  margin-top: 0;
+}
+.find-bar__summary {
+  margin: 0;
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: var(--text-md);
+}
+.cr-head__fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0 var(--space-4);
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.cr-head__fields .ex-grid {
+  flex: 1 1 760px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
 .cr-picker__title {
   font-size: var(--text-md);
   margin-bottom: var(--space-2);
+}
+
+/* ---------- Tabs over a white panel ---------- */
+.cr-entry,
+.cr-view,
+.case-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.cr-entry > *,
+.cr-view > *,
+.case-progress > * {
+  margin: 0;
 }
 .cr-entry__body {
   border: 0;
@@ -8,78 +89,226 @@
   margin: 0;
   min-width: 0;
 }
-.cr-entry__header {
-  background: #fff8fb;
+.cr-entry__body .ex-tabs__list {
+  margin-bottom: var(--space-4);
 }
+.cr-entry__body [role='tabpanel'] {
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+.cr-entry__body .ex-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.cr-entry__body .ex-section {
+  margin-top: var(--space-2);
+}
+/* Figma CR entry actions: Delete on the left, the unsaved note, then the other buttons. */
+.cr-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.cr-foot__dirty {
+  flex: 1;
+  text-align: right;
+  font-size: var(--text-sm);
+  color: var(--danger);
+}
+
+/* ---------- Pictures ---------- */
 .pictures {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
   margin-bottom: var(--space-3);
 }
+.pictures--compact {
+  align-items: center;
+  gap: var(--space-2);
+}
+.pictures__empty,
+.pictures__thumb {
+  display: block;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-alt);
+  overflow: hidden;
+}
+.pictures__thumb {
+  border-style: solid;
+  cursor: pointer;
+}
+.pictures__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .pictures__item {
   margin: 0;
   width: 180px;
-  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: var(--space-2);
-  background: var(--surface);
+  background: var(--surface-alt);
 }
 .pictures__item img {
   display: block;
   width: 100%;
   height: 120px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 .pictures__item figcaption {
   display: flex;
   justify-content: space-between;
 }
 
-/* Read-only CR view, also used for printing. */
+/* ---------- Two columns of white section cards (CR view, case progress) ---------- */
+.cr-columns {
+  columns: 2 520px;
+  column-gap: var(--space-4);
+}
+.cr-columns > *,
+.cr-columns__col > * {
+  break-inside: avoid;
+}
+.cr-columns:has(> .cr-columns__col) {
+  columns: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+.cr-columns__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+.cr-columns .ex-section {
+  display: block;
+  width: 100%;
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+.cr-columns__col .ex-section {
+  margin: 0;
+}
+/* The legend sits inside the card as its heading, not on the border. */
+.cr-columns .ex-section > legend {
+  float: left;
+  width: 100%;
+  margin-bottom: var(--space-3);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+.cr-columns .ex-section > legend + * {
+  clear: both;
+}
+.cr-columns .ex-grid {
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+
+/* Read-only values (Figma CR view): the label, then the value as plain text. */
 .cr-view dl {
   display: grid;
-  grid-template-columns: minmax(180px, max-content) 1fr;
-  gap: var(--space-1) var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
   margin: 0;
 }
 .cr-view__row {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 .cr-view dt {
-  font-weight: 600;
+  font-size: var(--text-md);
+  font-weight: 500;
   color: var(--text-muted);
 }
 .cr-view dd {
   margin: 0;
+  padding: 4px 0;
+  font-size: 16px;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
+
+/* ---------- Case progress ---------- */
+.case-grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 var(--space-4);
+}
+.case-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2) var(--space-5);
+}
+.case-outcomes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-2) 0 var(--space-4);
+}
+.case-outcomes__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.case-outcomes__title {
+  margin-bottom: 2px;
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.case-flags {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.case-flags .ex-field {
+  width: 240px;
+}
+.case-hearing {
+  display: grid;
+  grid-template-columns: 190px 1fr auto;
+  gap: var(--space-3);
+  align-items: end;
+}
+.case-progress > .ex-actions {
+  margin-top: 0;
+}
+
+@media (max-width: 1100px) {
+  .cr-entry__body .ex-grid,
+  .case-grid3,
+  .case-outcomes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media print {
-  .shell__header,
-  .shell__crumbs,
+  .topbar,
   .ex-actions,
+  .find-bar,
   .no-print {
     display: none !important;
   }
   .ex-page {
     padding: 0;
   }
-  .ex-section {
+  .cr-columns .ex-section {
     break-inside: avoid;
   }
-}
-
-/* Case progress: outcome grid and hearing rows. */
-.case-outcomes {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: var(--space-2) var(--space-4);
-  margin-bottom: var(--space-4);
-}
-.case-hearing {
-  display: grid;
-  grid-template-columns: 220px 1fr auto;
-  gap: var(--space-3);
-  align-items: end;
 }

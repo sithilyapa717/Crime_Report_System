@@ -5,6 +5,7 @@ import { label } from '@excise/labels';
 import { useState, type FormEvent } from 'react';
 import { Actions, Alert, Button, PasswordField, TextField } from '../../design-system/index.js';
 import { call, IpcError } from '../../src/ipc.js';
+import { AuthLayout } from './AuthLayout.js';
 
 const MIN = 8;
 
@@ -36,9 +37,11 @@ export function FirstRunScreen({ onDone }: { onDone: (s: Session) => void }) {
   };
 
   return (
-    <div className="ex-narrow ex-card">
-      <h1>{label('admin.firstRun')}</h1>
-      <p>{label('setup.intro')}</p>
+    <AuthLayout>
+      <div className="auth__heading">
+        <h1>{label('admin.firstRun')}</h1>
+        <p className="auth__sub">{label('setup.intro')}</p>
+      </div>
       <form onSubmit={submit} noValidate>
         {error && <Alert kind="error">{error}</Alert>}
         <TextField
@@ -65,7 +68,7 @@ export function FirstRunScreen({ onDone }: { onDone: (s: Session) => void }) {
           </Button>
         </Actions>
       </form>
-    </div>
+    </AuthLayout>
   );
 }
 
@@ -100,8 +103,10 @@ export function ChangePasswordScreen({
   };
 
   return (
-    <div className="ex-narrow ex-card">
-      <h1>{label('admin.changePassword')}</h1>
+    <AuthLayout>
+      <div className="auth__heading">
+        <h1>{label('admin.changePassword')}</h1>
+      </div>
       {forced && <Alert kind="warn">{label('password.mustChange')}</Alert>}
       <form onSubmit={submit} noValidate>
         {error && <Alert kind="error">{error}</Alert>}
@@ -125,6 +130,6 @@ export function ChangePasswordScreen({
           </Button>
         </Actions>
       </form>
-    </div>
+    </AuthLayout>
   );
 }

@@ -3,6 +3,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { label } from '@excise/labels';
 import { EmptyState } from './feedback.js';
+import { Icon } from './icons.js';
 
 export interface Column<R> {
   key: string;
@@ -21,6 +22,7 @@ export function Table<R>({
   rows,
   rowKey,
   onRowClick,
+  selectedKey,
   caption,
   filterable,
 }: {
@@ -28,6 +30,8 @@ export function Table<R>({
   rows: R[];
   rowKey: (row: R) => string;
   onRowClick?: (row: R) => void;
+  /** Highlights one row (the CR last opened from this list). */
+  selectedKey?: string | undefined;
   caption?: string;
   filterable?: boolean;
 }) {
@@ -72,7 +76,7 @@ export function Table<R>({
     <div>
       {filterable && (
         <input
-          className="ex-input"
+          className="ex-input ex-table-filter"
           aria-label={label('common.filter')}
           placeholder="…"
           value={filter}
@@ -90,6 +94,7 @@ export function Table<R>({
                 {columns.map((c) => (
                   <th
                     key={c.key}
+                    className={c.numeric ? 'num' : undefined}
                     aria-sort={
                       sort?.key === c.key
                         ? sort.dir === 1
@@ -113,6 +118,7 @@ export function Table<R>({
                     </button>
                   </th>
                 ))}
+                {onRowClick && <th aria-hidden="true" />}
               </tr>
             </thead>
             <tbody>
@@ -122,12 +128,18 @@ export function Table<R>({
                   onClick={onRowClick ? () => onRowClick(r) : undefined}
                   onKeyDown={onRowClick ? (e) => e.key === 'Enter' && onRowClick(r) : undefined}
                   tabIndex={onRowClick ? 0 : undefined}
+                  aria-selected={selectedKey === undefined ? undefined : rowKey(r) === selectedKey}
                 >
                   {columns.map((c) => (
                     <td key={c.key} className={c.numeric ? 'num' : undefined}>
                       {c.render ? c.render(r) : (c.value(r) ?? '')}
                     </td>
                   ))}
+                  {onRowClick && (
+                    <td className="ex-table__chevron" aria-hidden="true">
+                      <Icon name="chevronRight" size={18} />
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -139,6 +151,7 @@ export function Table<R>({
                       {c.total ? c.total(visible) : ''}
                     </td>
                   ))}
+                  {onRowClick && <td />}
                 </tr>
               </tfoot>
             )}

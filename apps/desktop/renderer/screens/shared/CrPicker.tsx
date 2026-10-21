@@ -28,9 +28,12 @@ export function lastOffice(): string | undefined {
 export function CrPicker({
   onFound,
   extra,
+  inline,
 }: {
   onFound: (cr: CrimeReport) => void;
   extra?: ReactNode;
+  /** One row of fields with the Open button beside them (Figma CR entry header). */
+  inline?: boolean;
 }) {
   const offices = useRefOptions('office');
   const [officeId, setOfficeId] = useState<string | undefined>(lastOffice());
@@ -62,31 +65,76 @@ export function CrPicker({
     }
   };
 
+  const fields = (
+    <>
+      <Select
+        label={label('cr.office')}
+        value={officeId}
+        onChange={setOfficeId}
+        options={offices}
+      />
+      <NumberField label={label('cr.year')} value={year} onChange={setYear} />
+      <NumberField
+        label={label('cr.number')}
+        value={seq}
+        onChange={setSeq}
+        hint={!inline && year ? `n/${year}` : undefined}
+      />
+    </>
+  );
+  const open = (
+    <Button
+      type="submit"
+      variant={inline ? 'default' : 'primary'}
+      busy={busy}
+      disabled={!officeId || !year || !seq}
+    >
+      {label('cr.find')}
+    </Button>
+  );
+
+  if (inline)
+    return (
+      <form
+        onSubmit={submit}
+        className="cr-picker cr-picker--inline"
+        aria-label={label('cr.openExisting')}
+      >
+        {error && <Alert kind="error">{error}</Alert>}
+        <div className="ex-filters">
+          {fields}
+          {extra}
+          {open}
+        </div>
+      </form>
+    );
+
   return (
-    <form onSubmit={submit} className="ex-section" aria-label={label('cr.openExisting')}>
+    <form onSubmit={submit} className="ex-card cr-picker" aria-label={label('cr.openExisting')}>
       <h2 className="cr-picker__title">{label('cr.openExisting')}</h2>
       {error && <Alert kind="error">{error}</Alert>}
-      <FieldGrid>
-        <Select
-          label={label('cr.office')}
-          value={officeId}
-          onChange={setOfficeId}
-          options={offices}
-        />
-        <NumberField label={label('cr.year')} value={year} onChange={setYear} />
-        <NumberField
-          label={label('cr.number')}
-          value={seq}
-          onChange={setSeq}
-          hint={year ? `n/${year}` : undefined}
-        />
-      </FieldGrid>
+      <FieldGrid>{fields}</FieldGrid>
       <div className="ex-actions">
         {extra}
-        <Button type="submit" variant="primary" busy={busy} disabled={!officeId || !year || !seq}>
-          {label('cr.find')}
-        </Button>
+        {open}
       </div>
     </form>
+  );
+}
+
+/** The "find a CR" strip at the top of CR entry, CR view and case progress (Figma "Find CR"):
+ *  the picker on the left, the screen's own buttons or summary on the right. */
+export function FindBar({
+  onFound,
+  children,
+}: {
+  onFound: (cr: CrimeReport) => void;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="find-bar">
+      <CrPicker inline onFound={onFound} />
+      {children && <div className="find-bar__end">{children}</div>}
+    </div>
   );
 }
