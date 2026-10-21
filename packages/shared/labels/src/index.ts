@@ -663,6 +663,12 @@ export const LABELS = {
   'menu.group.registers': l('ලේඛන', 'Registers'),
   'menu.group.convicts': l('වරදකරුවන්', 'Convicts'),
   'menu.group.reportsAdmin': l('වාර්තා සහ පරිපාලනය', 'Reports & admin'),
+  'menu.adminHub': l('පරිශීලකයින් සහ උපස්ථ', 'Users & backup'),
+  'menu.desc.adminHub': l(
+    'පරිශීලකයින්, උපස්ථ සහ විගණන සටහන',
+    'Users, backup, restore and audit log',
+  ),
+  'case.notes': l('සටහන්', 'Notes'),
   'menu.oicOnly': l('ස්ථානාධිපති පමණි', 'OIC only'),
   'menu.desc.crEntry': l(
     'නව වාර්තාවක් සාදන්න හෝ පවතින එකක් සංස්කරණය කරන්න',
