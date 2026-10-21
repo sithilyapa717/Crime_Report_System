@@ -669,6 +669,9 @@ export const LABELS = {
     'Users, backup, restore and audit log',
   ),
   'case.notes': l('සටහන්', 'Notes'),
+  'case.note.accused': l('විත්තිකරු පිළිබඳ සටහන', 'Note about the accused'),
+  'case.note.informant': l('තොරතුරු සපයන්නාගේ සහාය', 'Informant help'),
+  'case.note.other': l('වෙනත්', 'Other notes'),
   'menu.oicOnly': l('ස්ථානාධිපති පමණි', 'OIC only'),
   'menu.desc.crEntry': l(
     'නව වාර්තාවක් සාදන්න හෝ පවතින එකක් සංස්කරණය කරන්න',
