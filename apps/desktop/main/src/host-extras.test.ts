@@ -243,6 +243,36 @@ describe.each(BACKENDS)('print and support channels (%s)', (backend) => {
   });
 });
 
+describe.each(BACKENDS)('open in Word (%s)', (backend) => {
+  it('saves a new .docx, opens it, audits it and never overwrites', async () => {
+    const { call, login, opened, printed, refs, lastAudit } = await setup(backend, {
+      printoutDir: join(tmp, 'printouts'),
+    });
+    await login('observation');
+    const args = [{ officeId: refs.office, year: 2026 }, 'word'] as const;
+    const first = await call('print.convictsList', ...args);
+    const second = await call('print.convictsList', ...args);
+    if (!first.ok || !second.ok) throw new Error('word print failed');
+    const [a, b] = [first.value, second.value] as [string, string];
+    expect(a).toBe(join(tmp, 'printouts', 'convicts-2026.docx'));
+    expect(b).toBe(join(tmp, 'printouts', 'convicts-2026 (2).docx'));
+    expect((await readFile(a)).subarray(0, 2).toString()).toBe('PK');
+    expect(opened).toEqual([a, b]);
+    expect(printed).toEqual([]); // nothing went to the printer or a PDF
+    expect(await lastAudit()).toMatchObject({ action: 'document_generate' });
+  });
+
+  it('says so when this PC has no Word output set up', async () => {
+    const { call, login, refs } = await setup(backend);
+    await login('observation');
+    expect(
+      await call('print.convictsList', { officeId: refs.office, year: 2026 }, 'word'),
+    ).toMatchObject({
+      error: { code: 'word_unavailable' },
+    });
+  });
+});
+
 describe.each(BACKENDS)('import channels (%s)', (backend) => {
   const legacy = {
     tables: {

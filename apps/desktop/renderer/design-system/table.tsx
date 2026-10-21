@@ -1,6 +1,7 @@
 // Data table with click-to-sort headings, an optional text filter and a totals row. Enough for the
 // search results and reports; very long results are paged rather than virtualised.
 import { useMemo, useState, type ReactNode } from 'react';
+import { label } from '@excise/labels';
 import { EmptyState } from './feedback.js';
 
 export interface Column<R> {
@@ -72,7 +73,7 @@ export function Table<R>({
       {filterable && (
         <input
           className="ex-input"
-          aria-label="Filter"
+          aria-label={label('common.filter')}
           placeholder="…"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}

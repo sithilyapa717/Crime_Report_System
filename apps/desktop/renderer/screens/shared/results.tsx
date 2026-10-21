@@ -192,19 +192,22 @@ export function ConvictResults({ rows }: { rows: ConvictRow[] }) {
   );
 }
 
-/** "Print" (printer dialog) and "Save as PDF" for one of D's print layouts. */
+/**
+ * "Print" (printer dialog), "Save as PDF" and "Open in Word" for one of D's print layouts. The Word
+ * button saves a .docx and opens it, so staff can change it to their needs and print from Word.
+ */
 export function PrintButtons({
   print,
   printLabel = label('search.printList'),
   disabled,
 }: {
-  print: (target: 'printer' | 'pdf') => Promise<string | boolean | null>;
+  print: (target: 'printer' | 'pdf' | 'word') => Promise<string | boolean | null>;
   printLabel?: string;
   disabled?: boolean;
 }) {
   const toast = useToast();
   const [error, setError] = useState<string | null>(null);
-  const go = (target: 'printer' | 'pdf') => async () => {
+  const go = (target: 'printer' | 'pdf' | 'word') => async () => {
     setError(null);
     try {
       const r = await print(target);
@@ -220,6 +223,9 @@ export function PrintButtons({
       </Button>
       <Button onClick={go('pdf')} disabled={disabled}>
         {label('search.savePdf')}
+      </Button>
+      <Button onClick={go('word')} disabled={disabled}>
+        {label('search.openInWord')}
       </Button>
       {error && <Alert kind="error">{error}</Alert>}
     </>

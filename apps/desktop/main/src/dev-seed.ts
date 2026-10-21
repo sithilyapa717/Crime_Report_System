@@ -12,6 +12,7 @@ import {
   type SampleRefs,
 } from '@excise/mocks';
 import type { Role } from '@excise/schemas';
+import { seedShowcase } from './dev-showcase.js';
 import type { Repositories } from './host.js';
 
 export const DEV_PASSWORD = 'dev-password';
@@ -75,5 +76,7 @@ export async function createDevData(backend: Backend = 'memory'): Promise<DevDat
 
 /** Mock mode for `EXCISE_MOCK=1`: in-memory repositories with the dev data. */
 export async function createDevRepositories(): Promise<Repositories> {
-  return (await createDevData('memory')).repos;
+  const { repos, refs } = await createDevData('memory');
+  await seedShowcase(repos, refs);
+  return repos;
 }

@@ -73,7 +73,7 @@ Click a row in any result to open that CR.
 2. Choose all CRs, **by detecting officer** or **by informant** (and the officer).
 3. Choose the office, year and month or half-year once.
 4. Click the report: register, warrant, trial, summons, not yet filed, fines not collected, reward vouchers due, resolved, fines earned, convicts register.
-5. The result shows totals at the bottom. **Export to Excel**, **Export to CSV**, **Print** or **Save as PDF**.
+5. The result shows totals at the bottom. **Export to Excel**, **Export to CSV**, **Print**, **Save as PDF** or **Open in Word**.
 
 **Summary** gives counts, quantities per item type and fines, by offence, detecting officer or informant. The three buttons below it open the case-number look-up, CRs by name/NIC and previous offences by court.
 
@@ -86,3 +86,13 @@ Click a row in any result to open that CR.
 5. Documents made earlier for this CR are listed at the bottom.
 
 The wording of the documents is never changed; only the fields are filled in from the CR.
+
+## 9. Changing a printout in Word (Open in Word)
+
+The registers, the convicts list and the previous-conviction certificate (E 48) have an **Open in Word** button next to **Print** and **Save as PDF**.
+
+1. Click **Open in Word** (**Word හි විවෘත කරන්න**). The app saves the printout as a new Word file in `Documents\Excise documents\Print-outs` and opens it.
+2. Change what you need (wording, widths, fonts, extra lines) and print from Word as usual.
+3. Each click makes a new file (`… (2).docx`, `… (3).docx`); an earlier file is never overwritten.
+
+An edited file is a copy: it does not change if the CR or the register changes later. Click **Open in Word** again to get a fresh one. Needs Microsoft Word on this PC.

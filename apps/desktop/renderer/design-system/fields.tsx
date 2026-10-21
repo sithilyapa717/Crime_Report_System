@@ -256,7 +256,7 @@ export function Select({
       {showFilter && (
         <input
           className="ex-input"
-          aria-label={`${label}: filter`}
+          aria-label={`${label}: ${caption('common.filter')}`}
           placeholder="…"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}

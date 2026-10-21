@@ -19,7 +19,7 @@ EXCISE_RENDERER_URL=http://localhost:5173 pnpm start
 
 The app keeps its data in `<userData>/excise.sqlite` (`packages/db`). On a new database there are no accounts: the start screen asks the station head to create the first one.
 
-`EXCISE_MOCK=1 pnpm start` runs on in-memory repositories instead, with two sample CRs and these dev accounts (password `dev-password`); data is lost when the app closes:
+`EXCISE_MOCK=1 pnpm start` runs on in-memory repositories instead, with 20 sample CRs (2025 and 2026, Sinhala names, cases, convictions; see `src/dev-showcase.ts`) and these dev accounts (password `dev-password`); data is lost when the app closes:
 
 | Username      | Role                      |
 | ------------- | ------------------------- |
@@ -56,7 +56,7 @@ else showError(r.error); // { name, message, code?, issues? }
 | Audit (OIC)          | `audit.search`                                                                                                                                                |
 | Documents            | `docdata.buildFor`, `documents.listFor`, `documents.generate`, `documents.history`, `documents.open`, `documents.showInFolder`                                |
 | Pictures             | `files.attach` (opens a file dialog), `files.list`, `files.preview`, `files.open`, `files.remove`                                                             |
-| Printing             | `print.certificateE48`, `print.convictsList`, `print.register` (target `printer` or `pdf`)                                                                    |
+| Printing             | `print.certificateE48`, `print.convictsList`, `print.register` (target `printer`, `pdf` or `word`)                                                            |
 | Backup (OIC)         | `backup.settings`, `backup.updateSettings`, `backup.chooseFolder`, `backup.now`, `backup.list`, `backup.verify`, `backup.restore`, `backup.restoreFromFolder` |
 | Access import (OIC)  | `import.dryRun` (opens a file dialog), `import.run` (imports the file of the last dry run), `import.lastReport`, `import.saveReport`                          |
 | Support              | `support.showLogFile`                                                                                                                                         |
@@ -69,6 +69,7 @@ Files are only ever named, never passed as paths: `documents.open(crId, fileName
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Templates, registry, `docx-to-pdf.ps1` | `packages/documents` in development; `resources/documents` in the installed app (outside asar)                 |
 | Generated documents                    | `Documents/Excise documents`                                                                                   |
+| "Open in Word" print-outs (`word`)     | `Documents/Excise documents/Print-outs`, a new file each time, opened in Word for editing                      |
 | Generation log                         | `<userData>/generated-documents.jsonl` (until the `generated_documents` table)                                 |
 | Pictures                               | `<userData>/files`, random file names                                                                          |
 | Backups                                | the folder the OIC chooses; one `excise-backup-…` folder per backup; daily automatic backup checked every hour |

@@ -1,6 +1,6 @@
 // Service host: wires every service to the repositories and lists the IPC channels the UI may call.
 // Electron-free so it can be unit tested; main.ts passes the Electron parts (dialogs, shell, print).
-import { writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { basename } from 'node:path';
 import { DefaultAuditQueryService } from '@excise/audit';
 import {
@@ -28,7 +28,9 @@ import type { BackupSettingsInput, ReportParams } from '@excise/contract';
 import { DefaultCrService } from '@excise/cr';
 import { DefaultDocDataService } from '@excise/docdata';
 import {
+  buildDocx,
   DocumentsService,
+  writeNew,
   type DocumentGenerator,
   type GenerationLog,
   type TemplateRegistry,
@@ -41,7 +43,7 @@ import { DefaultReportService } from '@excise/reports';
 import { DefaultSearchService } from '@excise/search';
 import { ARG_SCHEMAS } from './args.js';
 import type { FontStatus } from './fonts.js';
-import { DefaultPrintService, type PrintOutput } from './print.js';
+import { DefaultPrintService, type PrintOutput, type WordOutput } from './print.js';
 
 export interface Repositories {
   crs: CrRepository;
@@ -73,6 +75,8 @@ export interface HostOptions {
   documents?: { generator: DocumentGenerator; registry: TemplateRegistry; log: GenerationLog };
   backup?: DefaultBackupService;
   printOutput?: PrintOutput;
+  /** Where "Open in Word" saves the print-outs (needs `openPath`). */
+  printoutDir?: string;
   /** Called after a restore replaced the database; the main process restarts the app. */
   onRestored?: () => void;
   /** The main-process log file, for "show the log file" (support). */
@@ -117,8 +121,34 @@ export function createServiceHost(repos: Repositories, opts: HostOptions) {
   const documents = opts.documents
     ? new DocumentsService({ ...opts.documents, docData: docdata, session: current })
     : undefined;
+  // "Open in Word": the layout is saved as a new .docx (never over an older one) and opened for editing.
+  const wordOutput: WordOutput | undefined =
+    opts.printoutDir && opts.openPath
+      ? async (layout, defaultName) => {
+          const dir = opts.printoutDir as string;
+          await mkdir(dir, { recursive: true });
+          const { filePath, fileName } = await writeNew(dir, defaultName, buildDocx(layout.word));
+          await repos.audit.record({
+            userId: current().userId,
+            action: 'document_generate',
+            table: 'documents',
+            rowId: null,
+            before: null,
+            after: { printout: fileName },
+          });
+          await (opts.openPath as (path: string) => Promise<void>)(filePath);
+          return filePath;
+        }
+      : undefined;
   const print = opts.printOutput
-    ? new DefaultPrintService(search, reports, repos.refs, opts.label ?? label, opts.printOutput)
+    ? new DefaultPrintService(
+        search,
+        reports,
+        repos.refs,
+        opts.label ?? label,
+        opts.printOutput,
+        wordOutput,
+      )
     : undefined;
 
   const importer =

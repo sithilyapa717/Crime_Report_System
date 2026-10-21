@@ -68,6 +68,25 @@ export class DocxZip {
     return new DocxZip(entries);
   }
 
+  /** A new archive holding these UTF-8 text parts (a .docx built from scratch). */
+  static create(files: Record<string, string>, now: Date = new Date()): DocxZip {
+    const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1);
+    const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+    return new DocxZip(
+      Object.entries(files).map(([name, text]) => ({
+        name,
+        flags: 0x0800, // UTF-8 names
+        method: 8,
+        dosTime,
+        dosDate,
+        crc: 0,
+        compressed: Buffer.alloc(0),
+        uncompressedSize: 0,
+        replaced: Buffer.from(text, 'utf8'),
+      })),
+    );
+  }
+
   names(): string[] {
     return this.entries.map((e) => e.name);
   }

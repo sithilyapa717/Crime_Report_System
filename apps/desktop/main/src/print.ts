@@ -22,12 +22,15 @@ import {
 /** Prints or saves one layout; returns the PDF path, `true` when printed, or null when cancelled. */
 export type PrintOutput = (
   layout: PrintLayout,
-  target: PrintTarget,
+  target: Exclude<PrintTarget, 'word'>,
   defaultName: string,
 ) => Promise<string | boolean | null>;
 
+/** Saves the layout as a .docx in the app's print-outs folder, opens it in Word, returns the path. */
+export type WordOutput = (layout: PrintLayout, defaultName: string) => Promise<string>;
+
 export class PrintError extends Error {
-  constructor(public readonly code: 'no_rows' | 'year_required') {
+  constructor(public readonly code: 'no_rows' | 'year_required' | 'word_unavailable') {
     super(code);
   }
 }
@@ -39,12 +42,19 @@ export class DefaultPrintService implements PrintService {
     private readonly refs: ReferenceLookup,
     private readonly label: (key: string) => string,
     private readonly output: PrintOutput,
+    private readonly wordOutput?: WordOutput,
   ) {}
+
+  private emit(layout: PrintLayout, target: PrintTarget, pdfName: string) {
+    if (target !== 'word') return this.output(layout, target, pdfName);
+    if (!this.wordOutput) throw new PrintError('word_unavailable');
+    return this.wordOutput(layout, pdfName.replace(/\.pdf$/i, '.docx'));
+  }
 
   async certificateE48(query: PreviousOffenceQuery, target: PrintTarget) {
     const rows = await this.search.previousOffences(query); // checks role and input
     if (!rows.length) throw new PrintError('no_rows');
-    return this.output(renderCertificateE48(rows), target, 'certificate-E48.pdf');
+    return this.emit(renderCertificateE48(rows), target, 'certificate-E48.pdf');
   }
 
   async convictsList(filter: ConvictFilter, target: PrintTarget) {
@@ -59,7 +69,7 @@ export class DefaultPrintService implements PrintService {
     const suffix = filter.month
       ? `${filter.year}-${String(filter.month).padStart(2, '0')}`
       : filter.year;
-    return this.output(layout, target, `convicts-${suffix}.pdf`);
+    return this.emit(layout, target, `convicts-${suffix}.pdf`);
   }
 
   async register(params: ReportParams, target: PrintTarget) {
@@ -79,6 +89,6 @@ export class DefaultPrintService implements PrintService {
       subtitle: [office, period, person].filter((s): s is string => !!s),
       caption: this.label,
     });
-    return this.output(layout, target, `report-${params.type}-${scope.year}.pdf`);
+    return this.emit(layout, target, `report-${params.type}-${scope.year}.pdf`);
   }
 }

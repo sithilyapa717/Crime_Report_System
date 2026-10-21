@@ -86,6 +86,6 @@ export const BackupName = z
   .regex(/^excise-backup-[\w.-]+$/)
   .refine((s) => !s.includes('..'), 'Invalid backup name');
 
-/** Where a print layout goes: the printer dialog, or a PDF the user saves. */
-export const PrintTarget = z.enum(['printer', 'pdf']);
+/** Where a print layout goes: the printer dialog, a PDF the user saves, or a Word file opened for editing. */
+export const PrintTarget = z.enum(['printer', 'pdf', 'word']);
 export type PrintTarget = z.infer<typeof PrintTarget>;

@@ -151,7 +151,7 @@ export class DocumentGenerator {
 }
 
 /** Writes to a name that does not exist yet ("wx" fails instead of overwriting). */
-async function writeNew(dir: string, baseName: string, data: Buffer): Promise<{ filePath: string; fileName: string }> {
+export async function writeNew(dir: string, baseName: string, data: Buffer): Promise<{ filePath: string; fileName: string }> {
   for (let n = 1; n < 1000; n++) {
     const fileName = withCopyNumber(baseName, n);
     const filePath = join(dir, fileName);

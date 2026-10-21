@@ -2,6 +2,8 @@
 // Chromium, so the CSS here targets Chromium's print engine. Fonts: the Sinhala fonts the app ships
 // (Noto Sans Sinhala, C1) first, then the ones office PCs already have.
 
+import type { WordDoc } from './word.ts';
+
 export interface PrintLayout {
   /** Complete HTML document. */
   html: string;
@@ -11,6 +13,8 @@ export interface PrintLayout {
    * Chromium fills the pageNumber / totalPages spans.
    */
   footerTemplate: string;
+  /** The same content for Word (buildDocx), so staff can edit it before printing. */
+  word: WordDoc;
 }
 
 export const FONT_STACK = '"Noto Sans Sinhala", "Iskoola Pota", "Nirmala UI", sans-serif';

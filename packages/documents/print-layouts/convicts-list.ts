@@ -5,6 +5,7 @@ import type { ConvictRow } from '../../shared/contract/src/index.ts';
 import type { OutcomeType } from '../../shared/schemas/src/case.ts';
 import { formatDate, formatMoney } from '../mapping/format.ts';
 import { esc, page, PAGE_FOOTER, tick, type PrintLayout } from './page.ts';
+import type { WordCell, WordDoc } from './word.ts';
 import { CONVICTS_LIST as W, MONTHS } from './wording.ts';
 
 export interface ConvictsListPeriod {
@@ -51,7 +52,18 @@ export function convictsListTitle(period: ConvictsListPeriod): string {
 
 export function renderConvictsList(rows: ConvictRow[], period: ConvictsListPeriod): PrintLayout {
   const title = convictsListTitle(period);
-  const head = [W.crNumber, W.name, W.nic, W.offence, W.quantity, W.fine, W.address, W.court, W.caseNumber, W.convictedDate]
+  const head = [
+    W.crNumber,
+    W.name,
+    W.nic,
+    W.offence,
+    W.quantity,
+    W.fine,
+    W.address,
+    W.court,
+    W.caseNumber,
+    W.convictedDate,
+  ]
     .map((h) => `<th>${esc(h)}</th>`)
     .join('');
   const sentenceHead = SENTENCES.map(([, h]) => `<th class="s">${esc(h)}</th>`).join('');
@@ -70,7 +82,56 @@ ${SENTENCES.map(([o]) => `<td class="s">${r.outcomes.includes(o) ? tick(true) : 
         .join('\n')
     : `<tr><td class="empty" colspan="${10 + SENTENCES.length}">–</td></tr>`;
 
+  const headers = [
+    W.crNumber,
+    W.name,
+    W.nic,
+    W.offence,
+    W.quantity,
+    W.fine,
+    W.address,
+    W.court,
+    W.caseNumber,
+    W.convictedDate,
+  ];
+  const word: WordDoc = {
+    landscape: true,
+    blocks: [
+      { kind: 'para', text: title, align: 'center', bold: true, size: 13, after: 4 },
+      ...(period.officeName
+        ? [{ kind: 'para', text: period.officeName, align: 'center', after: 8 } as const]
+        : []),
+      rows.length
+        ? {
+            kind: 'table',
+            headerHeight: 48,
+            header: [
+              ...headers.map((text): WordCell => ({ text, align: 'center' })),
+              ...SENTENCES.map(([, text]): WordCell => ({ text, vertical: true })),
+            ],
+            rows: rows.map((r): WordCell[] => [
+              { text: r.crNumber },
+              { text: r.accusedName },
+              { text: r.accusedNic ?? '' },
+              { text: r.offenceCode },
+              { text: String(r.quantity ?? ''), align: 'right' },
+              { text: r.fineAmount === null ? '' : formatMoney(r.fineAmount), align: 'right' },
+              { text: r.accusedAddress ?? '' },
+              { text: r.courtName ?? '' },
+              { text: r.caseNumber ?? '' },
+              { text: r.convictedDate ? formatDate(r.convictedDate) : '' },
+              ...SENTENCES.map(([o]): WordCell => ({
+                text: r.outcomes.includes(o) ? tick(true) : '',
+                align: 'center',
+              })),
+            ]),
+          }
+        : { kind: 'para', text: '–', align: 'center' },
+    ],
+  };
+
   return {
+    word,
     html: page({
       title,
       landscape: true,

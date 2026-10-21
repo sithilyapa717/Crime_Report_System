@@ -4,6 +4,7 @@
 import type { ConvictRow } from '../../shared/contract/src/index.ts';
 import { formatDate, formatMoney } from '../mapping/format.ts';
 import { esc, page, PAGE_FOOTER, tick, type PrintLayout } from './page.ts';
+import type { WordBlock } from './word.ts';
 import { E48 } from './wording.ts';
 
 const CSS = `
@@ -25,7 +26,8 @@ dd { margin: 0; border-bottom: 1px dotted #555; min-height: 6mm; }
 
 function certificate(r: ConvictRow): string {
   const has = (o: ConvictRow['outcomes'][number]) => r.outcomes.includes(o);
-  const line = (on: boolean, text: string) => `<div><span class="box">${tick(on)}</span>${esc(text)}</div>`;
+  const line = (on: boolean, text: string) =>
+    `<div><span class="box">${tick(on)}</span>${esc(text)}</div>`;
   const fine = r.fineAmount === null ? '' : formatMoney(r.fineAmount);
   return `<section class="cert">
 <div class="head"><div class="dept">${esc(E48.department)}</div><div>${esc(E48.formNumber)}</div><div class="ref">${esc(E48.reference)}</div></div>
@@ -52,11 +54,73 @@ ${line(has('imprisonment'), E48.imprisonment)}
 </section>`;
 }
 
+/** The same certificate for Word. */
+function certificateBlocks(r: ConvictRow, first: boolean): WordBlock[] {
+  const has = (o: ConvictRow['outcomes'][number]) => r.outcomes.includes(o);
+  const line = (on: boolean, text: string) => `${tick(on)}  ${text}`;
+  const fine = r.fineAmount === null ? '' : formatMoney(r.fineAmount);
+  return [
+    {
+      kind: 'para',
+      text: E48.department,
+      align: 'center',
+      bold: true,
+      size: 14,
+      after: 2,
+      pageBreakBefore: !first,
+    },
+    { kind: 'para', text: E48.formNumber, align: 'center', after: 2 },
+    { kind: 'para', text: E48.reference, align: 'center', size: 9, after: 6 },
+    {
+      kind: 'para',
+      text: E48.title,
+      align: 'center',
+      bold: true,
+      underline: true,
+      size: 13,
+      before: 22,
+      after: 18,
+    },
+    {
+      kind: 'fields',
+      labelWidth: 52,
+      rows: [
+        { label: E48.name, value: r.accusedName },
+        { label: E48.address, value: r.accusedAddress ?? '' },
+        { label: E48.nic, value: r.accusedNic ?? '' },
+        { label: E48.court, value: r.courtName ?? '' },
+        { label: E48.convictedDate, value: r.convictedDate ? formatDate(r.convictedDate) : '' },
+        { label: E48.caseNumber, value: r.caseNumber ?? '' },
+        { label: E48.offence, value: r.offenceName || r.offenceCode },
+        {
+          label: E48.sentence,
+          value: [
+            `${E48.fine} ${fine}`.trimEnd(),
+            line(has('community_service'), E48.communityService),
+            line(has('admonished'), E48.admonished),
+            line(has('probation'), E48.probation),
+            line(has('rehabilitation'), E48.rehabilitation),
+            line(has('imprisonment'), E48.imprisonment),
+          ],
+        },
+      ],
+    },
+    { kind: 'para', text: E48.certify, before: 34, after: 6 },
+    { kind: 'para', text: '.'.repeat(40), align: 'right', before: 50, after: 0 },
+  ];
+}
+
 /** One ඊ 48 certificate per conviction row. */
 export function renderCertificateE48(rows: ConvictRow[]): PrintLayout {
   if (!rows.length) throw new Error('no conviction to certify');
   return {
-    html: page({ title: E48.title, landscape: false, css: CSS, body: rows.map(certificate).join('\n') }),
+    word: { landscape: false, blocks: rows.flatMap((r, i) => certificateBlocks(r, i === 0)) },
+    html: page({
+      title: E48.title,
+      landscape: false,
+      css: CSS,
+      body: rows.map(certificate).join('\n'),
+    }),
     landscape: false,
     footerTemplate: PAGE_FOOTER,
   };

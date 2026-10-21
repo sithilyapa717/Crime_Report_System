@@ -68,7 +68,7 @@ describe('fields', () => {
       label: `Officer ${i}`,
     }));
     render(<Select label="Officer" value="3" onChange={() => undefined} options={options} />);
-    fireEvent.change(screen.getByLabelText('Officer: filter'), { target: { value: 'officer 1' } });
+    fireEvent.change(screen.getByLabelText('Officer: පෙරහන'), { target: { value: 'officer 1' } });
     const shown = screen.getAllByRole('option').map((o) => o.textContent);
     expect(shown).toContain('Officer 3');
     expect(shown).toContain('Officer 12');

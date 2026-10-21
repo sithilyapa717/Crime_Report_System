@@ -145,6 +145,10 @@ async function start(): Promise<void> {
     ...(backup ? { backup } : {}),
     documents: { generator, registry, log: generationLog },
     printOutput: createPrintOutput(dialogs.pickSavePath),
+    printoutDir: join(
+      process.env.EXCISE_DOCUMENTS_DIR ?? join(app.getPath('documents'), 'Excise documents'),
+      'Print-outs',
+    ),
     logFile: log.file,
     fontCheck: async () =>
       fontStatus(join(documentsRoot, 'registry', 'template-inventory.json'), await windowsFonts()),

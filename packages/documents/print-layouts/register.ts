@@ -8,6 +8,7 @@
 import type { ReportResult } from '../../shared/contract/src/index.ts';
 import { formatDate, formatMoney } from '../mapping/format.ts';
 import { esc, page, PAGE_FOOTER, tick, type PrintLayout } from './page.ts';
+import type { WordBlock, WordDoc } from './word.ts';
 
 export interface RegisterOptions {
   /** Title printed above the table (already in Sinhala, from the labels file). */
@@ -43,9 +44,10 @@ tfoot td { font-weight: bold; }
 tfoot { display: table-row-group; } /* total once, at the end */
 `;
 
-function cell(key: string, value: string | number | null): { html: string; cls: string } {
-  if (TICK_KEYS.has(key)) return { html: value ? tick(true) : '', cls: 'c' };
-  if (value === null || value === undefined || value === '') return { html: '', cls: '' };
+/** `text` is plain; the HTML layout escapes it and the Word layout writes it as it is. */
+function cell(key: string, value: string | number | null): { text: string; cls: string } {
+  if (TICK_KEYS.has(key)) return { text: value ? tick(true) : '', cls: 'c' };
+  if (value === null || value === undefined || value === '') return { text: '', cls: '' };
   // a register lists many CRs: one bad value prints as stored rather than stopping the whole printout
   const safe = (format: () => string) => {
     try {
@@ -54,11 +56,18 @@ function cell(key: string, value: string | number | null): { html: string; cls: 
       return String(value);
     }
   };
-  if (key === 'fineAmount' && typeof value === 'number') return { html: esc(safe(() => formatMoney(value))), cls: 'num' };
-  if (/Date$/.test(key) && typeof value === 'string') return { html: esc(safe(() => formatDate(value))), cls: 'nw' };
-  if (typeof value === 'number') return { html: esc(value), cls: 'num' };
-  return { html: esc(value), cls: /^(crNumber|accusedNic|caseNumber|offenceCode)$/.test(key) ? 'nw' : '' };
+  if (key === 'fineAmount' && typeof value === 'number')
+    return { text: safe(() => formatMoney(value)), cls: 'num' };
+  if (/Date$/.test(key) && typeof value === 'string')
+    return { text: safe(() => formatDate(value)), cls: 'nw' };
+  if (typeof value === 'number') return { text: String(value), cls: 'num' };
+  return {
+    text: value,
+    cls: /^(crNumber|accusedNic|caseNumber|offenceCode)$/.test(key) ? 'nw' : '',
+  };
 }
+
+const ALIGN = { num: 'right', c: 'center' } as const;
 
 export function renderRegister(result: ReportResult, opts: RegisterOptions): PrintLayout {
   const cols = result.columns;
@@ -69,7 +78,7 @@ export function renderRegister(result: ReportResult, opts: RegisterOptions): Pri
         `<tr>${cols
           .map((c) => {
             const v = cell(c.key, row[c.key] ?? null);
-            return `<td${v.cls ? ` class="${v.cls}"` : ''}>${v.html}</td>`;
+            return `<td${v.cls ? ` class="${v.cls}"` : ''}>${esc(v.text)}</td>`;
           })
           .join('')}</tr>`,
     )
@@ -80,7 +89,46 @@ export function renderRegister(result: ReportResult, opts: RegisterOptions): Pri
       ? `<tfoot><tr>${cols.map((_, i) => `<td class="num">${i === fineIndex ? esc(formatMoney(result.fineTotal)) : ''}</td>`).join('')}</tr></tfoot>`
       : '';
 
+  const word: WordDoc = {
+    landscape: true,
+    blocks: [
+      { kind: 'para', text: opts.title, align: 'center', bold: true, size: 13, after: 4 },
+      ...(opts.subtitle ?? []).map((text): WordBlock => ({
+        kind: 'para',
+        text,
+        align: 'center',
+        after: 4,
+      })),
+      result.rows.length
+        ? {
+            kind: 'table',
+            header: cols.map((c) => ({ text: opts.caption(c.labelKey), align: 'center' })),
+            rows: result.rows.map((row) =>
+              cols.map((c) => {
+                const v = cell(c.key, row[c.key] ?? null);
+                return {
+                  text: v.text,
+                  ...(ALIGN[v.cls as keyof typeof ALIGN]
+                    ? { align: ALIGN[v.cls as keyof typeof ALIGN] }
+                    : {}),
+                };
+              }),
+            ),
+            ...(fineIndex >= 0
+              ? {
+                  footer: cols.map((_, i) => ({
+                    text: i === fineIndex ? formatMoney(result.fineTotal) : '',
+                    align: 'right' as const,
+                  })),
+                }
+              : {}),
+          }
+        : { kind: 'para', text: '–', align: 'center' },
+    ],
+  };
+
   return {
+    word,
     html: page({
       title: opts.title,
       landscape: true,

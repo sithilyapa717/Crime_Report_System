@@ -1,6 +1,7 @@
 export {
   DocumentGenerator,
   GenerationError,
+  writeNew,
   type GenerateRequest,
   type GeneratedDocument,
   type GenerationWarning,
