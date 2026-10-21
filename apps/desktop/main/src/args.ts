@@ -114,5 +114,6 @@ export const ARG_SCHEMAS = {
   'import.lastReport': z.tuple([]),
   'import.saveReport': z.tuple([]),
 
+  'support.fontCheck': z.tuple([]),
   'support.showLogFile': z.tuple([]),
 } satisfies Record<Channel, z.ZodTypeAny>;

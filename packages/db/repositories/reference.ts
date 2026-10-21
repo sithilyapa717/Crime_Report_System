@@ -2,7 +2,7 @@
 import type { ReferenceItem, ReferenceLookup, ReferenceRepository } from '@excise/contract';
 import type { ReferenceInput, ReferenceKind } from '@excise/schemas';
 import { sql } from 'kysely';
-import type { ExciseDb } from '../src/connection.js';
+import type { DbHandle } from '../src/handle.js';
 import { created, listTable, now } from './common.js';
 
 interface ViewRow {
@@ -24,7 +24,7 @@ const toItem = (r: ViewRow): ReferenceItem => ({
 });
 
 export class SqliteReferenceRepository implements ReferenceRepository {
-  constructor(private readonly db: ExciseDb) {}
+  constructor(private readonly db: DbHandle) {}
 
   private view() {
     return this.db.q
@@ -145,7 +145,8 @@ export class SqliteReferenceRepository implements ReferenceRepository {
                       c.court_id, c.prosecuting_officer_id)
          OR EXISTS (SELECT 1 FROM cr_support_officers s WHERE s.crime_report_id = cr.id AND s.officer_id = ${id})
     `.execute(this.db.q);
-    return row.rows[0]?.n ?? 0;
+    // PostgreSQL returns COUNT as a bigint string.
+    return Number(row.rows[0]?.n ?? 0);
   }
 }
 

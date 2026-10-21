@@ -7,6 +7,8 @@
     "@excise/db": "workspace:*",
     "@excise/mocks": "workspace:*",
     "@excise/reports": "workspace:*",
-    "@excise/search": "workspace:*"
+    "@excise/search": "workspace:*",
+    "@types/pg": "^8.23.1",
+    "pg": "^8.23.1"
   }
 }

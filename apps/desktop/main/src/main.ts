@@ -15,6 +15,7 @@ import type { SessionHolder } from '@excise/auth';
 import { createSqliteRepositories, openDatabase } from '@excise/db';
 import { createDevRepositories } from './dev-seed.js';
 import { createDialogs, createPrintOutput } from './electron-parts.js';
+import { fontStatus, windowsFonts } from './fonts.js';
 import { createServiceHost, dispatch } from './host.js';
 import { createFileLogger, type Logger } from './log.js';
 
@@ -127,7 +128,9 @@ async function start(): Promise<void> {
   const generator = new DocumentGenerator({
     registry,
     originalsDir: join(documentsRoot, 'templates', 'original'),
-    outputDir: join(app.getPath('documents'), 'Excise documents'),
+    // EXCISE_DOCUMENTS_DIR: tests keep generated files out of the user's Documents folder.
+    outputDir:
+      process.env.EXCISE_DOCUMENTS_DIR ?? join(app.getPath('documents'), 'Excise documents'),
     log: generationLog,
     ...(process.platform === 'win32'
       ? { pdfExporter: wordPdfExporter(join(documentsRoot, 'generation', 'docx-to-pdf.ps1')) }
@@ -143,6 +146,8 @@ async function start(): Promise<void> {
     documents: { generator, registry, log: generationLog },
     printOutput: createPrintOutput(dialogs.pickSavePath),
     logFile: log.file,
+    fontCheck: async () =>
+      fontStatus(join(documentsRoot, 'registry', 'template-inventory.json'), await windowsFonts()),
     importer: {
       read: accessReader(join(app.getPath('temp'), 'excise-import'), readAccdbScript),
       reportFile: join(userData, 'import-report.json'),

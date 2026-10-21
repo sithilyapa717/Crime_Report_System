@@ -47,11 +47,13 @@ export function Dialog({
   onClose,
   title,
   children,
+  wide,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
+  wide?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -61,7 +63,13 @@ export function Dialog({
     if (!open && d.open) d.close();
   }, [open]);
   return (
-    <dialog ref={ref} className="ex-dialog" aria-label={title} onClose={onClose} onCancel={onClose}>
+    <dialog
+      ref={ref}
+      className={wide ? 'ex-dialog ex-dialog--wide' : 'ex-dialog'}
+      aria-label={title}
+      onClose={onClose}
+      onCancel={onClose}
+    >
       {open && (
         <div className="ex-dialog__body">
           <h2>{title}</h2>

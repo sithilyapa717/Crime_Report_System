@@ -6,7 +6,7 @@ import type { CrRepository } from '@excise/contract';
 import { CrimeReport, type CrimeReportInput } from '@excise/schemas';
 import { sql } from 'kysely';
 import type { CrimeReportsTable } from '../schema/tables.js';
-import type { ExciseDb } from '../src/connection.js';
+import type { DbHandle } from '../src/handle.js';
 import { chunks, compact, created, now } from './common.js';
 
 const seqOf = (crNumber: string) => Number(crNumber.split('/')[0]);
@@ -54,7 +54,7 @@ const CHILD_TABLES = [
 ] as const;
 
 export class SqliteCrRepository implements CrRepository {
-  constructor(private readonly db: ExciseDb) {}
+  constructor(private readonly db: DbHandle) {}
 
   private async writeChildren(crId: string, input: CrimeReportInput): Promise<void> {
     const q = this.db.q;
@@ -138,8 +138,9 @@ export class SqliteCrRepository implements CrRepository {
       await q
         .insertInto('cash_notes')
         .values(
-          input.cashNotes.map((c) => ({
+          input.cashNotes.map((c, position) => ({
             ...base(),
+            position,
             kind: c.kind,
             denomination: c.denomination,
             text: c.text,
@@ -259,12 +260,11 @@ export class SqliteCrRepository implements CrRepository {
             .where('crime_report_id', 'in', part)
             .orderBy('position')
             .execute(),
-          // Entry order (the unique index would otherwise decide).
           q
             .selectFrom('cash_notes')
             .selectAll()
             .where('crime_report_id', 'in', part)
-            .orderBy(sql`rowid`)
+            .orderBy('position')
             .execute(),
           q
             .selectFrom('productions')

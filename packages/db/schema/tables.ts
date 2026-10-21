@@ -125,6 +125,7 @@ export interface SeizedItemsTable extends Sync {
 
 export interface CashNotesTable extends Sync {
   crime_report_id: string;
+  position: number;
   kind: string;
   denomination: number;
   text: string;

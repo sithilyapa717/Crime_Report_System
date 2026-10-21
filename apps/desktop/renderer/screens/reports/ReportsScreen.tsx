@@ -1,0 +1,321 @@
+// C7: the reports menu (old `menu form6` and its 9 selector screens: monthly / half-year / yearly
+// × all / by detecting officer / by informant). The office, year and month are asked once
+// (REWRITE_PLAN §1.8); each report type is a button, as on the old screens. Results show with
+// Sinhala headings and totals, and export to Excel/CSV or print with D's register layout.
+import type { ReportResult, SummaryGroup } from '@excise/contract';
+import { label } from '@excise/labels';
+import type { ReportParams, ReportType, SummaryGroupBy } from '@excise/schemas';
+import { useState } from 'react';
+import {
+  Actions,
+  BigMenuButton,
+  Button,
+  FieldGrid,
+  FormSection,
+  MenuGrid,
+  RadioGroup,
+  Select,
+  Table,
+  formatDate,
+  formatMoney,
+  useToast,
+  type Column,
+} from '../../design-system/index.js';
+import { useNav } from '../../shell/navigation.js';
+import { call, IpcError } from '../../src/ipc.js';
+import { useRefOptions } from '../../src/references.js';
+import { SEIZED } from '../shared/cr-model.js';
+import {
+  ErrorLine,
+  MONTH_OPTIONS,
+  PrintButtons,
+  useOfficeYear,
+  useRun,
+} from '../shared/results.js';
+import './reports.css';
+
+type Period = 'month' | 'half_year' | 'year';
+type Person = 'none' | 'detecting_officer' | 'informant';
+
+const TYPES: ReportType[] = [
+  'register',
+  'warrant',
+  'trial',
+  'summons',
+  'not_filed',
+  'fines_not_collected',
+  'rewards_due',
+  'resolved',
+  'fines_earned',
+  'convicts',
+];
+const SUMMARIES: SummaryGroupBy[] = ['offence', 'detecting_officer', 'informant'];
+const MONEY = new Set(['fineAmount']);
+const DATES = new Set(['detectionDate', 'courtDate', 'convictedDate']);
+/** Convicts report: 1 means "this sentence was given". */
+const TICKS = new Set([
+  'communityService',
+  'settlement',
+  'probation',
+  'rehabilitation',
+  'governmentFee',
+  'imprisonment',
+  'admonished',
+  'suspendedSentence',
+]);
+
+type Shown =
+  | { kind: 'report'; type: ReportType; result: ReportResult }
+  | { kind: 'summary'; by: SummaryGroupBy; groups: SummaryGroup[] };
+
+export function ReportsScreen() {
+  const { session, go } = useNav();
+  const toast = useToast();
+  const byOfficerAllowed = session.role !== 'observation';
+  const { officeId, year, fields } = useOfficeYear();
+  const [period, setPeriod] = useState<Period>('month');
+  const [person, setPerson] = useState<Person>('none');
+  const [month, setMonth] = useState<string | undefined>(String(new Date().getMonth() + 1));
+  const [half, setHalf] = useState<'first' | 'second'>('first');
+  const [officerId, setOfficerId] = useState<string | undefined>();
+  const officers = useRefOptions(person === 'informant' ? 'informant' : 'detecting_officer');
+  const s = useRun<Shown>();
+
+  const params = (type: ReportType): ReportParams | null => {
+    if (!officeId || !year) return null;
+    if (period === 'month' && !month) return null;
+    if (person !== 'none' && !officerId) return null;
+    const scope =
+      period === 'month'
+        ? { kind: 'month' as const, officeId, year, month: Number(month) }
+        : period === 'half_year'
+          ? { kind: 'half_year' as const, officeId, year, half }
+          : { kind: 'year' as const, officeId, year };
+    return {
+      scope,
+      person: person === 'none' ? { kind: 'none' } : { kind: person, officerId: officerId! },
+      type,
+    };
+  };
+  const ready = params('register') !== null;
+
+  const runReport = (type: ReportType) => {
+    const p = params(type);
+    if (p) void s.run(async () => ({ kind: 'report', type, result: await call('reports.run', p) }));
+  };
+  const runSummary = (by: SummaryGroupBy) => {
+    const p = params('register');
+    if (p)
+      void s.run(async () => ({
+        kind: 'summary',
+        by,
+        groups: await call('reports.summary', p, by),
+      }));
+  };
+  const exportTo = (format: 'xlsx' | 'csv') => async () => {
+    if (s.result?.kind !== 'report') return;
+    const p = params(s.result.type);
+    if (!p) return;
+    try {
+      const path = await call('reports.export', p, format);
+      if (path) toast(`${label('report.exported')} ${path}`);
+    } catch (e) {
+      toast(e instanceof IpcError ? e.caption : label('error.unknown'), 'error');
+    }
+  };
+
+  return (
+    <div className="reports">
+      <h1>{label('menu.reports')}</h1>
+      <FormSection title={label('report.period')}>
+        <RadioGroup
+          label={label('report.period')}
+          name="period"
+          value={period}
+          onChange={setPeriod}
+          options={[
+            { value: 'month', label: label('reports.monthly') },
+            { value: 'half_year', label: label('reports.halfYear') },
+            { value: 'year', label: label('reports.yearly') },
+          ]}
+        />
+        {byOfficerAllowed && (
+          <RadioGroup
+            label={label('report.person')}
+            name="person"
+            value={person}
+            onChange={(p) => {
+              setPerson(p);
+              setOfficerId(undefined);
+            }}
+            options={[
+              { value: 'none', label: label('reports.byYearMonth') },
+              { value: 'detecting_officer', label: label('reports.byDetectingOfficer') },
+              { value: 'informant', label: label('reports.byInformant') },
+            ]}
+          />
+        )}
+        <FieldGrid>
+          {fields}
+          {period === 'month' && (
+            <Select
+              label={label('cr.month')}
+              value={month}
+              options={MONTH_OPTIONS}
+              onChange={setMonth}
+            />
+          )}
+          {period === 'half_year' && (
+            <Select
+              label={label('report.half')}
+              value={half}
+              onChange={(v) => setHalf((v as 'first' | 'second') ?? 'first')}
+              options={[
+                { value: 'first', label: label('cr.halfYear.first') },
+                { value: 'second', label: label('cr.halfYear.second') },
+              ]}
+            />
+          )}
+          {person !== 'none' && (
+            <Select
+              label={label(person === 'informant' ? 'cr.informant' : 'cr.detectingOfficer')}
+              value={officerId}
+              options={officers}
+              onChange={setOfficerId}
+            />
+          )}
+        </FieldGrid>
+      </FormSection>
+
+      <FormSection title={label('report.type')}>
+        <MenuGrid label={label('report.type')}>
+          {TYPES.map((t) => (
+            <BigMenuButton
+              key={t}
+              className="reports__type"
+              disabled={!ready || s.busy}
+              onClick={() => runReport(t)}
+            >
+              {label(`reportType.${t}`)}
+            </BigMenuButton>
+          ))}
+        </MenuGrid>
+        <h3 className="reports__sub">{label('report.summary')}</h3>
+        <Actions>
+          {SUMMARIES.map((by) => (
+            <Button key={by} disabled={!ready || s.busy} onClick={() => runSummary(by)}>
+              {label(`report.summary.${by}`)}
+            </Button>
+          ))}
+        </Actions>
+        <h3 className="reports__sub">{label('menu.reports')}</h3>
+        <Actions>
+          <Button onClick={() => go('caseNumberSearch')}>{label('reports.byCaseNumber')}</Button>
+          <Button onClick={() => go('nameNicSearch')}>{label('reports.byNameNic')}</Button>
+          <Button onClick={() => go('previousByCourt')}>{label('reports.previousByCourt')}</Button>
+        </Actions>
+      </FormSection>
+
+      <ErrorLine error={s.error} />
+      {s.result?.kind === 'report' && (
+        <FormSection title={label(`reportType.${s.result.type}`)}>
+          <Actions>
+            <Button onClick={exportTo('xlsx')}>{label('report.exportXlsx')}</Button>
+            <Button onClick={exportTo('csv')}>{label('report.exportCsv')}</Button>
+            <PrintButtons
+              print={(target) =>
+                call('print.register', params((s.result as { type: ReportType }).type)!, target)
+              }
+            />
+          </Actions>
+          <ReportTable result={s.result.result} />
+        </FormSection>
+      )}
+      {s.result?.kind === 'summary' && (
+        <FormSection
+          title={`${label('report.summary')} – ${label(`report.summary.${s.result.by}`)}`}
+        >
+          <SummaryTable groups={s.result.groups} />
+        </FormSection>
+      )}
+    </div>
+  );
+}
+
+type Row = ReportResult['rows'][number] & { __i: number };
+
+export function ReportTable({ result }: { result: ReportResult }) {
+  const rows: Row[] = result.rows.map((r, i) => ({ ...r, __i: i }));
+  const columns: Column<Row>[] = result.columns.map((c) => ({
+    key: c.key,
+    title: label(c.labelKey),
+    value: (r) => r[c.key] ?? null,
+    numeric: MONEY.has(c.key) || c.key === 'quantity',
+    render: (r) => {
+      const v = r[c.key];
+      if (v === null || v === undefined) return '';
+      if (MONEY.has(c.key)) return formatMoney(Number(v));
+      if (DATES.has(c.key)) return formatDate(String(v));
+      if (TICKS.has(c.key)) return v ? '✓' : '';
+      return v;
+    },
+    ...(MONEY.has(c.key) ? { total: () => formatMoney(result.fineTotal) } : {}),
+  }));
+  return (
+    <>
+      <p className="ex-muted">
+        {label('report.count')}: {rows.length} · {label('report.fineTotal')}:{' '}
+        {formatMoney(result.fineTotal)}
+      </p>
+      <Table
+        rows={rows}
+        rowKey={(r) => String(r.__i)}
+        columns={columns}
+        filterable={rows.length > 20}
+      />
+    </>
+  );
+}
+
+function SummaryTable({ groups }: { groups: SummaryGroup[] }) {
+  const items = SEIZED.filter(({ type }) => groups.some((g) => g.quantities[type]));
+  const sum = (f: (g: SummaryGroup) => number) => groups.reduce((s, g) => s + f(g), 0);
+  const columns: Column<SummaryGroup>[] = [
+    {
+      key: 'label',
+      title: label('report.col.offenceCode'),
+      value: (g) => g.label || g.key,
+      total: () => label('report.total'),
+    },
+    {
+      key: 'count',
+      title: label('report.count'),
+      value: (g) => g.count,
+      numeric: true,
+      total: () => sum((g) => g.count),
+    },
+    ...items.map(({ type }): Column<SummaryGroup> => ({
+      key: type,
+      title: label(`seized.${type}`),
+      value: (g) => g.quantities[type] ?? 0,
+      numeric: true,
+      total: () => Math.round(sum((g) => g.quantities[type] ?? 0) * 1000) / 1000,
+    })),
+    {
+      key: 'quantityTotal',
+      title: label('report.quantityTotal'),
+      value: (g) => g.quantityTotal,
+      numeric: true,
+      total: () => sum((g) => g.quantityTotal),
+    },
+    {
+      key: 'fineTotal',
+      title: label('report.fineTotal'),
+      value: (g) => g.fineTotal,
+      render: (g) => formatMoney(g.fineTotal),
+      numeric: true,
+      total: () => formatMoney(sum((g) => g.fineTotal)),
+    },
+  ];
+  return <Table rows={groups} rowKey={(g) => g.key || '-'} columns={columns} />;
+}
