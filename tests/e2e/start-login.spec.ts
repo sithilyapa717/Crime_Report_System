@@ -30,8 +30,7 @@ test('first run: the station head creates the first account and sees the full me
     'menu.crEntry',
     'menu.reports',
     'menu.referenceLists',
-    'admin.users',
-    'admin.backup',
+    'menu.adminHub',
   ] as const) {
     await expect(page.getByRole('button', { name: label(key), exact: true })).toBeVisible();
   }
@@ -41,11 +40,20 @@ test('first run: the station head creates the first account and sees the full me
   await expect(
     page.getByRole('heading', { name: label('menu.convicts'), exact: true }),
   ).toBeVisible();
-  await page.getByRole('button', { name: label('shell.home'), exact: true }).click();
+  await page.getByRole('button', { name: label('login.back'), exact: true }).click();
 
   await page.getByRole('button', { name: label('shell.logout'), exact: true }).click();
   await expect(page.getByRole('navigation', { name: label('start.chooseRole') })).toBeVisible();
   await page.screenshot({ path: join(SHOTS, 'start.png') });
+
+  // Number keys pick a role, but not while typing in a field.
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.keyboard.press('3');
+  await expect(page.getByRole('heading', { name: label('role.observation') })).toBeVisible();
+  await page.getByLabel(label('login.username')).fill('');
+  await page.keyboard.press('2');
+  await expect(page.getByLabel(label('login.username'))).toHaveValue('2');
+  await expect(page.getByRole('heading', { name: label('role.observation') })).toBeVisible();
   expect(run.errors).toEqual([]);
 });
 
@@ -66,9 +74,9 @@ test('login must match the role button; new users must change their password; ob
   await page.getByRole('button', { name: label('login.submit'), exact: true }).click();
   await expect(page.getByRole('alert')).toContainText(label('role.observation'));
 
-  // Wrong password: the general message.
-  await page.getByRole('button', { name: label('login.back'), exact: true }).click();
+  // Wrong password: the general message. Another role card switches the form in place.
   await page.getByRole('button', { name: label('role.observation'), exact: true }).click();
+  await expect(page.getByRole('heading', { name: label('role.observation') })).toBeVisible();
   await page.getByLabel(label('login.username')).fill('obs1');
   await page.getByLabel(label('login.password')).fill('wrong-one');
   await page.getByRole('button', { name: label('login.submit'), exact: true }).click();
@@ -91,7 +99,7 @@ test('login must match the role button; new users must change their password; ob
   await expect(page.getByRole('button', { name: label('menu.crEntry'), exact: true })).toHaveCount(
     0,
   );
-  await expect(page.getByRole('button', { name: label('admin.users'), exact: true })).toHaveCount(
+  await expect(page.getByRole('button', { name: label('menu.adminHub'), exact: true })).toHaveCount(
     0,
   );
   // The service refuses too, not only the menu.

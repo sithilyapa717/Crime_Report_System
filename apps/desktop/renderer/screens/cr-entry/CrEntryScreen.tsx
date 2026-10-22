@@ -6,7 +6,6 @@ import type { CaseRecord, CrimeReport } from '@excise/schemas';
 import { label } from '@excise/labels';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Actions,
   Alert,
   Button,
   ConfirmDialog,
@@ -26,7 +25,7 @@ import { useLeaveGuard, useNav } from '../../shell/navigation.js';
 import { call, IpcError } from '../../src/ipc.js';
 import { useRefOptions } from '../../src/references.js';
 import { CashTab, SeizedTab, TimesTab, type TabProps } from '../cr-entry-tabs/tabs.js';
-import { CrPicker, lastOffice, rememberOffice } from '../shared/CrPicker.js';
+import { FindBar, lastOffice, rememberOffice } from '../shared/CrPicker.js';
 import {
   caseBody,
   emptyDraft,
@@ -175,19 +174,24 @@ export function CrEntryScreen() {
 
   return (
     <div className="cr-entry">
-      <h1>{label('form.crEntry')}</h1>
-      {!loaded && <CrPicker onFound={(cr) => replace('crEntry', { id: cr.id })} />}
+      <section className="ex-card cr-head">
+        <FindBar onFound={(cr) => replace('crEntry', { id: cr.id })}>
+          {loaded && <Button onClick={() => replace('crEntry')}>{label('cr.new')}</Button>}
+        </FindBar>
+        <fieldset className="cr-head__fields" disabled={deleted}>
+          <legend className="ex-visually-hidden">
+            {loaded ? loaded.cr.crNumber : label('cr.new')}
+          </legend>
+          <HeaderFields {...props} />
+          {loaded && <Pictures crimeReportId={loaded.cr.id} compact readOnly={deleted} />}
+        </fieldset>
+      </section>
       {message && <Alert kind="error">{message}</Alert>}
       {deleted && (
         <Alert kind="warn">
           {label('cr.deleted')} <Button onClick={restore}>{label('cr.restore')}</Button>
         </Alert>
       )}
-
-      <fieldset className="ex-section cr-entry__header" disabled={deleted}>
-        <legend>{loaded ? loaded.cr.crNumber : label('cr.new')}</legend>
-        <HeaderFields {...props} />
-      </fieldset>
 
       <fieldset className="cr-entry__body" disabled={deleted}>
         <Tabs
@@ -241,15 +245,16 @@ export function CrEntryScreen() {
         />
       </fieldset>
 
-      {loaded && !deleted && <Pictures crimeReportId={loaded.cr.id} />}
-
-      <Actions>
-        {loaded && !deleted && <DocumentsButton crimeReportId={loaded.cr.id} role={session.role} />}
+      <div className="cr-foot">
         {loaded && !deleted && (
           <Button variant="danger" onClick={() => setConfirmDelete(true)}>
             {label('cr.delete')}
           </Button>
         )}
+        <span className="cr-foot__dirty" aria-live="polite">
+          {dirty ? label('cr.dirty') : ''}
+        </span>
+        {loaded && !deleted && <DocumentsButton crimeReportId={loaded.cr.id} role={session.role} />}
         <Button
           onClick={() =>
             baseline ? setDraft(baseline) : setDraft(emptyDraft({ officeId: draft.officeId }))
@@ -261,7 +266,7 @@ export function CrEntryScreen() {
         <Button variant="primary" onClick={save} busy={busy} disabled={deleted || !dirty}>
           {label('common.save')}
         </Button>
-      </Actions>
+      </div>
       <ConfirmDialog
         open={confirmDelete}
         title={label('cr.delete')}
@@ -309,15 +314,14 @@ function HeaderFields({ draft, set, errors }: TabProps) {
         options={MONTHS}
         onChange={(v) => set((d) => ({ ...d, month: v ? Number(v) : undefined }))}
       />
-      <RadioGroup
+      <Select
         label={label('cr.halfYear')}
-        name="halfYear"
         value={draft.halfYear}
-        onChange={(v) => set((d) => ({ ...d, halfYear: v }))}
         options={[
           { value: 'first', label: label('cr.halfYear.first') },
           { value: 'second', label: label('cr.halfYear.second') },
         ]}
+        onChange={(v) => set((d) => ({ ...d, halfYear: v as CrDraft['halfYear'] }))}
       />
     </FieldGrid>
   );
@@ -337,67 +341,65 @@ function DetectionTab({ draft, set, errors }: TabProps) {
   const pick = (key: keyof CrDraft) => (v: string | undefined) => set((d) => ({ ...d, [key]: v }));
   return (
     <>
-      <FormSection title={label('tab.detection')}>
-        <FieldGrid>
-          <DateField
-            label={label('cr.detectionDate')}
-            value={draft.detectionDate}
-            error={errors.detectionDate}
-            onChange={pick('detectionDate')}
-          />
-          <TextField
-            label={label('cr.place')}
-            value={draft.place}
-            error={errors.place}
-            onChange={(v) => set((d) => ({ ...d, place: v }))}
-          />
-          <Select
-            label={label('cr.offence')}
-            value={draft.offenceTypeId}
-            error={errors.offenceTypeId}
-            options={offences}
-            onChange={pick('offenceTypeId')}
-          />
-          <Select
-            label={label('cr.policeArea')}
-            value={draft.policeAreaId}
-            options={police}
-            onChange={pick('policeAreaId')}
-          />
-          <Select
-            label={label('cr.divisionalSecretariat')}
-            value={draft.divisionalSecretariatId}
-            options={secretariats}
-            onChange={pick('divisionalSecretariatId')}
-          />
-          <Select
-            label={label('cr.detectingOfficer')}
-            value={draft.detectingOfficerId}
-            options={detecting}
-            onChange={pick('detectingOfficerId')}
-          />
-          <Select
-            label={label('cr.informant')}
-            value={draft.informantId}
-            options={informants}
-            onChange={pick('informantId')}
-          />
-          <Select label={label('cr.ac')} value={draft.acId} options={ac} onChange={pick('acId')} />
-          <Select label={label('cr.sc')} value={draft.scId} options={sc} onChange={pick('scId')} />
-          <Select
-            label={label('cr.oic')}
-            value={draft.oicId}
-            options={oic}
-            onChange={pick('oicId')}
-          />
-          <Select
-            label={label('cr.driver')}
-            value={draft.driverId}
-            options={drivers}
-            onChange={pick('driverId')}
-          />
-        </FieldGrid>
-      </FormSection>
+      <FieldGrid>
+        <DateField
+          label={label('cr.detectionDate')}
+          value={draft.detectionDate}
+          error={errors.detectionDate}
+          onChange={pick('detectionDate')}
+        />
+        <TextField
+          label={label('cr.place')}
+          value={draft.place}
+          error={errors.place}
+          onChange={(v) => set((d) => ({ ...d, place: v }))}
+        />
+        <Select
+          label={label('cr.offence')}
+          value={draft.offenceTypeId}
+          error={errors.offenceTypeId}
+          options={offences}
+          onChange={pick('offenceTypeId')}
+        />
+        <Select
+          label={label('cr.policeArea')}
+          value={draft.policeAreaId}
+          options={police}
+          onChange={pick('policeAreaId')}
+        />
+        <Select
+          label={label('cr.divisionalSecretariat')}
+          value={draft.divisionalSecretariatId}
+          options={secretariats}
+          onChange={pick('divisionalSecretariatId')}
+        />
+        <Select
+          label={label('cr.detectingOfficer')}
+          value={draft.detectingOfficerId}
+          options={detecting}
+          onChange={pick('detectingOfficerId')}
+        />
+        <Select
+          label={label('cr.informant')}
+          value={draft.informantId}
+          options={informants}
+          onChange={pick('informantId')}
+        />
+        <Select label={label('cr.ac')} value={draft.acId} options={ac} onChange={pick('acId')} />
+        <Select label={label('cr.sc')} value={draft.scId} options={sc} onChange={pick('scId')} />
+        <Select
+          label={label('cr.oic')}
+          value={draft.oicId}
+          options={oic}
+          onChange={pick('oicId')}
+        />
+        <Select
+          label={label('cr.driver')}
+          value={draft.driverId}
+          options={drivers}
+          onChange={pick('driverId')}
+        />
+      </FieldGrid>
       <FormSection title={label('cr.supportOfficer')}>
         <FieldGrid>
           {Array.from({ length: 10 }, (_, i) => i + 1).map((pos) => (
@@ -443,7 +445,7 @@ function AccusedTab({ draft, set, errors }: TabProps) {
     />
   );
   return (
-    <FormSection title={label('tab.accused')}>
+    <>
       <FieldGrid>
         {text('name', 'accused.name')}
         {text('address', 'accused.address')}
@@ -479,7 +481,7 @@ function AccusedTab({ draft, set, errors }: TabProps) {
         value={draft.accusedNote}
         onChange={(v) => set((d) => ({ ...d, accusedNote: v }))}
       />
-    </FormSection>
+    </>
   );
 }
 
@@ -493,14 +495,12 @@ function SuretyTab({ draft, set, errors }: TabProps) {
     />
   );
   return (
-    <FormSection title={label('tab.surety')}>
-      <FieldGrid>
-        {field('name', 'surety.name')}
-        {field('address', 'surety.address')}
-        {field('nic', 'surety.nic')}
-        {field('phone', 'surety.phone')}
-      </FieldGrid>
-    </FormSection>
+    <FieldGrid>
+      {field('name', 'surety.name')}
+      {field('address', 'surety.address')}
+      {field('nic', 'surety.nic')}
+      {field('phone', 'surety.phone')}
+    </FieldGrid>
   );
 }
 
@@ -508,28 +508,26 @@ function CourtTab({ draft, set, errors }: TabProps) {
   const courts = useRefOptions('court');
   const prosecutors = useRefOptions('prosecuting_officer');
   return (
-    <FormSection title={label('tab.court')}>
-      <FieldGrid>
-        <Select
-          label={label('case.court')}
-          value={draft.courtId}
-          error={errors.courtId}
-          options={courts}
-          onChange={(v) => set((d) => ({ ...d, courtId: v }))}
-        />
-        <DateField
-          label={label('case.courtDate')}
-          value={draft.courtDate}
-          error={errors.courtDate}
-          onChange={(v) => set((d) => ({ ...d, courtDate: v }))}
-        />
-        <Select
-          label={label('case.prosecutor')}
-          value={draft.prosecutingOfficerId}
-          options={prosecutors}
-          onChange={(v) => set((d) => ({ ...d, prosecutingOfficerId: v }))}
-        />
-      </FieldGrid>
-    </FormSection>
+    <FieldGrid>
+      <Select
+        label={label('case.court')}
+        value={draft.courtId}
+        error={errors.courtId}
+        options={courts}
+        onChange={(v) => set((d) => ({ ...d, courtId: v }))}
+      />
+      <DateField
+        label={label('case.courtDate')}
+        value={draft.courtDate}
+        error={errors.courtDate}
+        onChange={(v) => set((d) => ({ ...d, courtDate: v }))}
+      />
+      <Select
+        label={label('case.prosecutor')}
+        value={draft.prosecutingOfficerId}
+        options={prosecutors}
+        onChange={(v) => set((d) => ({ ...d, prosecutingOfficerId: v }))}
+      />
+    </FieldGrid>
   );
 }

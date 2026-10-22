@@ -4,15 +4,7 @@
 import type { CrListRow } from '@excise/contract';
 import { label } from '@excise/labels';
 import { useState, type FormEvent, type ReactNode } from 'react';
-import {
-  Actions,
-  Button,
-  DateField,
-  FieldGrid,
-  FormSection,
-  Select,
-  TextField,
-} from '../../design-system/index.js';
+import { Button, Card, DateField, Select, TextField } from '../../design-system/index.js';
 import { call } from '../../src/ipc.js';
 import { useRefOptions } from '../../src/references.js';
 import { lastOffice } from '../shared/CrPicker.js';
@@ -31,34 +23,26 @@ function SearchForm({
   canSearch,
   onSearch,
   busy,
-  extra,
 }: {
   title: string;
   fields: ReactNode;
   canSearch: boolean;
   onSearch: () => void;
   busy: boolean;
-  extra?: ReactNode;
 }) {
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (canSearch) onSearch();
   };
   return (
-    <>
-      <h1>{title}</h1>
-      <form onSubmit={submit} aria-label={title}>
-        <FormSection title={label('search.go')}>
-          <FieldGrid>{fields}</FieldGrid>
-          <Actions>
-            {extra}
-            <Button type="submit" variant="primary" busy={busy} disabled={!canSearch}>
-              {label('search.go')}
-            </Button>
-          </Actions>
-        </FormSection>
+    <Card>
+      <form className="ex-filters" onSubmit={submit} aria-label={title}>
+        {fields}
+        <Button type="submit" variant="primary" busy={busy} disabled={!canSearch}>
+          {title}
+        </Button>
       </form>
-    </>
+    </Card>
   );
 }
 
@@ -77,25 +61,29 @@ export function RegisterByYearScreen() {
             call('search.crimeReports', { kind: 'year', officeId: officeId!, year: year! }),
           )
         }
-        extra={
-          <PrintButtons
-            disabled={!officeId || !year}
-            print={(target) =>
-              call(
-                'print.register',
-                {
-                  scope: { kind: 'year', officeId: officeId!, year: year! },
-                  person: { kind: 'none' },
-                  type: 'register',
-                },
-                target,
-              )
-            }
-          />
-        }
       />
       <ErrorLine error={s.error} />
-      {s.result && <CrResults rows={s.result} />}
+      {s.result && (
+        <CrResults
+          rows={s.result}
+          actions={
+            <PrintButtons
+              disabled={!officeId || !year}
+              print={(target) =>
+                call(
+                  'print.register',
+                  {
+                    scope: { kind: 'year', officeId: officeId!, year: year! },
+                    person: { kind: 'none' },
+                    type: 'register',
+                  },
+                  target,
+                )
+              }
+            />
+          }
+        />
+      )}
     </>
   );
 }

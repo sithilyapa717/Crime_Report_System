@@ -2,6 +2,7 @@
 import { label } from '@excise/labels';
 import { useToast } from '../design-system/index.js';
 import type { Screens } from '../shell/AppShell.js';
+import { AdminHub } from '../shell/AdminHub.js';
 import { useNav } from '../shell/navigation.js';
 import { AuditScreen } from '../screens/admin/AuditScreen.js';
 import { BackupScreen } from '../screens/admin/BackupScreen.js';
@@ -45,6 +46,7 @@ function ChangeOwnPassword() {
 }
 
 export const SCREENS: Screens = {
+  adminHub: AdminHub,
   changePassword: ChangeOwnPassword,
   crEntry: CrEntryScreen,
   crView: CrViewScreen,

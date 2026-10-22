@@ -68,6 +68,7 @@ export function Tabs({
             role="tab"
             className="ex-tabs__tab"
             aria-selected={t.key === current}
+            data-invalid={t.invalid || undefined}
             aria-controls={`${base}-${t.key}-panel`}
             tabIndex={t.key === current ? 0 : -1}
             onClick={() => select(t.key)}
@@ -90,5 +91,63 @@ export function Tabs({
         </div>
       ))}
     </div>
+  );
+}
+
+/** The white rounded panel the Figma screens are built from (filters, results, form body). */
+export function Card({
+  title,
+  actions,
+  className,
+  children,
+}: {
+  title?: ReactNode;
+  /** Shown at the right of the title row. */
+  actions?: ReactNode;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className={className ? `ex-card ${className}` : 'ex-card'}>
+      {(title || actions) && (
+        <div className="ex-card__head">
+          {title && <h2 className="ex-card__title">{title}</h2>}
+          {actions && <div className="ex-card__actions">{actions}</div>}
+        </div>
+      )}
+      {children}
+    </section>
+  );
+}
+
+/** A single choice shown as pills (Figma "Chip"): report scope, person and type. */
+export function ChipGroup<T extends string>({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: T;
+  onChange: (v: T) => void;
+  options: { value: T; label: string }[];
+}) {
+  return (
+    <fieldset className="ex-chips">
+      <legend className="ex-chips__label">{label}</legend>
+      <div className="ex-chips__list">
+        {options.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            className="ex-chip"
+            aria-pressed={o.value === value}
+            onClick={() => onChange(o.value)}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </fieldset>
   );
 }

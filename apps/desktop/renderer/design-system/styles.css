@@ -1,49 +1,51 @@
 /* Design system (C1). Tokens first; components use classes only (the app's CSP has no inline styles).
-   Colours follow the old Access screens (REWRITE_PLAN §1.8): yellow role buttons, pink/blue label
-   tags, orange = times, blue = cash, purple = seized quantities. */
+   Colours and sizes follow the Figma file "Crime Report System - UI" (variables color/*, radius/*,
+   space/*; Components frame), set in Noto Sans Sinhala. */
 
 :root {
   --font: 'Noto Sans Sinhala', 'Iskoola Pota', 'Nirmala UI', system-ui, sans-serif;
-  --text: #1d2330;
-  --text-muted: #5b6475;
-  --bg: #f3f4f7;
+  /* Figma variables */
+  --text: #1e1e1e;
+  --text-muted: #6b655c;
+  --bg: #efece7;
   --surface: #ffffff;
-  --border: #c9ced8;
-  --border-strong: #8c95a6;
-  --primary: #0b5394;
-  --primary-hover: #094479;
+  --surface-alt: #f6f3ee;
+  --border: #e4ded5;
+  --primary: #1e1e1e;
   --primary-text: #ffffff;
-  --danger: #b3261e;
-  --danger-bg: #fbe9e7;
-  --ok: #1e7b34;
-  --ok-bg: #e6f4ea;
-  --warn: #8a5a00;
-  --warn-bg: #fff4d6;
-  --focus: #f0a400;
+  --primary-soft: #f1ece4;
+  --accent: #f5cb45;
+  --accent-soft: #fbf0c9;
+  --danger: #d64545;
+  --ok: #2e9a5c;
+  /* Derived */
+  --border-strong: #cfc6b8;
+  --danger-bg: #fbeaea;
+  --ok-bg: #e5f4ec;
+  --warn: #8a6a00;
+  --warn-bg: var(--accent-soft);
+  --focus-ring: 0 0 0 4px rgb(245 203 69 / 0.55);
+  --shadow-raised: 0 10px 24px rgb(38 26 13 / 0.08);
 
-  /* Old-screen colours */
-  --role-yellow: #ffd83b;
-  --role-yellow-hover: #ffcc00;
-  --tag-pink: #f8d7e6;
-  --tag-blue: #d6e6fb;
-  --section-times: #fde3c8;
-  --section-times-border: #e8913a;
-  --section-cash: #d9e9fb;
-  --section-cash-border: #3a7bd5;
-  --section-seized: #ebdcf7;
-  --section-seized-border: #8a4fc4;
+  /* Old-screen section colours, kept as a small dot before a section title (REWRITE_PLAN §1.8). */
+  --section-times: #e8913a;
+  --section-cash: #3a7bd5;
+  --section-seized: #8a4fc4;
 
-  --radius: 6px;
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-card: 22px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 24px;
   --space-6: 32px;
-  --text-sm: 13px;
+  --text-xs: 13px;
+  --text-sm: 14px;
   --text-md: 15px;
-  --text-lg: 18px;
-  --text-xl: 24px;
+  --text-lg: 17px;
+  --text-xl: 19px;
 }
 
 * {
@@ -66,40 +68,48 @@ body {
 }
 
 :focus-visible {
-  outline: 3px solid var(--focus);
+  outline: 2px solid var(--text);
   outline-offset: 2px;
+  box-shadow: var(--focus-ring);
 }
 
 h1,
 h2,
 h3 {
   margin: 0 0 var(--space-3);
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
-/* ---------- Buttons ---------- */
+.ex-icon {
+  flex: none;
+}
+
+/* ---------- Buttons (Figma "Button": pills) ---------- */
 .ex-button {
   font: inherit;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 36px;
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
+  min-height: 44px;
+  padding: 10px 22px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
   background: var(--surface);
   color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
   cursor: pointer;
   /* Long Sinhala captions wrap instead of being cut off (§1.8). */
   white-space: normal;
   text-align: center;
 }
 .ex-button:hover:not(:disabled) {
-  background: #eef1f6;
+  background: var(--surface-alt);
 }
 .ex-button:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 .ex-button--primary {
@@ -108,99 +118,106 @@ h3 {
   color: var(--primary-text);
 }
 .ex-button--primary:hover:not(:disabled) {
-  background: var(--primary-hover);
+  background: #3a3a3a;
 }
 .ex-button--danger {
-  background: var(--danger);
   border-color: var(--danger);
-  color: #fff;
+  color: var(--danger);
+}
+.ex-button--danger:hover:not(:disabled) {
+  background: var(--danger-bg);
 }
 .ex-button--ghost {
   border-color: transparent;
   background: transparent;
 }
 
-.ex-menu-button {
-  font: inherit;
-  font-size: var(--text-lg);
-  font-weight: 600;
-  min-height: 72px;
-  padding: var(--space-3) var(--space-4);
-  border: 2px solid var(--primary);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--primary);
-  cursor: pointer;
-  white-space: normal;
-  text-align: center;
-}
-.ex-menu-button:hover {
-  background: var(--tag-blue);
-}
-.ex-menu-button--role {
-  min-height: 120px;
-  border-color: #b38f00;
-  background: var(--role-yellow);
-  color: #2b2100;
-}
-.ex-menu-button--role:hover {
-  background: var(--role-yellow-hover);
-}
-.ex-menu-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--space-4);
-}
-
-/* ---------- Forms ---------- */
+/* ---------- Forms (Figma "Field") ---------- */
 .ex-field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 6px;
   margin-bottom: var(--space-3);
+  min-width: 0;
 }
 .ex-field__label {
   align-self: flex-start;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  padding: 1px var(--space-2);
-  border-radius: 4px;
-  background: var(--tag-blue);
+  font-size: var(--text-md);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-muted);
 }
-.ex-field__label--pink {
-  background: var(--tag-pink);
+/* The old forms' pink tag (required in the old system) survives as a small marker. */
+.ex-field__label--pink::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin: 0 6px 1px 0;
+  border-radius: 50%;
+  background: var(--accent);
 }
 .ex-field__error {
   color: var(--danger);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
 }
 .ex-field__hint {
   color: var(--text-muted);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
 }
 .ex-input,
 .ex-select,
 .ex-textarea {
   font: inherit;
+  font-size: 16px;
   width: 100%;
-  min-height: 36px;
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--border-strong);
+  min-height: 46px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--surface);
+  background-color: var(--surface-alt);
   color: var(--text);
+  line-height: 1.4;
+}
+.ex-select {
+  appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231e1e1e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+.ex-input:hover,
+.ex-select:hover,
+.ex-textarea:hover {
+  border-color: var(--border-strong);
+}
+/* Figma "State=Focus": white, dark 1.5px border, yellow ring. */
+.ex-input:focus,
+.ex-select:focus,
+.ex-textarea:focus {
+  outline: none;
+  border-color: var(--text);
+  box-shadow:
+    inset 0 0 0 0.5px var(--text),
+    var(--focus-ring);
+  background-color: var(--surface);
+}
+.ex-input:disabled,
+.ex-select:disabled,
+.ex-textarea:disabled {
+  opacity: 0.7;
 }
 .ex-input[aria-invalid='true'],
 .ex-select[aria-invalid='true'],
 .ex-textarea[aria-invalid='true'] {
   border-color: var(--danger);
-  background: var(--danger-bg);
 }
 .ex-input--number {
-  text-align: right;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
 }
 .ex-textarea {
-  min-height: 72px;
+  min-height: 46px;
   resize: vertical;
 }
 .ex-check {
@@ -210,53 +227,112 @@ h3 {
   cursor: pointer;
 }
 .ex-check input {
+  flex: none;
   width: 18px;
   height: 18px;
+  margin: 0;
+  accent-color: var(--primary);
 }
 .ex-radio-group {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-4);
+  gap: var(--space-2) var(--space-4);
   border: 0;
   padding: 0;
   margin: 0 0 var(--space-3);
+  min-width: 0;
+}
+.ex-radio-group > legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 6px;
 }
 
+/* Field groups inside a card: a quiet heading, no box. `tone` adds the old colour as a dot. */
 .ex-section {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: var(--space-4);
-  margin: 0 0 var(--space-4);
-  background: var(--surface);
+  border: 0;
+  padding: 0;
+  margin: 0 0 var(--space-3);
+  min-width: 0;
 }
 .ex-section > legend {
-  font-weight: 700;
-  padding: 0 var(--space-2);
+  padding: 0;
+  margin-bottom: var(--space-3);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--text-muted);
 }
-.ex-section--times {
+.ex-section--times > legend::before,
+.ex-section--cash > legend::before,
+.ex-section--seized > legend::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 8px 2px 0;
+  border-radius: 50%;
+}
+.ex-section--times > legend::before {
   background: var(--section-times);
-  border-color: var(--section-times-border);
 }
-.ex-section--cash {
+.ex-section--cash > legend::before {
   background: var(--section-cash);
-  border-color: var(--section-cash-border);
 }
-.ex-section--seized {
+.ex-section--seized > legend::before {
   background: var(--section-seized);
-  border-color: var(--section-seized-border);
 }
 .ex-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 0 var(--space-4);
 }
 
 .ex-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  align-items: center;
+  gap: var(--space-3);
   justify-content: flex-end;
   margin-top: var(--space-4);
+}
+
+/* ---------- Chips (Figma "Chip": single choice) ---------- */
+.ex-chips {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.ex-chips__label {
+  padding: 0;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-md);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.ex-chips__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-2);
+}
+.ex-chip {
+  font: inherit;
+  font-size: 16px;
+  min-height: 38px;
+  padding: 6px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+.ex-chip:hover {
+  border-color: var(--border-strong);
+}
+.ex-chip[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 600;
 }
 
 /* ---------- Feedback ---------- */
@@ -268,29 +344,30 @@ h3 {
 }
 .ex-alert--error {
   background: var(--danger-bg);
-  border-color: var(--danger);
+  border-color: #f0bcbc;
   color: var(--danger);
 }
 .ex-alert--ok {
   background: var(--ok-bg);
-  border-color: var(--ok);
+  border-color: #b7dfc8;
   color: var(--ok);
 }
 .ex-alert--warn {
-  background: var(--warn-bg);
-  border-color: var(--warn);
-  color: var(--warn);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--text);
 }
 .ex-badge {
   display: inline-block;
-  padding: 0 var(--space-2);
+  padding: 2px 8px;
   border-radius: 999px;
-  font-size: var(--text-sm);
-  background: var(--tag-blue);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  background: var(--primary-soft);
+  color: var(--text);
 }
 .ex-badge--warn {
-  background: var(--warn-bg);
-  color: var(--warn);
+  background: var(--accent-soft);
 }
 .ex-badge--danger {
   background: var(--danger-bg);
@@ -301,10 +378,10 @@ h3 {
   color: var(--ok);
 }
 .ex-spinner {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border: 3px solid var(--border);
-  border-top-color: var(--primary);
+  border-top-color: var(--text);
   border-radius: 50%;
   animation: ex-spin 0.8s linear infinite;
 }
@@ -321,122 +398,241 @@ h3 {
 
 .ex-toasts {
   position: fixed;
-  right: var(--space-4);
-  bottom: var(--space-4);
+  right: var(--space-5);
+  bottom: var(--space-5);
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: var(--space-2);
   z-index: 100;
 }
+/* Figma "Toast": a green pill for a done action, red for a failure. */
 .ex-toast {
-  min-width: 260px;
   max-width: 420px;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius);
-  background: var(--text);
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: var(--ok);
   color: #fff;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+  font-weight: 600;
+  box-shadow: var(--shadow-raised);
 }
 .ex-toast--error {
   background: var(--danger);
+  border-radius: var(--radius);
 }
 
 /* ---------- Dialog ---------- */
 .ex-dialog {
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   padding: 0;
   width: min(560px, 92vw);
-  box-shadow: 0 10px 40px rgb(0 0 0 / 0.35);
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: 0 20px 60px rgb(38 26 13 / 0.25);
 }
 .ex-dialog::backdrop {
-  background: rgb(10 20 40 / 0.45);
+  background: rgb(30 30 30 / 0.4);
 }
 .ex-dialog__body {
-  padding: var(--space-5);
+  padding: var(--space-5) 28px;
+}
+.ex-dialog__body h2 {
+  font-size: var(--text-xl);
 }
 
-/* ---------- Tabs ---------- */
+/* ---------- Tabs (Figma "Tab": pills, the active one white and raised) ---------- */
 .ex-tabs__list {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
-  border-bottom: 2px solid var(--border);
+  gap: 0;
   margin-bottom: var(--space-4);
 }
 .ex-tabs__tab {
   font: inherit;
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--border);
-  border-bottom: 0;
-  border-radius: var(--radius) var(--radius) 0 0;
-  background: #e7eaf0;
+  font-size: 16px;
+  position: relative;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 500;
   cursor: pointer;
+}
+.ex-tabs__tab:hover {
+  color: var(--text);
 }
 .ex-tabs__tab[aria-selected='true'] {
   background: var(--surface);
-  font-weight: 700;
-  position: relative;
-  top: 2px;
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgb(51 38 26 / 0.08);
+}
+/* A tab with errors: a red dot, as in the Figma CR entry. */
+.ex-tabs__tab[data-invalid='true']::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--danger);
 }
 
-/* ---------- Table ---------- */
+/* ---------- Table (Figma "Table": rounded row strips, chevron on clickable rows) ---------- */
 .ex-table-wrap {
   overflow: auto;
   max-height: 65vh;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
 }
 .ex-table {
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 6px;
   width: 100%;
-  font-size: var(--text-sm);
 }
 .ex-table th,
 .ex-table td {
-  padding: var(--space-1) var(--space-2);
-  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle;
 }
 .ex-table th {
   position: sticky;
   top: 0;
-  background: #e7eaf0;
-  cursor: default;
+  z-index: 1;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: var(--surface);
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--text-muted);
 }
 .ex-table th button {
   font: inherit;
-  font-weight: 700;
+  color: inherit;
+  text-align: inherit;
   border: 0;
   background: none;
   cursor: pointer;
   padding: 0;
 }
+.ex-table td {
+  background: var(--surface-alt);
+  font-size: 16px;
+}
+.ex-table td:first-child {
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+.ex-table td:last-child {
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.ex-table tbody tr[tabindex] {
+  cursor: pointer;
+}
+.ex-table tbody tr:hover td,
+.ex-table tbody tr[aria-selected='true'] td {
+  background: var(--accent-soft);
+}
+.ex-table tbody tr:hover td:first-child,
+.ex-table tbody tr[aria-selected='true'] td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.ex-table th.num,
 .ex-table td.num {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
-.ex-table tbody tr:hover {
-  background: #f4f7fc;
+.ex-table td.ex-table__chevron {
+  width: 40px;
+  padding-left: 0;
+  color: var(--text);
 }
 .ex-table tfoot td {
-  font-weight: 700;
-  background: #f0f2f6;
+  background: transparent;
+  border-top: 1.5px solid var(--text);
+  border-radius: 0;
+  font-weight: 600;
+}
+.ex-table td .ex-input,
+.ex-table td .ex-select {
+  min-height: 38px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  background-color: var(--surface);
+}
+.ex-table-filter {
+  max-width: 320px;
+  margin-bottom: var(--space-3);
 }
 
 /* ---------- Layout ---------- */
 .ex-page {
-  max-width: 1280px;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
   padding: var(--space-5);
+  padding-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.ex-page > * {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 .ex-card {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   padding: var(--space-5);
+}
+.ex-card--outline {
+  border: 1px solid var(--border);
+}
+.ex-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+.ex-card__title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+.ex-card__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+/* Filters row (search screens): fields side by side, the button aligned with the inputs. */
+.ex-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0 var(--space-4);
+}
+.ex-filters > .ex-field {
+  width: 240px;
+  margin-bottom: 0;
+}
+.ex-filters > .ex-button {
+  margin-bottom: 1px;
+}
+/* Under a results table: the count on the left, buttons on the right. */
+.ex-results-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+.ex-results-foot .ex-actions {
+  margin-top: 0;
+}
+.ex-results-foot__count {
+  font-size: var(--text-md);
+  color: var(--text-muted);
 }
 .ex-narrow {
   max-width: 440px;

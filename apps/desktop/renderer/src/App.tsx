@@ -1,12 +1,10 @@
-// Top level: decides between first-run set-up, the start screen, login, a forced password change
+// Top level: decides between first-run set-up, the sign-in screen, a forced password change
 // and the app itself, and returns to the right one when the main process says the session ended.
 import type { Session } from '@excise/contract';
-import type { Role } from '@excise/schemas';
 import { useEffect, useState } from 'react';
 import { Spinner, ToastProvider } from '../design-system/index.js';
 import { AppShell } from '../shell/AppShell.js';
 import { NavigationProvider } from '../shell/navigation.js';
-import { LoginScreen } from '../screens/start-login/LoginScreen.js';
 import { ChangePasswordScreen, FirstRunScreen } from '../screens/start-login/PasswordScreens.js';
 import { StartScreen } from '../screens/start-login/StartScreen.js';
 import { call, onSessionLost } from './ipc.js';
@@ -16,7 +14,6 @@ type State =
   | { at: 'loading' }
   | { at: 'firstRun' }
   | { at: 'start' }
-  | { at: 'login'; role: Role }
   | { at: 'changePassword'; session: Session }
   | { at: 'app'; session: Session };
 
@@ -37,13 +34,13 @@ export function App() {
 
   useEffect(
     () =>
-      onSessionLost((reason) =>
+      onSessionLost((reason) => {
         setState((s) =>
           reason === 'password_change_required' && 'session' in s
             ? { at: 'changePassword', session: { ...s.session, mustChangePassword: true } }
             : { at: 'start' },
-        ),
-      ),
+        );
+      }),
     [],
   );
 
@@ -64,16 +61,7 @@ export function App() {
       body = <FirstRunScreen onDone={(s) => setState(afterLogin(s))} />;
       break;
     case 'start':
-      body = <StartScreen onRole={(role) => setState({ at: 'login', role })} />;
-      break;
-    case 'login':
-      body = (
-        <LoginScreen
-          role={state.role}
-          onBack={() => setState({ at: 'start' })}
-          onLoggedIn={(s) => setState(afterLogin(s))}
-        />
-      );
+      body = <StartScreen onLoggedIn={(s) => setState(afterLogin(s))} />;
       break;
     case 'changePassword':
       body = (

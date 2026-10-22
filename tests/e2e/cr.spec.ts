@@ -50,7 +50,7 @@ test('enter a CR through every tab, then record the case and see it everywhere',
   await setUp(page);
 
   await button(page, 'menu.crEntry').click();
-  await expect(page.getByRole('heading', { name: label('form.crEntry') })).toBeVisible();
+  await expect(page.getByRole('heading', { name: label('menu.crEntry') })).toBeVisible();
   // Header strip
   await field(page, 'cr.office').last().selectOption({ label: 'මීගමුව' });
   await field(page, 'cr.year').last().fill('2026');
@@ -127,13 +127,13 @@ test('enter a CR through every tab, then record the case and see it everywhere',
   // Unsaved changes: leaving asks; dismissing keeps the screen.
   await page.getByRole('tab', { name: label('tab.detection') }).click();
   await field(page, 'cr.place').fill('Changed place');
-  await button(page, 'shell.home').click();
-  await expect(page.getByRole('heading', { name: label('form.crEntry') })).toBeVisible();
+  await button(page, 'login.back').click();
+  await expect(page.getByRole('heading', { name: label('menu.crEntry') })).toBeVisible();
   await button(page, 'cr.undo').click();
   await expect(field(page, 'cr.place')).toHaveValue('කොච්චිකඩේ');
 
   // Case progress from the menu, choosing the CR by office + number.
-  await button(page, 'shell.home').click();
+  await button(page, 'login.back').click();
   await button(page, 'menu.caseProgress').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
   await field(page, 'cr.number').fill('7');
@@ -150,9 +150,21 @@ test('enter a CR through every tab, then record the case and see it everywhere',
     .getByLabel(`${label('outcome.imprisonment')} – ${label('case.prisonMonths')}`)
     .fill('6');
   await page.getByLabel(label('case.addToConvicts')).check();
+  await page.getByLabel(label('case.note.other')).fill('Handed to the court clerk');
   await page.screenshot({ path: join(SHOTS, 'case-progress.png'), fullPage: true });
   await button(page, 'common.save').click();
-  await expect(page.getByText(label('cr.saved'))).toBeVisible();
+  await expect(page.getByText(label('cr.saved')).last()).toBeVisible();
+
+  const noted = await page.evaluate(async () => {
+    const list = await window.excise.call('search.crimeReports', {
+      kind: 'name_nic',
+      name: 'කුමාර',
+    });
+    if (!list.ok || !list.value[0]) return null;
+    const cr = await window.excise.call('cr.get', list.value[0].id);
+    return cr.ok ? cr.value?.notes : null;
+  });
+  expect(noted).toBe('Handed to the court clerk');
 
   const convicts = await page.evaluate(() => window.excise.call('search.convicts', { year: 2026 }));
   expect(convicts).toMatchObject({
@@ -168,7 +180,7 @@ test('enter a CR through every tab, then record the case and see it everywhere',
   });
 
   // Read-only view.
-  await button(page, 'shell.home').click();
+  await button(page, 'login.back').click();
   await button(page, 'menu.crView').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
   await field(page, 'cr.number').fill('7');

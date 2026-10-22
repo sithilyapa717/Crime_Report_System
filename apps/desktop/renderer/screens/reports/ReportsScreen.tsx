@@ -1,6 +1,7 @@
 // C7: the reports menu (old `menu form6` and its 9 selector screens: monthly / half-year / yearly
 // × all / by detecting officer / by informant). The office, year and month are asked once
-// (REWRITE_PLAN §1.8); each report type is a button, as on the old screens. Results show with
+// (REWRITE_PLAN §1.8); period, person and type are chips (Figma "05 Reports"), and a type chip
+// runs its report straight away, as the old type buttons did. Results show with
 // Sinhala headings and totals, and export to Excel/CSV or print with D's register layout.
 import type { ReportResult, SummaryGroup } from '@excise/contract';
 import { label } from '@excise/labels';
@@ -8,12 +9,9 @@ import type { ReportParams, ReportType, SummaryGroupBy } from '@excise/schemas';
 import { useState } from 'react';
 import {
   Actions,
-  BigMenuButton,
   Button,
-  FieldGrid,
-  FormSection,
-  MenuGrid,
-  RadioGroup,
+  Card,
+  ChipGroup,
   Select,
   Table,
   formatDate,
@@ -126,36 +124,8 @@ export function ReportsScreen() {
 
   return (
     <div className="reports">
-      <h1>{label('menu.reports')}</h1>
-      <FormSection title={label('report.period')}>
-        <RadioGroup
-          label={label('report.period')}
-          name="period"
-          value={period}
-          onChange={setPeriod}
-          options={[
-            { value: 'month', label: label('reports.monthly') },
-            { value: 'half_year', label: label('reports.halfYear') },
-            { value: 'year', label: label('reports.yearly') },
-          ]}
-        />
-        {byOfficerAllowed && (
-          <RadioGroup
-            label={label('report.person')}
-            name="person"
-            value={person}
-            onChange={(p) => {
-              setPerson(p);
-              setOfficerId(undefined);
-            }}
-            options={[
-              { value: 'none', label: label('reports.byYearMonth') },
-              { value: 'detecting_officer', label: label('reports.byDetectingOfficer') },
-              { value: 'informant', label: label('reports.byInformant') },
-            ]}
-          />
-        )}
-        <FieldGrid>
+      <Card className="report-form">
+        <div className="ex-filters">
           {fields}
           {period === 'month' && (
             <Select
@@ -176,67 +146,106 @@ export function ReportsScreen() {
               ]}
             />
           )}
-          {person !== 'none' && (
-            <Select
-              label={label(person === 'informant' ? 'cr.informant' : 'cr.detectingOfficer')}
-              value={officerId}
-              options={officers}
-              onChange={setOfficerId}
+        </div>
+        <ChipGroup<Period>
+          label={label('report.scope')}
+          value={period}
+          onChange={setPeriod}
+          options={[
+            { value: 'year', label: label('cr.year') },
+            { value: 'month', label: label('cr.month') },
+            { value: 'half_year', label: label('report.half') },
+          ]}
+        />
+        {byOfficerAllowed && (
+          <div className="report-person">
+            <ChipGroup<Person>
+              label={label('report.person')}
+              value={person}
+              onChange={(p) => {
+                setPerson(p);
+                setOfficerId(undefined);
+              }}
+              options={[
+                { value: 'none', label: label('report.personNone') },
+                { value: 'detecting_officer', label: label('reports.byDetectingOfficer') },
+                { value: 'informant', label: label('reports.byInformant') },
+              ]}
             />
-          )}
-        </FieldGrid>
-      </FormSection>
-
-      <FormSection title={label('report.type')}>
-        <MenuGrid label={label('report.type')}>
-          {TYPES.map((t) => (
-            <BigMenuButton
-              key={t}
-              className="reports__type"
-              disabled={!ready || s.busy}
-              onClick={() => runReport(t)}
-            >
-              {label(`reportType.${t}`)}
-            </BigMenuButton>
-          ))}
-        </MenuGrid>
-        <h3 className="reports__sub">{label('report.summary')}</h3>
-        <Actions>
-          {SUMMARIES.map((by) => (
-            <Button key={by} disabled={!ready || s.busy} onClick={() => runSummary(by)}>
-              {label(`report.summary.${by}`)}
-            </Button>
-          ))}
-        </Actions>
-        <h3 className="reports__sub">{label('menu.reports')}</h3>
-        <Actions>
+            {person !== 'none' && (
+              <Select
+                label={label(person === 'informant' ? 'cr.informant' : 'cr.detectingOfficer')}
+                value={officerId}
+                options={officers}
+                onChange={setOfficerId}
+              />
+            )}
+          </div>
+        )}
+        {/* Each type runs its report straight away, as the old type buttons did. */}
+        <fieldset className="ex-chips">
+          <legend className="ex-chips__label">{label('report.type')}</legend>
+          <div className="ex-chips__list">
+            {TYPES.map((t) => (
+              <button
+                key={t}
+                type="button"
+                className="ex-chip"
+                aria-pressed={s.result?.kind === 'report' && s.result.type === t}
+                disabled={!ready || s.busy}
+                onClick={() => runReport(t)}
+              >
+                {label(`report.typeChip.${t}`)}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset className="ex-chips">
+          <legend className="ex-chips__label">{label('report.summary')}</legend>
+          <div className="ex-chips__list">
+            {SUMMARIES.map((by) => (
+              <button
+                key={by}
+                type="button"
+                className="ex-chip"
+                aria-pressed={s.result?.kind === 'summary' && s.result.by === by}
+                disabled={!ready || s.busy}
+                onClick={() => runSummary(by)}
+              >
+                {label(`report.summary.${by}`)}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+        <div className="report-links">
           <Button onClick={() => go('caseNumberSearch')}>{label('reports.byCaseNumber')}</Button>
           <Button onClick={() => go('nameNicSearch')}>{label('reports.byNameNic')}</Button>
           <Button onClick={() => go('previousByCourt')}>{label('reports.previousByCourt')}</Button>
-        </Actions>
-      </FormSection>
+        </div>
+      </Card>
 
       <ErrorLine error={s.error} />
       {s.result?.kind === 'report' && (
-        <FormSection title={label(`reportType.${s.result.type}`)}>
-          <Actions>
-            <Button onClick={exportTo('xlsx')}>{label('report.exportXlsx')}</Button>
-            <Button onClick={exportTo('csv')}>{label('report.exportCsv')}</Button>
-            <PrintButtons
-              print={(target) =>
-                call('print.register', params((s.result as { type: ReportType }).type)!, target)
-              }
-            />
-          </Actions>
+        <Card title={label(`report.typeChip.${s.result.type}`)}>
           <ReportTable result={s.result.result} />
-        </FormSection>
+          <div className="ex-results-foot">
+            <span />
+            <Actions>
+              <Button onClick={exportTo('xlsx')}>{label('report.exportXlsx')}</Button>
+              <Button onClick={exportTo('csv')}>{label('report.exportCsv')}</Button>
+              <PrintButtons
+                print={(target) =>
+                  call('print.register', params((s.result as { type: ReportType }).type)!, target)
+                }
+              />
+            </Actions>
+          </div>
+        </Card>
       )}
       {s.result?.kind === 'summary' && (
-        <FormSection
-          title={`${label('report.summary')} – ${label(`report.summary.${s.result.by}`)}`}
-        >
+        <Card title={`${label('report.summary')} – ${label(`report.summary.${s.result.by}`)}`}>
           <SummaryTable groups={s.result.groups} />
-        </FormSection>
+        </Card>
       )}
     </div>
   );
