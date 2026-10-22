@@ -109,7 +109,7 @@ test('register searches find the CRs and a row opens the CR view', async () => {
 
   await button(page, 'menu.registerByYear').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
-  await button(page, 'search.go').click();
+  await button(page, 'menu.registerByYear').click();
   await expect(page.getByRole('cell', { name: '1/2026', exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: '2/2026', exact: true })).toBeVisible();
   await page.screenshot({ path: join(SHOTS, 'register-by-year.png'), fullPage: true });
@@ -120,7 +120,7 @@ test('register searches find the CRs and a row opens the CR view', async () => {
   await button(page, 'menu.byCourtDate').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
   await field(page, 'case.courtDate').fill('2026.01.10');
-  await button(page, 'search.go').click();
+  await button(page, 'menu.byCourtDate').click();
   await expect(page.getByRole('cell', { name: 'Kumara Silva' })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'Other Person' })).toHaveCount(0);
 
@@ -128,7 +128,7 @@ test('register searches find the CRs and a row opens the CR view', async () => {
   await button(page, 'menu.byDetectionDate').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
   await field(page, 'cr.detectionDate').fill('2026.01.05');
-  await button(page, 'search.go').click();
+  await button(page, 'menu.byDetectionDate').click();
   await expect(page.getByRole('cell', { name: 'Other Person' })).toBeVisible();
   expect(run.errors).toEqual([]);
 });
@@ -139,7 +139,7 @@ test('convicts register and previous offences, printed to PDF', async () => {
 
   await button(page, 'menu.convicts').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
-  await button(page, 'search.go').click();
+  await button(page, 'menu.convicts').click();
   await expect(page.getByRole('cell', { name: 'Kumara Silva' })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'Other Person' })).toHaveCount(0);
   await button(page, 'search.savePdf').click();
@@ -150,7 +150,7 @@ test('convicts register and previous offences, printed to PDF', async () => {
   await button(page, 'shell.home').click();
   await button(page, 'menu.convictsCheck').click();
   await field(page, 'search.nic').fill('851234567v');
-  await button(page, 'search.go').click();
+  await button(page, 'menu.convictsCheck').click();
   await expect(page.getByRole('cell', { name: 'Kumara Silva' })).toBeVisible();
 
   await button(page, 'shell.home').click();
@@ -179,10 +179,12 @@ test('reports: monthly register, fines earned, Excel export and the summary by o
   await button(page, 'menu.reports').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
   await field(page, 'cr.month').selectOption({ label: label('month.1') });
-  await page.getByRole('button', { name: label('reportType.register'), exact: true }).click();
+  await page.getByRole('button', { name: label('report.typeChip.register'), exact: true }).click();
   await expect(page.getByRole('cell', { name: '2/2026', exact: true })).toBeVisible();
 
-  await page.getByRole('button', { name: label('reportType.fines_earned'), exact: true }).click();
+  await page
+    .getByRole('button', { name: label('report.typeChip.fines_earned'), exact: true })
+    .click();
   await expect(page.getByRole('cell', { name: '1/2026', exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: '2/2026', exact: true })).toHaveCount(0);
   await expect(page.getByText(`${label('report.fineTotal')}: 5,000.00`)).toBeVisible();
@@ -201,7 +203,7 @@ test('reports: monthly register, fines earned, Excel export and the summary by o
   await button(page, 'reports.byCaseNumber').click();
   await field(page, 'case.court').selectOption({ label: 'මීගමුව අධිකරණය' });
   await field(page, 'case.number').fill('B/101/26');
-  await button(page, 'search.go').click();
+  await button(page, 'reports.byCaseNumber').click();
   await expect(page.getByRole('cell', { name: 'Kumara Silva' })).toBeVisible();
   expect(run.errors).toEqual([]);
 });

@@ -2,10 +2,12 @@
 // convicts table, print / PDF buttons, and running a call with its error shown.
 import type { ConvictRow, CrListRow } from '@excise/contract';
 import { label } from '@excise/labels';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
+  Actions,
   Alert,
   Button,
+  Card,
   NumberField,
   Select,
   Table,
@@ -87,7 +89,34 @@ export const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
 
 const c = (key: string) => label(`report.col.${key}`);
 
-export function CrResults({ rows }: { rows: CrListRow[] }) {
+/** Figma results card: the table, then "ප්‍රතිඵල N" on the left and the buttons on the right. */
+export function ResultsCard({
+  count,
+  countText = `${label('search.results')} ${count}`,
+  title,
+  actions,
+  children,
+}: {
+  count: number;
+  countText?: string;
+  title?: ReactNode;
+  actions?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <Card title={title}>
+      {children}
+      <div className="ex-results-foot">
+        <span className="ex-results-foot__count" role="status">
+          {countText}
+        </span>
+        {actions && <Actions>{actions}</Actions>}
+      </div>
+    </Card>
+  );
+}
+
+export function CrResults({ rows, actions }: { rows: CrListRow[]; actions?: ReactNode }) {
   const { go } = useNav();
   const columns: Column<CrListRow>[] = [
     { key: 'crNumber', title: c('crNumber'), value: (r) => r.crNumber },
@@ -111,10 +140,7 @@ export function CrResults({ rows }: { rows: CrListRow[] }) {
     { key: 'caseNumber', title: c('caseNumber'), value: (r) => r.caseNumber },
   ];
   return (
-    <>
-      <p className="ex-muted">
-        {label('search.count')} {rows.length}. {rows.length > 0 && label('search.open')}
-      </p>
+    <ResultsCard count={rows.length} actions={actions}>
       <Table
         caption={label('search.results')}
         rows={rows}
@@ -123,7 +149,7 @@ export function CrResults({ rows }: { rows: CrListRow[] }) {
         filterable={rows.length > 20}
         onRowClick={(r) => go('crView', { id: r.id })}
       />
-    </>
+    </ResultsCard>
   );
 }
 
@@ -138,7 +164,15 @@ const SENTENCES: [string, ConvictRow['outcomes'][number]][] = [
   ['suspendedSentence', 'suspended_sentence'],
 ];
 
-export function ConvictResults({ rows }: { rows: ConvictRow[] }) {
+export function ConvictResults({
+  rows,
+  actions,
+  countText,
+}: {
+  rows: ConvictRow[];
+  actions?: ReactNode;
+  countText?: string;
+}) {
   const { go } = useNav();
   const columns: Column<ConvictRow>[] = [
     { key: 'crNumber', title: c('crNumber'), value: (r) => r.crNumber },
@@ -176,10 +210,7 @@ export function ConvictResults({ rows }: { rows: ConvictRow[] }) {
     })),
   ];
   return (
-    <>
-      <p className="ex-muted">
-        {label('search.count')} {rows.length}
-      </p>
+    <ResultsCard count={rows.length} actions={actions} {...(countText ? { countText } : {})}>
       <Table
         caption={label('search.results')}
         rows={rows}
@@ -188,7 +219,7 @@ export function ConvictResults({ rows }: { rows: ConvictRow[] }) {
         filterable={rows.length > 20}
         onRowClick={(r) => go('crView', { id: r.crimeReportId })}
       />
-    </>
+    </ResultsCard>
   );
 }
 
@@ -227,7 +258,7 @@ export function PrintButtons({
       <Button onClick={go('word')} disabled={disabled}>
         {label('search.openInWord')}
       </Button>
-      {error && <Alert kind="error">{error}</Alert>}
+      {error && <span className="ex-field__error">{error}</span>}
     </>
   );
 }
