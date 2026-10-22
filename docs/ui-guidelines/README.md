@@ -22,40 +22,48 @@ pnpm test:e2e                                           # Playwright on the real
 
 `EXCISE_MOCK=1` runs the app on in-memory data with the dev accounts (see `apps/desktop/main/README.md`).
 
+## Design source
+
+The screens follow the Figma file "Crime Report System - UI" (frames 01-08 and the Components frame, October 2026 revision), with every typeface replaced by the bundled Noto Sans Sinhala. Its Sinhala wording is in `@excise/labels`. Frames 09 (documents dialog, D), 10 (list editor, A) and 11 (users, backup, audit, A) belong to other members.
+
 ## Tokens (`design-system/styles.css`)
 
-| Token                                                   | Use                                                                                              |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `--role-yellow`                                         | the four role buttons on the start screen                                                        |
-| `--tag-blue`, `--tag-pink`                              | field label tags, as on the old forms                                                            |
-| `--section-times`, `--section-cash`, `--section-seized` | orange / blue / purple boxes for times, cash and seized quantities (`FormSection tone="times"`…) |
-| `--primary`, `--danger`, `--ok`, `--warn`               | actions and messages                                                                             |
-| Font                                                    | Noto Sans Sinhala, bundled (`@fontsource/noto-sans-sinhala`); no internet needed                 |
+The values are the Figma variables (`color/*`, `radius/*`, `space/*`).
+
+| Token                                      | Value                | Use                                                                              |
+| ------------------------------------------ | -------------------- | -------------------------------------------------------------------------------- |
+| `--bg`                                     | `#efece7`            | page background (also behind the top bar)                                        |
+| `--surface`, `--surface-alt`               | `#ffffff`, `#f6f3ee` | cards; filled inputs, table rows, the find-a-CR strip                            |
+| `--text`, `--text-muted`                   | `#1e1e1e`, `#6b655c` | body text; labels, captions, table headers                                       |
+| `--border`                                 | `#e4ded5`            | inputs, secondary buttons, chips                                                 |
+| `--primary`, `--primary-soft`              | `#1e1e1e`, `#f1ece4` | black pill buttons, selected role card; badges and the access chip               |
+| `--accent`, `--accent-soft`                | `#f5cb45`, `#fbf0c9` | focus ring, selected chips, hovered or opened table rows, menu icon on hover     |
+| `--danger`, `--ok`                         | `#d64545`, `#2e9a5c` | delete buttons and errors; the "saved" toast                                     |
+| `--radius-sm`, `--radius`, `--radius-card` | 6, 12, 22 px         | thumbnails; inputs and rows; cards                                               |
+| Font                                       |                      | Noto Sans Sinhala, bundled (`@fontsource/noto-sans-sinhala`); no internet needed |
 
 ## Components (`design-system/index.ts`)
 
-| Component                                                               | Notes                                                                                         |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `Button`                                                                | `variant`: default, primary, danger, ghost; `busy` shows a spinner. Captions wrap, never clip |
-| `BigMenuButton`, `MenuGrid`                                             | main-menu buttons; `yellow` for the role buttons                                              |
-| `TextField`, `PasswordField`, `TextArea`                                | label tag (`tag="pink"` for the pink ones), `error`, `hint`                                   |
-| `DateField`                                                             | shows and accepts `YYYY.MM.DD` (also `-` or `/`); value is ISO or `undefined`                 |
-| `TimeField`                                                             | free text kept as typed (14.45 or 14:45)                                                      |
-| `NumberField`                                                           | `decimals` for quantities; empty is `undefined`                                               |
-| `Select`                                                                | options `{ value, label, disabled }`; a filter box appears for lists over 12                  |
-| `Checkbox`, `RadioGroup`                                                |                                                                                               |
-| `FormSection`, `FieldGrid`, `Actions`                                   | boxed field groups with the old colours; a responsive field grid; a right-aligned button row  |
-| `Tabs`                                                                  | `invalid` marks a tab with errors; arrow-key navigation                                       |
-| `Table`                                                                 | click a heading to sort, optional filter, totals row, pages of 500 rows                       |
-| `Dialog`, `ConfirmDialog`                                               | native `<dialog>` (focus trap, Escape)                                                        |
-| `Alert`, `Badge`, `Spinner`, `EmptyState`, `ToastProvider` / `useToast` |                                                                                               |
-| `formatDate`, `parseDateInput`, `formatMoney`                           | display helpers (money from cents)                                                            |
+| Component                                                                                          | Notes                                                                                                                                   |
+| -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`                                                                                           | `variant`: default (white, blue text), primary, danger (red outline), ghost; `busy` shows a spinner                                     |
+| `Icon`                                                                                             | Lucide-style line icons (`name`), `currentColor`; inline SVG, CSP-safe                                                                  |
+| `TextField`, `PasswordField`, `TextArea`, `DateField`, `TimeField`, `NumberField`, `Select`        | label above, 42px box; `tag="pink"` keeps the old required marker as a dot                                                              |
+| `Checkbox`, `RadioGroup`, `ChipGroup`                                                              | `ChipGroup` is a single choice shown as pills (report scope, person, type)                                                              |
+| `Card`                                                                                             | the white rounded panel every screen is built from; optional `title` and `actions`                                                      |
+| `FormSection`, `FieldGrid`, `Actions`                                                              | a titled field group (inside `.cr-columns` it becomes an outlined card)                                                                 |
+| `Tabs`                                                                                             | pill tabs (the active one white); `invalid` adds a red dot and ⚠; arrow keys move                                                       |
+| `Table`                                                                                            | rows as rounded strips with a chevron when clickable; click a heading to sort, `filterable`, totals row, `selectedKey` highlights a row |
+| `Dialog`, `ConfirmDialog`, `Alert`, `Badge`, `Spinner`, `EmptyState`, `ToastProvider` / `useToast` |                                                                                                                                         |
+| `formatDate`, `parseDateInput`, `formatMoney`                                                      | display helpers (money from cents)                                                                                                      |
+
+Layout classes: `.ex-filters` (a row of filter fields with the button aligned to the inputs) and `.ex-results-foot` (count left, buttons right) for search screens.
 
 ## Shell (`shell/`)
 
 - `routes.ts`: the screens, the four role menus (old captions and order) and `allowed(role, route)`.
 - `navigation.tsx`: a small stack router (`go`, `back`, `home`); no URLs.
-- `AppShell.tsx`: header (user, role, change password, log out) and the main menu laid out like the old one (two colour-coded columns; reports and list editing on the right).
+- `AppShell.tsx`: the top bar (round back button, screen title, role · office, main-menu and change-password buttons) and the main menu: the role with the log-out button, then four group cards (crime reports, registers, convicts, reports & admin), each item with an icon and a one-line description.
 - Register a screen in `src/screens.tsx`; until then the menu item shows "built in a later phase".
 
 ## Tests

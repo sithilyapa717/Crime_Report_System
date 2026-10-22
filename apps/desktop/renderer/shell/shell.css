@@ -1,124 +1,186 @@
+/* App shell and main menu (Figma "TopBar" and "02 Main menu"). */
 .shell {
   min-height: 100%;
   display: flex;
   flex-direction: column;
 }
-.shell__header {
+.shell > main {
+  flex: 1;
+}
+
+/* ---------- Top bar: on the page background, round white back button ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 80px;
+  padding: 20px var(--space-6);
+}
+.topbar__back,
+.topbar__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+.topbar__icon {
+  background: transparent;
+  color: var(--text-muted);
+}
+.topbar__back:hover,
+.topbar__icon:hover {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-raised);
+}
+.topbar__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.4;
+}
+.topbar__where {
+  font-size: var(--text-md);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ---------- Main menu ---------- */
+.home-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-2) var(--space-5);
-  background: var(--primary);
-  color: var(--primary-text);
+  padding: 4px;
 }
-.shell__header .ex-button--ghost {
-  color: var(--primary-text);
-}
-.shell__header .ex-muted {
-  color: #cfe0f5;
-  margin-left: var(--space-3);
-}
-.shell__user {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-.shell__crumbs {
-  display: flex;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-5) 0;
-}
-.shell > main {
-  width: 100%;
-}
-/* Old main menu (03_menu.png): two columns of colour-coded buttons, reports and list editing on
-   the right. */
-.home {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
-  gap: var(--space-5);
-  align-items: start;
-}
-.home .ex-menu-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-.home__side .ex-menu-grid {
-  grid-template-columns: 1fr;
-}
-.ex-menu-button.tone-0 {
-  border-color: #0b5394;
-  color: #0b5394;
-}
-.ex-menu-button.tone-1 {
-  border-color: #1e7b34;
-  color: #1e7b34;
-}
-.ex-menu-button.tone-2 {
-  border-color: #b35c00;
-  color: #8a4600;
-}
-.ex-menu-button.tone-3 {
-  border-color: #8a4fc4;
-  color: #6b34a3;
-}
-.ex-menu-button.tone-0:hover {
-  background: #dfeaf8;
-}
-.ex-menu-button.tone-1:hover {
-  background: #e3f3e7;
-}
-.ex-menu-button.tone-2:hover {
-  background: #fdeedd;
-}
-.ex-menu-button.tone-3:hover {
-  background: #f1e7fa;
-}
-@media (max-width: 900px) {
-  .home {
-    grid-template-columns: 1fr;
-  }
-}
-.shell__section {
-  margin-top: var(--space-6);
+.home-head__role {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
-/* Start screen */
-.start {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-5);
-  padding: var(--space-6);
-  background: linear-gradient(180deg, #0b3d6b 0%, #0b5394 45%, var(--bg) 45%);
-}
-.start__banner {
-  text-align: center;
-  color: #fff;
-}
-.start__banner h1 {
-  font-size: 34px;
-  margin: 0;
-}
-.start__banner p {
-  margin: var(--space-1) 0 0;
-  font-size: var(--text-lg);
-}
-.start__roles {
+.home-groups {
   display: grid;
-  grid-template-columns: repeat(4, minmax(180px, 240px));
-  gap: var(--space-4);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+  margin-top: var(--space-3);
 }
-.start__footer {
+.home-group {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
+  min-width: 0;
+  padding: 20px 12px 12px;
+  border-radius: var(--radius-card);
+  background: var(--surface);
 }
-@media (max-width: 1000px) {
-  .start__roles {
-    grid-template-columns: repeat(2, minmax(160px, 240px));
+.home-group__title {
+  margin: 0 0 6px;
+  padding: 0 2px;
+  font-size: var(--text-md);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+.home-item {
+  font: inherit;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.home-item:hover,
+.home-item:focus-visible {
+  background: var(--surface-alt);
+}
+.home-item__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--surface-alt);
+  color: var(--text);
+  transition: background-color 0.15s;
+}
+.home-item:hover .home-item__icon,
+.home-item:focus-visible .home-item__icon {
+  background: var(--accent);
+}
+.home-item__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+.home-item__name {
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.4;
+}
+.home-item__desc {
+  font-size: var(--text-md);
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+@media (max-width: 1100px) {
+  .home-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+@media (max-width: 700px) {
+  .home-groups {
+    grid-template-columns: 1fr;
+  }
+  .topbar {
+    padding: var(--space-4);
+  }
+  .topbar__where {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-item,
+  .home-item__icon {
+    transition: none;
+  }
+}
+@media print {
+  .topbar {
+    display: none !important;
+  }
+}
+
+/* The top bar shows the screen title; a screen's own leading title (older screens, other
+   members' screens) would repeat it. */
+.ex-page > h1:first-child {
+  display: none;
+}
+
+/* Administration page: the four admin screens in one card, two per row. */
+.admin-hub {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 12px;
 }

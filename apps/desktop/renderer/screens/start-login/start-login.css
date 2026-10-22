@@ -1,0 +1,242 @@
+/* Sign-in, first-run and password screens. Sizes and colours from the Figma frame
+   "01 Start + Login" (1366 x 768): a white shell inset 24px, the beige role panel with two soft
+   glows on the left, the form on the right. */
+
+.auth {
+  min-height: 100%;
+  padding: var(--space-5);
+  display: flex;
+  background: var(--bg);
+}
+
+.auth__shell {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 690fr) minmax(400px, 628fr);
+  min-height: 600px;
+  padding: var(--space-2);
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: 0 12px 40px rgb(38 26 13 / 0.08);
+}
+
+/* ---------- Role panel ---------- */
+.auth__panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: 36px;
+  border-radius: var(--radius-card);
+  color: var(--text);
+  background:
+    radial-gradient(
+      circle at 40% 67%,
+      rgb(242 131 107 / 0.75) 0,
+      rgb(242 131 107 / 0.15) 9%,
+      rgb(242 131 107 / 0) 19%
+    ),
+    radial-gradient(
+      circle at 69% 58%,
+      rgb(247 208 78 / 0.95) 0,
+      rgb(247 208 78 / 0.25) 15%,
+      rgb(247 208 78 / 0) 28%
+    ),
+    #d8cec0;
+}
+
+.auth__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.auth__mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: var(--primary-text);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.auth__panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.auth__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.auth__pill {
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 16px;
+  font-weight: 500;
+}
+.auth__dept {
+  margin: 0;
+  /* Figma: 46px in Abhaya Libre. Noto Sans Sinhala is wider, so it scales to stay on one line. */
+  font-size: clamp(30px, 3vw, 46px);
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+.auth__lead {
+  margin: -14px 0 0;
+  font-size: 16px;
+}
+
+/* ---------- Role cards ---------- */
+.auth-roles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.auth-role {
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  width: 100%;
+  height: 136px;
+  padding: 16px;
+  border: 1px solid rgb(255 255 255 / 0.75);
+  border-radius: 20px;
+  background: rgb(255 255 255 / 0.7);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s,
+    box-shadow 0.15s;
+}
+.auth-role:hover {
+  background: var(--surface);
+}
+.auth-role[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--primary-text);
+  box-shadow: 0 10px 24px rgb(38 26 13 / 0.18);
+}
+.auth-role__key {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--text);
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.auth-role[aria-pressed='true'] .auth-role__key {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--text);
+}
+.auth-role__name {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* ---------- Form side ---------- */
+.auth__work {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) var(--space-5);
+}
+.auth__form {
+  width: min(380px, 100%);
+}
+.auth__heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  text-align: center;
+}
+.auth__heading h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.auth__sub {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+.auth__chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+.auth__form .ex-field {
+  margin-bottom: var(--space-4);
+}
+.auth__submit {
+  width: 100%;
+  margin-top: 6px;
+}
+.auth__form .ex-actions {
+  margin-top: 6px;
+}
+.auth__form .ex-actions .ex-button--primary {
+  flex: 1;
+}
+.auth__note {
+  margin: 22px 0 0;
+  font-size: var(--text-md);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ---------- Smaller windows ---------- */
+@media (max-width: 1100px) {
+  .auth-roles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .auth-role {
+    height: 104px;
+  }
+}
+@media (max-width: 860px) {
+  .auth {
+    padding: var(--space-3);
+  }
+  .auth__shell {
+    grid-template-columns: 1fr;
+  }
+  .auth__panel {
+    padding: var(--space-5);
+  }
+  .auth__dept {
+    white-space: normal;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-role {
+    transition: none;
+  }
+}
