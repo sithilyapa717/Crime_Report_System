@@ -3,6 +3,7 @@
 import { randomUUID } from 'node:crypto';
 import { rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import type { WordFonts } from '@excise/documents';
 import { app, BrowserWindow, dialog, shell } from 'electron';
 import type { HostOptions } from './host.js';
 import type { PrintOutput } from './print.js';
@@ -55,14 +56,32 @@ export function createDialogs(
 }
 
 /**
+ * The app's own Sinhala font for the print window, so a PC without any Sinhala font still prints
+ * Sinhala instead of boxes. Inline (data: URLs), because a file:// page may not load other files.
+ */
+function withSinhalaFont(html: string, fonts: WordFonts): string {
+  const face = (font: Buffer, weight: number) =>
+    `@font-face { font-family: "Noto Sans Sinhala"; font-weight: ${weight}; ` +
+    `src: url(data:font/ttf;base64,${font.toString('base64')}) format("truetype"); ` +
+    `unicode-range: U+0964-0965, U+0D81-0DF4, U+200C-200D, U+25CC; }`;
+  return html.replace(
+    '<head>',
+    `<head><style>${face(fonts.regular, 400)}${face(fonts.bold, 700)}</style>`,
+  );
+}
+
+/**
  * Renders a print layout in a hidden, script-free window, then prints it (system printer dialog)
  * or saves it as an A4 PDF where the user chooses.
  */
-export function createPrintOutput(pickSavePath: HostOptions['pickSavePath']): PrintOutput {
+export function createPrintOutput(
+  pickSavePath: HostOptions['pickSavePath'],
+  fonts?: WordFonts,
+): PrintOutput {
   return async (layout, target, defaultName) => {
     // A temporary file, not a data: URL: large registers exceed the data URL size limit.
     const file = join(app.getPath('temp'), `excise-print-${randomUUID()}.html`);
-    await writeFile(file, layout.html, 'utf8');
+    await writeFile(file, fonts ? withSinhalaFont(layout.html, fonts) : layout.html, 'utf8');
     const w = new BrowserWindow({
       show: false,
       webPreferences: { sandbox: true, contextIsolation: true, javascript: false },

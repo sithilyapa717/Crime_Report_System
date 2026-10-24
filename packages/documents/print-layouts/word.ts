@@ -5,6 +5,14 @@
 // Only what those layouts need: centred / right-aligned paragraphs, bordered tables with a repeated
 // header row and a total row, a two-column "label … value" block, vertical column captions, page
 // breaks and a "Page X of Y" footer. Sinhala runs use the complex-script font and size slots.
+//
+// Fonts: Word takes Sinhala letters from the hAnsi slot (cs for complex-script runs), both set to
+// Noto Sans Sinhala, and ASCII letters and digits from the ascii slot (Times New Roman, on every
+// PC). Many office PCs have no Sinhala font Word can use (Iskoola Pota comes only with some Office
+// or Windows installs), so the Sinhala font is embedded in the file when the caller passes it
+// (`WordFonts`); otherwise Word shows boxes.
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { DocxZip } from '../engine/zip.ts';
 
 export type WordAlign = 'left' | 'center' | 'right';
@@ -57,7 +65,15 @@ export interface WordDoc {
   blocks: WordBlock[];
 }
 
-const FONT = 'Iskoola Pota';
+const LATIN = 'Times New Roman';
+const SINHALA = 'Noto Sans Sinhala';
+const RFONTS = `<w:rFonts w:ascii="${LATIN}" w:hAnsi="${SINHALA}" w:eastAsia="${LATIN}" w:cs="${SINHALA}"/>`;
+
+/** TrueType files of the Sinhala font to embed (print-layouts/fonts, see `loadWordFonts`). */
+export interface WordFonts {
+  regular: Buffer;
+  bold: Buffer;
+}
 const MM = 56.6929; // twips per millimetre
 const NS =
   'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
@@ -77,7 +93,7 @@ const half = (pt: number) => Math.round(pt * 2);
 function run(text: string, opts: { size: number; bold?: boolean; underline?: boolean }): string {
   const sz = half(opts.size);
   const rPr =
-    `<w:rFonts w:ascii="${FONT}" w:hAnsi="${FONT}" w:eastAsia="${FONT}" w:cs="${FONT}"/>` +
+    RFONTS +
     (opts.bold ? '<w:b/><w:bCs/>' : '') +
     (opts.underline ? '<w:u w:val="single"/>' : '') +
     `<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/>`;
@@ -202,7 +218,7 @@ function documentXml(doc: WordDoc): string {
 
 const footerXml = () => {
   const r = (inner: string) =>
-    `<w:r><w:rPr><w:rFonts w:ascii="${FONT}" w:hAnsi="${FONT}" w:cs="${FONT}"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>${inner}</w:r>`;
+    `<w:r><w:rPr>${RFONTS}<w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>${inner}</w:r>`;
   const field = (code: string) =>
     `<w:fldSimple w:instr=" ${code} ">${r('<w:t>1</w:t>')}</w:fldSimple>`;
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -210,25 +226,75 @@ const footerXml = () => {
 };
 
 const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:styles ${NS}><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="${FONT}" w:hAnsi="${FONT}" w:eastAsia="${FONT}" w:cs="${FONT}"/><w:sz w:val="22"/><w:szCs w:val="22"/><w:lang w:val="en-GB" w:bidi="si-LK"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>`;
+<w:styles ${NS}><w:docDefaults><w:rPrDefault><w:rPr>${RFONTS}<w:sz w:val="22"/><w:szCs w:val="22"/><w:lang w:val="en-GB" w:bidi="si-LK"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>`;
 
-const CONTENT_TYPES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/></Types>`;
+const contentTypes = (embed: boolean) => `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>${embed ? '<Default Extension="odttf" ContentType="application/vnd.openxmlformats-officedocument.obfuscatedFont"/>' : ''}<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>${embed ? '<Override PartName="/word/fontTable.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml"/><Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>' : ''}</Types>`;
 
 const ROOT_RELS = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
 
-const DOCUMENT_RELS = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/></Relationships>`;
+const REL = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
 
-/** The finished .docx file contents. */
-export function buildDocx(doc: WordDoc): Buffer {
+const documentRels = (embed: boolean) => `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${REL}/styles" Target="styles.xml"/><Relationship Id="rId2" Type="${REL}/footer" Target="footer1.xml"/>${embed ? `<Relationship Id="rId3" Type="${REL}/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="${REL}/settings" Target="settings.xml"/>` : ''}</Relationships>`;
+
+// Embedded fonts are stored obfuscated (ECMA-376 Part 1, 17.8.1): the first 32 bytes are XORed
+// with the font key, a GUID read as bytes from its last hex pair to its first.
+const FONT_KEYS = {
+  regular: '{4E6F746F-5361-6E73-5369-6E68616C6101}',
+  bold: '{4E6F746F-5361-6E73-5369-6E68616C6102}',
+};
+
+export function obfuscateFont(font: Buffer, guid: string): Buffer {
+  const hex = guid.replace(/[{}-]/g, '');
+  const key = Array.from({ length: 16 }, (_, i) => parseInt(hex.slice(30 - i * 2, 32 - i * 2), 16));
+  const out = Buffer.from(font);
+  for (let i = 0; i < 32 && i < out.length; i++)
+    out[i] = (out[i] as number) ^ (key[i % 16] as number);
+  return out;
+}
+
+const fontTableXml = () => `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:fonts ${NS}><w:font w:name="${SINHALA}"><w:charset w:val="00"/><w:family w:val="swiss"/><w:pitch w:val="variable"/><w:sig w:usb0="80008003" w:usb1="02002000" w:usb2="00000200" w:usb3="00000000" w:csb0="00000093" w:csb1="00000000"/><w:embedRegular r:id="rId1" w:fontKey="${FONT_KEYS.regular}"/><w:embedBold r:id="rId2" w:fontKey="${FONT_KEYS.bold}"/></w:font><w:font w:name="${LATIN}"><w:charset w:val="00"/><w:family w:val="roman"/><w:pitch w:val="variable"/></w:font></w:fonts>`;
+
+const FONT_TABLE_RELS = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${REL}/font" Target="fonts/font1.odttf"/><Relationship Id="rId2" Type="${REL}/font" Target="fonts/font2.odttf"/></Relationships>`;
+
+// embedTrueTypeFonts keeps the font in the file when staff edit and save it again.
+const SETTINGS = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:settings ${NS}><w:embedTrueTypeFonts/></w:settings>`;
+
+/** The finished .docx file contents; with `fonts`, the Sinhala font travels inside the file. */
+export function buildDocx(doc: WordDoc, fonts?: WordFonts): Buffer {
+  const embed = !!fonts;
   return DocxZip.create({
-    '[Content_Types].xml': CONTENT_TYPES,
+    '[Content_Types].xml': contentTypes(embed),
     '_rels/.rels': ROOT_RELS,
     'word/document.xml': documentXml(doc),
     'word/styles.xml': stylesXml,
     'word/footer1.xml': footerXml(),
-    'word/_rels/document.xml.rels': DOCUMENT_RELS,
+    'word/_rels/document.xml.rels': documentRels(embed),
+    ...(fonts
+      ? {
+          'word/fontTable.xml': fontTableXml(),
+          'word/_rels/fontTable.xml.rels': FONT_TABLE_RELS,
+          'word/settings.xml': SETTINGS,
+          'word/fonts/font1.odttf': obfuscateFont(fonts.regular, FONT_KEYS.regular),
+          'word/fonts/font2.odttf': obfuscateFont(fonts.bold, FONT_KEYS.bold),
+        }
+      : {}),
   }).write();
+}
+
+/** Reads the fonts made by scripts/make-word-fonts.ts; undefined when they are missing. */
+export async function loadWordFonts(dir: string): Promise<WordFonts | undefined> {
+  try {
+    return {
+      regular: await readFile(join(dir, 'NotoSansSinhala-Regular.ttf')),
+      bold: await readFile(join(dir, 'NotoSansSinhala-Bold.ttf')),
+    };
+  } catch {
+    return undefined;
+  }
 }

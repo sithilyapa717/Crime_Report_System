@@ -35,6 +35,8 @@ extraResources:
     filter:
       - templates.json
       - template-inventory.json
+  - from: ../../../packages/documents/print-layouts/fonts
+    to: documents/print-layouts/fonts
   - from: ../../../packages/documents/generation/docx-to-pdf.ps1
     to: documents/generation/docx-to-pdf.ps1
   - from: ../../../packages/migration/src/reader/read-accdb.ps1
