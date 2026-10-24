@@ -1,0 +1,30 @@
+/* A12: the cash and seized-items tables. Each cell input keeps its label for screen readers and
+   the e2e tests, but the column heading already shows it, so it is hidden on screen. */
+.cr-tabs-table {
+  margin-bottom: var(--space-3);
+}
+.cr-tabs-table--narrow {
+  max-width: 520px;
+}
+/* Show every row: the form scrolls, not the table. */
+.cr-tabs-table .ex-table-wrap {
+  max-height: none;
+}
+.cr-tabs-table .ex-field {
+  margin: 0;
+}
+.cr-tabs-table .ex-field__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.cr-tabs-table td .ex-input {
+  max-width: 160px;
+  margin-left: auto;
+}
+.cr-tabs-table td.num .ex-input {
+  text-align: right;
+}

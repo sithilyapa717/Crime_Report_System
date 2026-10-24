@@ -1,5 +1,6 @@
 // A12: the Times, Cash and Seized-items tabs of CR entry, in the old colours (§1.8):
-// orange = times, blue = cash, purple = seized quantities.
+// orange = times, blue = cash, purple = seized quantities. Cash and seized items are tables.
+import type { ReactNode } from 'react';
 import { label } from '@excise/labels';
 import {
   FieldGrid,
@@ -9,7 +10,8 @@ import {
   TextField,
   TimeField,
 } from '../../design-system/index.js';
-import { DENOMINATIONS, SEIZED, type CrDraft } from '../shared/cr-model.js';
+import { DENOMINATIONS, SEIZED, type CrDraft, type Denomination } from '../shared/cr-model.js';
+import './tabs.css';
 
 export interface TabProps {
   draft: CrDraft;
@@ -43,111 +45,163 @@ export function TimesTab({ draft, set, errors }: TabProps) {
   );
 }
 
+/** Fixed rows for data entry, styled as the design-system table but without sorting (Figma 06.5/06.6). */
+function EntryTable<R>({
+  caption,
+  narrow,
+  headings,
+  rows,
+  rowKey,
+  cells,
+}: {
+  caption: string;
+  narrow?: boolean;
+  headings: { title: string; numeric?: boolean }[];
+  rows: readonly R[];
+  rowKey: (row: R) => string;
+  cells: (row: R) => ReactNode[];
+}) {
+  return (
+    <div className={narrow ? 'cr-tabs-table cr-tabs-table--narrow' : 'cr-tabs-table'}>
+      <div className="ex-table-wrap">
+        <table className="ex-table">
+          <caption className="ex-visually-hidden">{caption}</caption>
+          <thead>
+            <tr>
+              {headings.map((h) => (
+                <th key={h.title} className={h.numeric ? 'num' : undefined}>
+                  {h.title}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={rowKey(r)}>
+                {cells(r).map((c, i) => (
+                  <td key={i} className={headings[i]?.numeric ? 'num' : undefined}>
+                    {c}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/** One row per note, with the notes used and the notes left over side by side (Figma 06.5). */
 export function CashTab({ draft, set, errors }: TabProps) {
-  const box = (kind: 'used' | 'left') => (
-    <FormSection title={label(kind === 'used' ? 'cash.used' : 'cash.left')} tone="cash">
-      <FieldGrid>
-        {DENOMINATIONS.map((n) => (
-          <TextField
-            key={n}
-            label={`Rs ${n}`}
-            value={draft.cash[`${kind}:${n}`] ?? ''}
-            onChange={(v) => set((d) => ({ ...d, cash: { ...d.cash, [`${kind}:${n}`]: v } }))}
-          />
-        ))}
-      </FieldGrid>
-    </FormSection>
+  // The inputs keep the old "Rs 1000" names that the e2e CR flow looks for.
+  const cell = (kind: 'used' | 'left', n: Denomination) => (
+    <TextField
+      label={`Rs ${n}`}
+      value={draft.cash[`${kind}:${n}`] ?? ''}
+      onChange={(v) => set((d) => ({ ...d, cash: { ...d.cash, [`${kind}:${n}`]: v } }))}
+    />
   );
   return (
     <>
-      {box('used')}
-      {box('left')}
-      <FormSection title={label('cash.foundPlace')} tone="cash">
-        <FieldGrid>
-          <TextField
-            label={label('cash.foundPlace')}
-            value={draft.cashFoundPlace}
-            error={errors.cashFoundPlace}
-            onChange={(v) => set((d) => ({ ...d, cashFoundPlace: v }))}
-          />
-          <TextField
-            label={label('cash.serials')}
-            value={draft.cashSerials}
-            onChange={(v) => set((d) => ({ ...d, cashSerials: v }))}
-          />
-          <TextField
-            label={label('cash.serials1')}
-            value={draft.cashSerials1}
-            onChange={(v) => set((d) => ({ ...d, cashSerials1: v }))}
-          />
-        </FieldGrid>
-      </FormSection>
+      <EntryTable
+        caption={label('tab.cash')}
+        narrow
+        headings={[
+          { title: label('cash.note') },
+          { title: label('cash.used'), numeric: true },
+          { title: label('cash.left'), numeric: true },
+        ]}
+        rows={DENOMINATIONS}
+        rowKey={String}
+        cells={(n) => [`${label('cash.rupees')} ${n}`, cell('used', n), cell('left', n)]}
+      />
+      <FieldGrid>
+        <TextField
+          label={label('cash.foundPlace')}
+          value={draft.cashFoundPlace}
+          error={errors.cashFoundPlace}
+          onChange={(v) => set((d) => ({ ...d, cashFoundPlace: v }))}
+        />
+        <TextField
+          label={label('cash.serials')}
+          value={draft.cashSerials}
+          onChange={(v) => set((d) => ({ ...d, cashSerials: v }))}
+        />
+        <TextField
+          label={label('cash.serials1')}
+          value={draft.cashSerials1}
+          onChange={(v) => set((d) => ({ ...d, cashSerials1: v }))}
+        />
+      </FieldGrid>
     </>
   );
 }
 
+/** One row per item type with its quantity and unit, then the totals and productions (Figma 06.6). */
 export function SeizedTab({ draft, set, errors }: TabProps) {
   return (
     <>
-      <FormSection title={label('tab.seized')} tone="seized">
-        <FieldGrid>
-          {SEIZED.map(({ type }) => {
-            const item = draft.seized[type] ?? {};
-            return (
-              <NumberField
-                key={type}
-                decimals
-                label={label(`seized.${type}`)}
-                value={item.quantity}
-                onChange={(q) =>
-                  set((d) => ({
-                    ...d,
-                    seized: { ...d.seized, [type]: { ...d.seized[type], quantity: q } },
-                  }))
-                }
-              />
-            );
-          })}
-        </FieldGrid>
-      </FormSection>
-      <FormSection title={label('cr.quantity')} tone="seized">
-        <FieldGrid>
+      <EntryTable
+        caption={label('tab.seized')}
+        headings={[
+          { title: label('seized.item') },
+          { title: label('cr.quantity'), numeric: true },
+          { title: label('seized.unit') },
+        ]}
+        rows={SEIZED}
+        rowKey={(r) => r.type}
+        cells={({ type, unit }) => [
+          label(`seized.${type}`),
           <NumberField
-            label={label('cr.quantity')}
-            value={draft.quantity}
-            error={errors.quantity}
-            onChange={(v) => set((d) => ({ ...d, quantity: v }))}
-          />
-          <NumberField
-            label={label('cr.quantityExtra')}
-            value={draft.quantityExtra}
-            error={errors.quantityExtra}
-            onChange={(v) => set((d) => ({ ...d, quantityExtra: v }))}
-          />
-          <NumberField
-            label={label('cr.overQuantity')}
-            value={draft.overQuantity}
-            error={errors.overQuantity}
-            onChange={(v) => set((d) => ({ ...d, overQuantity: v }))}
-          />
-        </FieldGrid>
-      </FormSection>
-      <FormSection title={label('cr.productions')} tone="seized">
-        {(['cr.productions', 'cr.production1', 'cr.production2'] as const).map((caption, i) => (
-          <TextArea
-            key={caption}
-            label={label(caption)}
-            value={draft.productions[i]!}
-            onChange={(v) =>
-              set((d) => {
-                const productions = [...d.productions] as CrDraft['productions'];
-                productions[i] = v;
-                return { ...d, productions };
-              })
+            key="quantity"
+            decimals
+            label={label(`seized.${type}`)}
+            value={draft.seized[type]?.quantity}
+            onChange={(q) =>
+              set((d) => ({
+                ...d,
+                seized: { ...d.seized, [type]: { ...d.seized[type], quantity: q } },
+              }))
             }
-          />
-        ))}
-      </FormSection>
+          />,
+          unit,
+        ]}
+      />
+      <FieldGrid>
+        <NumberField
+          label={label('cr.quantity')}
+          value={draft.quantity}
+          error={errors.quantity}
+          onChange={(v) => set((d) => ({ ...d, quantity: v }))}
+        />
+        <NumberField
+          label={label('cr.quantityExtra')}
+          value={draft.quantityExtra}
+          error={errors.quantityExtra}
+          onChange={(v) => set((d) => ({ ...d, quantityExtra: v }))}
+        />
+        <NumberField
+          label={label('cr.overQuantity')}
+          value={draft.overQuantity}
+          error={errors.overQuantity}
+          onChange={(v) => set((d) => ({ ...d, overQuantity: v }))}
+        />
+      </FieldGrid>
+      {(['cr.productions', 'cr.production1', 'cr.production2'] as const).map((caption, i) => (
+        <TextArea
+          key={caption}
+          label={label(caption)}
+          value={draft.productions[i]!}
+          onChange={(v) =>
+            set((d) => {
+              const productions = [...d.productions] as CrDraft['productions'];
+              productions[i] = v;
+              return { ...d, productions };
+            })
+          }
+        />
+      ))}
     </>
   );
 }
