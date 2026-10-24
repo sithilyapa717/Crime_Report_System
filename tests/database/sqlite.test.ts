@@ -1,4 +1,5 @@
 // What only the real database can show: rollback, constraints, file backups and restore.
+import { randomUUID } from 'node:crypto';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -6,6 +7,8 @@ import { DefaultBackupService } from '@excise/backup';
 import { sampleCaseInput, sampleCrInput, seedSampleReferences } from '@excise/mocks';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createSqliteRepositories, openDatabase, seedDemo, type ExciseDb } from '@excise/db';
+import { MIGRATIONS } from '../../packages/db/migrations/index.ts';
+import { toPostgres } from '../../packages/db/postgres-spike/pg-db.ts';
 
 let tmp: string;
 const opened: ExciseDb[] = [];
@@ -50,6 +53,62 @@ describe('SQLite database', () => {
     expect(await repos.queries.search({ kind: 'year', officeId: refs.office, year: 2026 })).toEqual(
       [],
     );
+  });
+
+  it('refuses a mismatched CR number, the wrong officer role, a bad outcome and a duplicate position', async () => {
+    const { repos, refs } = await fileDb();
+    const saved = await repos.crs.insert(sampleCrInput(refs));
+    expect(saved.crNumber).toBe('1/2026');
+    expect(repos.db.sqlite.pragma('integrity_check')).toEqual([{ integrity_check: 'ok' }]);
+    expect(repos.db.sqlite.pragma('foreign_key_check')).toEqual([]);
+
+    await expect(
+      repos.crs.insert(sampleCrInput(refs, { crNumber: '5/2026', crYear: 2020 })),
+    ).rejects.toThrow(/cr_number must match/);
+
+    const driver = await repos.references.insert('driver', { value: 'Driver One' });
+    await expect(
+      repos.crs.insert(
+        sampleCrInput(refs, { crNumber: '2/2026', detectingOfficerId: driver.id }),
+      ),
+    ).rejects.toThrow(/detecting_officer/);
+
+    const savedCase = await repos.cases.save(sampleCaseInput(saved.id, refs), null);
+    const at = new Date().toISOString();
+    expect(() =>
+      repos.db.sqlite
+        .prepare(
+          `INSERT INTO outcomes (id, case_id, position, outcome_type, add_to_convict_register, created_at, updated_at, version)
+           VALUES (?, ?, 0, 'not_an_outcome', 0, ?, ?, 1)`,
+        )
+        .run(randomUUID(), savedCase!.id, at, at),
+    ).toThrow(/outcome_type is not a known outcome/);
+
+    expect(() =>
+      repos.db.sqlite
+        .prepare(
+          `INSERT INTO seized_items (id, crime_report_id, position, item_type, quantity, unit, created_at, updated_at, version)
+           VALUES (?, ?, 0, 'toddy', 1, 'L', ?, ?, 1)`,
+        )
+        .run(randomUUID(), saved.id, at, at),
+    ).toThrow(/UNIQUE/);
+
+    expect(() =>
+      repos.db.sqlite
+        .prepare(`UPDATE officers SET kind = 'driver' WHERE id = ?`)
+        .run(refs.detectingOfficer),
+    ).toThrow(/officer kind is immutable/);
+  });
+
+  it('translates the integrity triggers into PostgreSQL', () => {
+    const sql = MIGRATIONS.find((m) => m.name === '0004_integrity')!.sql;
+    const pg = toPostgres(sql);
+    expect(pg).not.toContain('RAISE(ABORT');
+    expect(pg).not.toMatch(/\binstr\(/);
+    expect(pg).toContain('strpos(');
+    expect(pg).toContain('EXECUTE FUNCTION crime_reports_integrity_insert()');
+    expect(pg).toContain('CREATE UNIQUE INDEX seized_items_position');
+    expect(pg).toContain('WHERE deleted_at IS NULL');
   });
 
   it('the database itself refuses two live CRs with one number, and bad dates', async () => {

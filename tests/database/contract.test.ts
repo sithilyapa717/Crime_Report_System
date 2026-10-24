@@ -45,6 +45,8 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
 
     it('CR: insert and read back every field', async () => {
       const { repos, refs } = await setup();
+      const supportA = await repos.references.insert('support_officer', { value: 'Support A' });
+      const supportB = await repos.references.insert('support_officer', { value: 'Support B' });
       const input = sampleCrInput(refs, {
         place: 'කොච්චිකඩේ',
         accused: {
@@ -58,8 +60,8 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
         surety: { name: 'Surety', nic: '199012345678' },
         times: { arrival: '14.45', detection: '15:10' },
         supportOfficers: [
-          { officerId: refs.otherOfficer, position: 1 },
-          { officerId: refs.detectingOfficer, position: 7 },
+          { officerId: supportA.id, position: 1 },
+          { officerId: supportB.id, position: 7 },
         ],
         seizedItems: [
           { itemType: 'spirit', quantity: 3.5, unit: 'L' },
@@ -364,14 +366,15 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
         nameSi: 'ස්ප්‍රීතු',
       });
 
+      const support = await repos.references.insert('support_officer', { value: 'Support' });
       const cr = await repos.crs.insert(
-        sampleCrInput(refs, { supportOfficers: [{ officerId: refs.otherOfficer, position: 2 }] }),
+        sampleCrInput(refs, { supportOfficers: [{ officerId: support.id, position: 2 }] }),
       );
       await repos.cases.save(sampleCaseInput(cr.id, refs), null);
       for (const id of [
         refs.office,
         refs.offencePuds,
-        refs.otherOfficer,
+        support.id,
         refs.court,
         refs.prosecutor,
       ]) {

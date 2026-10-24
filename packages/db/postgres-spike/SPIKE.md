@@ -2,7 +2,7 @@
 
 **Question:** can the same repositories run on PostgreSQL for the hosted version (REWRITE_PLAN §9, Phase 9), and which SQL differs?
 
-**Answer:** yes. The full repository contract suite (`tests/database/contract.test.ts`, the same tests that run on the mocks and on SQLite) passes on PostgreSQL 16 with the repository code unchanged. The schema is generated from the SQLite migrations by four rewrites, and two results needed an explicit number conversion.
+**Answer:** yes. The full repository contract suite (`tests/database/contract.test.ts`, the same tests that run on the mocks and on SQLite) passes on PostgreSQL 16 with the repository code unchanged. The schema is generated from the SQLite migrations by the rewrites below, and two results needed an explicit number conversion.
 
 Run it: `pnpm db:pg-spike` (Windows, with PostgreSQL's programs in `C:\Program Files\PostgreSQL\16\bin` or `PG_BIN`). It starts a throwaway local cluster in a temp folder (trust login on localhost, no password), runs the suite, then stops and deletes the cluster. Result on 2026-10-20: **27/27 passed** (9 contract tests × mocks, SQLite, PostgreSQL).
 
@@ -16,6 +16,8 @@ Run it: `pnpm db:pg-spike` (Windows, with PostgreSQL's programs in `C:\Program F
 | `CHECK (date(x) = x)`         | `CHECK (x ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$')` | The spike keeps dates as ISO text. The hosted version should use real `date` columns |
 | `REAL`                        | `DOUBLE PRECISION`                           | PostgreSQL `REAL` is 4-byte; seized quantities need 8                                |
 | `(name COLLATE NOCASE)` index | `(lower(name))`                              | Case-insensitive name search                                                         |
+| `instr(text, needle)`         | `strpos(text, needle)`                       | Same argument order; both return 0 when the needle is missing                        |
+| `SELECT RAISE(ABORT, 'm') WHERE c` in a trigger | PL/pgSQL `IF c THEN RAISE EXCEPTION 'm'` and `RETURN NEW` | Integrity triggers in migration 0004. Partial unique indexes stay as written |
 
 ### Query code (changed in the repositories; works on both)
 
