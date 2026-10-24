@@ -68,3 +68,40 @@ export async function call<C extends Channel>(channel: C, ...args: Args<C>): Pro
   }
   throw err;
 }
+
+/** SQLite messages raised after the service has already accepted the input. */
+const DATABASE_MESSAGE: Record<string, string> = {
+  'cr_number must match cr_seq and cr_year': 'error.db.crNumber',
+  'detecting_officer_id must be a detecting_officer': 'error.db.detectingOfficer',
+  'informant_id must be an informant': 'error.db.informant',
+  'ac_id must be an ac': 'error.db.ac',
+  'sc_id must be an sc': 'error.db.sc',
+  'oic_id must be an oic': 'error.db.oic',
+  'driver_id must be a driver': 'error.db.driver',
+  'officer kind is immutable': 'error.db.officerKind',
+  'prosecuting_officer_id must be a prosecuting_officer': 'error.db.prosecutor',
+  'officer_id must be a support_officer': 'error.db.support',
+  'outcome_type is not a known outcome': 'error.db.outcome',
+  'template_id must exist in document_templates': 'error.db.template',
+};
+
+/**
+ * Text for a popup when the application accepted a save and the database rejected it.
+ * The first line is the Sinhala explanation; the second is the database message.
+ * Returns null for validation and permission errors, which the form already shows.
+ */
+export function databaseFailure(err: unknown): string | null {
+  if (!(err instanceof IpcError)) return null;
+  const fromDatabase =
+    err.kind === 'SqliteError' || (typeof err.code === 'string' && err.code.startsWith('SQLITE_'));
+  if (!fromDatabase) return null;
+  const raw = err.message.trim();
+  const key = DATABASE_MESSAGE[raw];
+  const friendly = key
+    ? label(key)
+    : raw.startsWith('UNIQUE constraint failed')
+      ? label('error.db.unique')
+      : raw;
+  if (!friendly) return label('error.unknown');
+  return friendly === raw ? raw : `${friendly}\n${raw}`;
+}

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { MENUS, allowed } from '../shell/routes.js';
 import { formatDate, formatMoney, parseDateInput } from './dates.js';
+import { SaveFailedDialog } from './feedback.js';
 import { DateField, NumberField, Select } from './fields.js';
 import { Tabs } from './layout.js';
 import { Table } from './table.js';
@@ -73,6 +74,26 @@ describe('fields', () => {
     expect(shown).toContain('Officer 3');
     expect(shown).toContain('Officer 12');
     expect(shown).not.toContain('Officer 4');
+  });
+});
+
+describe('save failure dialog', () => {
+  it('says the save failed and shows the database error', () => {
+    render(
+      <SaveFailedDialog
+        open
+        detail={'තෝරාගත් ග්‍රහන නිළධාරියා එම ලැයිස්තුවේ නැත.\ndetecting_officer_id must be a detecting_officer'}
+        onClose={() => undefined}
+      />,
+    );
+    const hidden = { hidden: true };
+    expect(screen.getByRole('heading', { name: 'සුරැකීම අසාර්ථක විය.', ...hidden })).toBeTruthy();
+    expect(
+      screen.getByText('යෙදුම මෙය පිළිගත්තද දත්ත සමුදාය ප්‍රතික්ෂේප කළේය.', hidden),
+    ).toBeTruthy();
+    expect(
+      screen.getByText('detecting_officer_id must be a detecting_officer', hidden),
+    ).toBeTruthy();
   });
 });
 

@@ -264,6 +264,60 @@ export const LABELS = {
     'යම් දෝෂයක් සිදු විය. විස්තර ලොග් ගොනුවේ සුරකින ලදී.',
     'Something went wrong. Details were saved to the log file.',
   ),
+  'error.saveFailed': l('සුරැකීම අසාර්ථක විය.', 'Failed to save.'),
+  'error.saveFailedBody': l(
+    'යෙදුම මෙය පිළිගත්තද දත්ත සමුදාය ප්‍රතික්ෂේප කළේය.',
+    'The application accepted this, but the database rejected it.',
+  ),
+  'error.db.crNumber': l(
+    'අපරාධ වාර්තා අංකය, අනු අංකය සහ වර්ෂය එකම අගය විය යුතුය.',
+    'The CR number, sequence and year must be the same value.',
+  ),
+  'error.db.detectingOfficer': l(
+    'තෝරාගත් ග්‍රහන නිළධාරියා එම ලැයිස්තුවේ නැත.',
+    'The detecting officer is not on the detecting-officer list.',
+  ),
+  'error.db.informant': l(
+    'තෝරාගත් ඔත්තු සපයන නිළධාරියා එම ලැයිස්තුවේ නැත.',
+    'The informant is not on the informant list.',
+  ),
+  'error.db.ac': l(
+    'තෝරාගත් සහකාර සුරාබදු කොමසාරිස් එම ලැයිස්තුවේ නැත.',
+    'The AC is not on the AC list.',
+  ),
+  'error.db.sc': l(
+    'තෝරාගත් සුරාබදු අධිකාරි එම ලැයිස්තුවේ නැත.',
+    'The SC is not on the SC list.',
+  ),
+  'error.db.oic': l(
+    'තෝරාගත් සුරාබදු ස්ථානාධිපති එම ලැයිස්තුවේ නැත.',
+    'The OIC is not on the OIC list.',
+  ),
+  'error.db.driver': l(
+    'තෝරාගත් සුරාබදු රියදුරු එම ලැයිස්තුවේ නැත.',
+    'The driver is not on the driver list.',
+  ),
+  'error.db.officerKind': l(
+    'නිළධාරියෙකුගේ ලැයිස්තුව වෙනස් කළ නොහැක.',
+    'An officer cannot be moved to another list.',
+  ),
+  'error.db.prosecutor': l(
+    'තෝරාගත් නඩු පවරන නිළධාරියා එම ලැයිස්තුවේ නැත.',
+    'The prosecuting officer is not on the prosecuting-officer list.',
+  ),
+  'error.db.support': l(
+    'තෝරාගත් නිළධාරියා ග්‍රහනයකට සම්බන්ධ විය හැකි නිළධාරීන් ලැයිස්තුවේ නැත.',
+    'That officer is not on the support-staff list.',
+  ),
+  'error.db.outcome': l('ප්‍රතිඵල වර්ගය හඳුනාගත නොහැක.', 'That outcome type is not recognised.'),
+  'error.db.template': l(
+    'ලේඛන ආකෘතිය දත්ත සමුදායේ නැත.',
+    'That document template is not in the database.',
+  ),
+  'error.db.unique': l(
+    'මෙය දැනටමත් සුරකින ලදී, නැතහොත් එකම අනු අංකය දෙවරක් ඇත.',
+    'This record already exists, or two rows share the same position.',
+  ),
   // Start screen and login (C3). No old caption exists for most of these: English until approved.
   'start.title': l('සුරාබදු දෙපාර්තමේන්තුව', 'Department of Excise'),
   // Tamil line of the trilingual title (§1.8); wording to confirm with the department.
