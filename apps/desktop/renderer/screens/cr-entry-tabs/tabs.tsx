@@ -1,11 +1,11 @@
 // A12: the Times, Cash and Seized-items tabs of CR entry, in the old colours (§1.8):
 // orange = times, blue = cash, purple = seized quantities. Cash and seized items are tables.
+import type { ReactNode } from 'react';
 import { label } from '@excise/labels';
 import {
   FieldGrid,
   FormSection,
   NumberField,
-  Table,
   TextArea,
   TextField,
   TimeField,
@@ -45,9 +45,57 @@ export function TimesTab({ draft, set, errors }: TabProps) {
   );
 }
 
+/** Fixed rows for data entry, styled as the design-system table but without sorting (Figma 06.5/06.6). */
+function EntryTable<R>({
+  caption,
+  narrow,
+  headings,
+  rows,
+  rowKey,
+  cells,
+}: {
+  caption: string;
+  narrow?: boolean;
+  headings: { title: string; numeric?: boolean }[];
+  rows: readonly R[];
+  rowKey: (row: R) => string;
+  cells: (row: R) => ReactNode[];
+}) {
+  return (
+    <div className={narrow ? 'cr-tabs-table cr-tabs-table--narrow' : 'cr-tabs-table'}>
+      <div className="ex-table-wrap">
+        <table className="ex-table">
+          <caption className="ex-visually-hidden">{caption}</caption>
+          <thead>
+            <tr>
+              {headings.map((h) => (
+                <th key={h.title} className={h.numeric ? 'num' : undefined}>
+                  {h.title}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={rowKey(r)}>
+                {cells(r).map((c, i) => (
+                  <td key={i} className={headings[i]?.numeric ? 'num' : undefined}>
+                    {c}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 /** One row per note, with the notes used and the notes left over side by side (Figma 06.5). */
 export function CashTab({ draft, set, errors }: TabProps) {
-  const cell = (kind: 'used' | 'left') => (n: Denomination) => (
+  // The inputs keep the old "Rs 1000" names that the e2e CR flow looks for.
+  const cell = (kind: 'used' | 'left', n: Denomination) => (
     <TextField
       label={`Rs ${n}`}
       value={draft.cash[`${kind}:${n}`] ?? ''}
@@ -55,29 +103,19 @@ export function CashTab({ draft, set, errors }: TabProps) {
     />
   );
   return (
-    <FormSection title={label('tab.cash')} tone="cash">
-      <div className="cr-tabs-table">
-        <Table<Denomination>
-          caption={label('tab.cash')}
-          rows={DENOMINATIONS}
-          rowKey={String}
-          columns={[
-            { key: 'note', title: label('tab.cash'), value: (n) => n, render: (n) => `Rs ${n}` },
-            {
-              key: 'used',
-              title: label('cash.used'),
-              value: (n) => draft.cash[`used:${n}`] ?? '',
-              render: cell('used'),
-            },
-            {
-              key: 'left',
-              title: label('cash.left'),
-              value: (n) => draft.cash[`left:${n}`] ?? '',
-              render: cell('left'),
-            },
-          ]}
-        />
-      </div>
+    <>
+      <EntryTable
+        caption={label('tab.cash')}
+        narrow
+        headings={[
+          { title: label('cash.note') },
+          { title: label('cash.used'), numeric: true },
+          { title: label('cash.left'), numeric: true },
+        ]}
+        rows={DENOMINATIONS}
+        rowKey={String}
+        cells={(n) => [`${label('cash.rupees')} ${n}`, cell('used', n), cell('left', n)]}
+      />
       <FieldGrid>
         <TextField
           label={label('cash.foundPlace')}
@@ -96,46 +134,40 @@ export function CashTab({ draft, set, errors }: TabProps) {
           onChange={(v) => set((d) => ({ ...d, cashSerials1: v }))}
         />
       </FieldGrid>
-    </FormSection>
+    </>
   );
 }
-
-type SeizedRow = (typeof SEIZED)[number];
 
 /** One row per item type with its quantity and unit, then the totals and productions (Figma 06.6). */
 export function SeizedTab({ draft, set, errors }: TabProps) {
   return (
-    <FormSection title={label('tab.seized')} tone="seized">
-      <div className="cr-tabs-table">
-        <Table<SeizedRow>
-          caption={label('tab.seized')}
-          rows={SEIZED}
-          rowKey={(r) => r.type}
-          columns={[
-            { key: 'item', title: label('tab.seized'), value: (r) => label(`seized.${r.type}`) },
-            {
-              key: 'quantity',
-              title: label('cr.quantity'),
-              numeric: true,
-              value: (r) => draft.seized[r.type]?.quantity ?? null,
-              render: ({ type }) => (
-                <NumberField
-                  decimals
-                  label={label(`seized.${type}`)}
-                  value={draft.seized[type]?.quantity}
-                  onChange={(q) =>
-                    set((d) => ({
-                      ...d,
-                      seized: { ...d.seized, [type]: { ...d.seized[type], quantity: q } },
-                    }))
-                  }
-                />
-              ),
-            },
-            { key: 'unit', title: label('seized.unit'), value: (r) => r.unit },
-          ]}
-        />
-      </div>
+    <>
+      <EntryTable
+        caption={label('tab.seized')}
+        headings={[
+          { title: label('seized.item') },
+          { title: label('cr.quantity'), numeric: true },
+          { title: label('seized.unit') },
+        ]}
+        rows={SEIZED}
+        rowKey={(r) => r.type}
+        cells={({ type, unit }) => [
+          label(`seized.${type}`),
+          <NumberField
+            key="quantity"
+            decimals
+            label={label(`seized.${type}`)}
+            value={draft.seized[type]?.quantity}
+            onChange={(q) =>
+              set((d) => ({
+                ...d,
+                seized: { ...d.seized, [type]: { ...d.seized[type], quantity: q } },
+              }))
+            }
+          />,
+          unit,
+        ]}
+      />
       <FieldGrid>
         <NumberField
           label={label('cr.quantity')}
@@ -170,6 +202,6 @@ export function SeizedTab({ draft, set, errors }: TabProps) {
           }
         />
       ))}
-    </FormSection>
+    </>
   );
 }
