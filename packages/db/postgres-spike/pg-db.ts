@@ -31,10 +31,47 @@ export const REWRITES: { why: string; from: RegExp; to: string }[] = [
     from: /\((\w+) COLLATE NOCASE\)/g,
     to: '(lower($1))',
   },
+  {
+    why: 'instr and strpos take the same arguments and both return 0 when the needle is missing',
+    from: /\binstr\(/g,
+    to: 'strpos(',
+  },
 ];
 
+/**
+ * SQLite `SELECT RAISE(ABORT, 'message') WHERE condition` triggers become PL/pgSQL.
+ * One function per trigger, fired BEFORE the same event, returning NEW.
+ */
+function convertRaiseTriggers(sql: string): string {
+  return sql.replace(
+    /CREATE TRIGGER (\w+)\s+BEFORE (INSERT|UPDATE)(?: OF \w+)? ON (\w+)\s+BEGIN\s*([\s\S]*?)\s*END;/g,
+    (full, name: string, event: string, table: string, body: string) => {
+      const checks: string[] = [];
+      for (const match of body.matchAll(
+        /SELECT RAISE\(ABORT, '([^']*)'\)\s+WHERE\s+([\s\S]*?);/g,
+      )) {
+        checks.push(`  IF ${match[2]!.trim()} THEN\n    RAISE EXCEPTION '${match[1]}';\n  END IF;`);
+      }
+      if (!checks.length) return full;
+      return [
+        `CREATE OR REPLACE FUNCTION ${name}() RETURNS trigger AS $fn$`,
+        'BEGIN',
+        checks.join('\n'),
+        '  RETURN NEW;',
+        'END;',
+        '$fn$ LANGUAGE plpgsql;',
+        '',
+        `CREATE TRIGGER ${name}`,
+        `BEFORE ${event} ON ${table}`,
+        `FOR EACH ROW EXECUTE FUNCTION ${name}();`,
+      ].join('\n');
+    },
+  );
+}
+
 export function toPostgres(sqliteSql: string): string {
-  return REWRITES.reduce((sql, r) => sql.replace(r.from, r.to), sqliteSql);
+  const rewritten = REWRITES.reduce((sql, r) => sql.replace(r.from, r.to), sqliteSql);
+  return convertRaiseTriggers(rewritten);
 }
 
 export class PgDb implements DbHandle {

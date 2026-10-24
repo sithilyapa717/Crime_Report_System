@@ -23,6 +23,7 @@ import {
 } from '../../design-system/index.js';
 import { useLeaveGuard, useNav } from '../../shell/navigation.js';
 import { call, IpcError } from '../../src/ipc.js';
+import { useSaveFailure } from '../../src/save-failure.js';
 import { useRefOptions } from '../../src/references.js';
 import { CashTab, SeizedTab, TimesTab, type TabProps } from '../cr-entry-tabs/tabs.js';
 import { FindBar, lastOffice, rememberOffice } from '../shared/CrPicker.js';
@@ -60,6 +61,7 @@ export function CrEntryScreen() {
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const toast = useToast();
+  const saveFailure = useSaveFailure();
 
   const baseline = useMemo(() => (loaded ? fromReport(loaded.cr, loaded.case) : null), [loaded]);
   const dirty = baseline
@@ -88,6 +90,7 @@ export function CrEntryScreen() {
     setBusy(true);
     setErrors({});
     setMessage(null);
+    let courtRejected = false;
     try {
       const input = toInput(draft);
       const saved = loaded
@@ -115,7 +118,8 @@ export function CrEntryScreen() {
           );
         } catch (err) {
           // The CR itself is saved; show the court problem on the Court tab.
-          if (err instanceof IpcError) {
+          if (saveFailure.report(err)) courtRejected = true;
+          else if (err instanceof IpcError) {
             setErrors(
               Object.fromEntries(
                 Object.entries(err.fieldErrors()).map(([k, v]) => [
@@ -131,9 +135,10 @@ export function CrEntryScreen() {
       }
       setLoaded({ cr: saved, case: savedCase });
       setDraft(fromReport(saved, savedCase));
-      toast(label('cr.saved'));
+      if (!courtRejected) toast(label('cr.saved'));
       if (!loaded) replace('crEntry', { id: saved.id });
     } catch (err) {
+      if (saveFailure.report(err)) return;
       if (err instanceof IpcError) {
         const fields = err.fieldErrors();
         setErrors(fields);
@@ -153,7 +158,8 @@ export function CrEntryScreen() {
       await call('cr.softDelete', loaded.cr.id);
       await load(loaded.cr.id);
     } catch (err) {
-      setMessage(err instanceof IpcError ? err.caption : label('error.unknown'));
+      if (!saveFailure.report(err))
+        setMessage(err instanceof IpcError ? err.caption : label('error.unknown'));
     }
   };
 
@@ -163,7 +169,8 @@ export function CrEntryScreen() {
       await call('cr.restore', loaded.cr.id);
       await load(loaded.cr.id);
     } catch (err) {
-      setMessage(err instanceof IpcError ? err.caption : label('error.unknown'));
+      if (!saveFailure.report(err))
+        setMessage(err instanceof IpcError ? err.caption : label('error.unknown'));
     }
   };
 
@@ -275,6 +282,7 @@ export function CrEntryScreen() {
         onConfirm={remove}
         onCancel={() => setConfirmDelete(false)}
       />
+      {saveFailure.dialog}
     </div>
   );
 }

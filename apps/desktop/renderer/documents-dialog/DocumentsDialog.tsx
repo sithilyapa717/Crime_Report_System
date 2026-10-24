@@ -17,6 +17,7 @@ import {
   formatDate,
 } from '../design-system/index.js';
 import { call, IpcError, type Result } from '../src/ipc.js';
+import { useSaveFailure } from '../src/save-failure.js';
 import './documents-dialog.css';
 
 type Data = Result<'documents.listFor'>;
@@ -52,6 +53,7 @@ export function DocumentsDialog({
   const [busy, setBusy] = useState<string | null>(null);
   const [made, setMade] = useState<Made | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const saveFailure = useSaveFailure();
 
   const load = () =>
     call('documents.listFor', crimeReportId)
@@ -74,7 +76,8 @@ export function DocumentsDialog({
       setMade(await call('documents.generate', crimeReportId, t.id, pdf ? { pdf: true } : {}));
       await load();
     } catch (e) {
-      setError(e instanceof IpcError ? e.caption : label('error.unknown'));
+      if (!saveFailure.report(e))
+        setError(e instanceof IpcError ? e.caption : label('error.unknown'));
     } finally {
       setBusy(null);
     }
@@ -92,6 +95,7 @@ export function DocumentsDialog({
     <Dialog open={open} onClose={onClose} title={label('documents.title')} wide>
       {!data && !error && <Spinner />}
       {error && <Alert kind="error">{error}</Alert>}
+      {saveFailure.dialog}
       {data && (
         <>
           <p>

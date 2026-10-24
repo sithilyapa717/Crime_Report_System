@@ -80,6 +80,31 @@ export function Dialog({
   );
 }
 
+/** Shown when a save the application accepted is then rejected by the database. */
+export function SaveFailedDialog({
+  open,
+  detail,
+  onClose,
+}: {
+  open: boolean;
+  detail: string;
+  onClose: () => void;
+}) {
+  const [explanation, raw] = detail.split('\n');
+  return (
+    <Dialog open={open} onClose={onClose} title={label('error.saveFailed')}>
+      <p>{label('error.saveFailedBody')}</p>
+      {explanation ? <p>{explanation}</p> : null}
+      {raw ? <p>{raw}</p> : null}
+      <div className="ex-actions">
+        <Button variant="primary" onClick={onClose}>
+          {label('common.ok')}
+        </Button>
+      </div>
+    </Dialog>
+  );
+}
+
 export function ConfirmDialog({
   open,
   title,

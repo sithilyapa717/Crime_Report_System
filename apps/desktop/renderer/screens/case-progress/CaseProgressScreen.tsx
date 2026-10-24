@@ -24,6 +24,7 @@ import {
 } from '../../design-system/index.js';
 import { useLeaveGuard, useNav } from '../../shell/navigation.js';
 import { call, IpcError } from '../../src/ipc.js';
+import { useSaveFailure } from '../../src/save-failure.js';
 import { useRefNames, useRefOptions } from '../../src/references.js';
 import { FindBar } from '../shared/CrPicker.js';
 import '../cr-entry/cr-entry.css';
@@ -229,6 +230,7 @@ export function CaseProgressScreen() {
   const [loading, setLoading] = useState(!!id);
   const [notes, setNotes] = useState<CrNotes>(crNotes(null));
   const toast = useToast();
+  const saveFailure = useSaveFailure();
   const courts = useRefOptions('court');
   const prosecutors = useRefOptions('prosecuting_officer');
   const name = useRefNames(['offence', 'office']);
@@ -294,6 +296,7 @@ export function CaseProgressScreen() {
       }
       toast(label('cr.saved'));
     } catch (err) {
+      if (saveFailure.report(err)) return;
       if (err instanceof IpcError) {
         setErrors(err.fieldErrors());
         setMessage(err.caption);
@@ -577,6 +580,7 @@ export function CaseProgressScreen() {
           {label('common.save')}
         </Button>
       </Actions>
+      {saveFailure.dialog}
     </div>
   );
 }

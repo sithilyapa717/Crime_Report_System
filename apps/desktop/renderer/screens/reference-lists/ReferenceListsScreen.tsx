@@ -18,6 +18,7 @@ import {
   TextField,
 } from '../../design-system/index.js';
 import { call, IpcError } from '../../src/ipc.js';
+import { useSaveFailure } from '../../src/save-failure.js';
 import { forgetLists } from '../../src/references.js';
 import { ErrorLine } from '../shared/results.js';
 
@@ -52,6 +53,7 @@ function ListEditor({ kind }: { kind: ReferenceKind }) {
   const [editing, setEditing] = useState<ReferenceItem | null>(null);
   const [deleting, setDeleting] = useState<ReferenceItem | null>(null);
   const [usage, setUsage] = useState<Record<string, number>>({});
+  const saveFailure = useSaveFailure();
 
   const refresh = () =>
     call('reference.list', kind, { includeInactive: true })
@@ -69,7 +71,8 @@ function ListEditor({ kind }: { kind: ReferenceKind }) {
       await refresh();
       return true;
     } catch (e) {
-      setError(e instanceof IpcError ? e.caption : label('error.unknown'));
+      if (!saveFailure.report(e))
+        setError(e instanceof IpcError ? e.caption : label('error.unknown'));
       return false;
     }
   };
@@ -180,6 +183,7 @@ function ListEditor({ kind }: { kind: ReferenceKind }) {
           onSave={(v, c, r) => act(() => call('reference.rename', editing.id, input(v, c, r)))}
         />
       )}
+      {saveFailure.dialog}
       <ConfirmDialog
         open={!!deleting}
         title={label('lists.delete')}
