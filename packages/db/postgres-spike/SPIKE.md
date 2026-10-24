@@ -10,14 +10,14 @@ Run it: `pnpm db:pg-spike` (Windows, with PostgreSQL's programs in `C:\Program F
 
 ### Schema (handled by `toPostgres` in `pg-db.ts`)
 
-| SQLite                        | PostgreSQL                                   | Note                                                                                 |
-| ----------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `PRAGMA foreign_keys = ON`    | removed                                      | Foreign keys are always on                                                           |
-| `CHECK (date(x) = x)`         | `CHECK (x ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$')` | The spike keeps dates as ISO text. The hosted version should use real `date` columns |
-| `REAL`                        | `DOUBLE PRECISION`                           | PostgreSQL `REAL` is 4-byte; seized quantities need 8                                |
-| `(name COLLATE NOCASE)` index | `(lower(name))`                              | Case-insensitive name search                                                         |
-| `instr(text, needle)`         | `strpos(text, needle)`                       | Same argument order; both return 0 when the needle is missing                        |
-| `SELECT RAISE(ABORT, 'm') WHERE c` in a trigger | PL/pgSQL `IF c THEN RAISE EXCEPTION 'm'` and `RETURN NEW` | Integrity triggers in migration 0004. Partial unique indexes stay as written |
+| SQLite                                          | PostgreSQL                                                | Note                                                                                 |
+| ----------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `PRAGMA foreign_keys = ON`                      | removed                                                   | Foreign keys are always on                                                           |
+| `CHECK (date(x) = x)`                           | `CHECK (x ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$')`              | The spike keeps dates as ISO text. The hosted version should use real `date` columns |
+| `REAL`                                          | `DOUBLE PRECISION`                                        | PostgreSQL `REAL` is 4-byte; seized quantities need 8                                |
+| `(name COLLATE NOCASE)` index                   | `(lower(name))`                                           | Case-insensitive name search                                                         |
+| `instr(text, needle)`                           | `strpos(text, needle)`                                    | Same argument order; both return 0 when the needle is missing                        |
+| `SELECT RAISE(ABORT, 'm') WHERE c` in a trigger | PL/pgSQL `IF c THEN RAISE EXCEPTION 'm'` and `RETURN NEW` | Integrity triggers in migration 0004. Partial unique indexes stay as written         |
 
 ### Query code (changed in the repositories; works on both)
 

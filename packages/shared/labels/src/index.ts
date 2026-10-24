@@ -285,10 +285,7 @@ export const LABELS = {
     'තෝරාගත් සහකාර සුරාබදු කොමසාරිස් එම ලැයිස්තුවේ නැත.',
     'The AC is not on the AC list.',
   ),
-  'error.db.sc': l(
-    'තෝරාගත් සුරාබදු අධිකාරි එම ලැයිස්තුවේ නැත.',
-    'The SC is not on the SC list.',
-  ),
+  'error.db.sc': l('තෝරාගත් සුරාබදු අධිකාරි එම ලැයිස්තුවේ නැත.', 'The SC is not on the SC list.'),
   'error.db.oic': l(
     'තෝරාගත් සුරාබදු ස්ථානාධිපති එම ලැයිස්තුවේ නැත.',
     'The OIC is not on the OIC list.',

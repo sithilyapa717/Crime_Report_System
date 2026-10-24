@@ -371,13 +371,7 @@ for (const [name, make] of Object.entries(IMPLEMENTATIONS)) {
         sampleCrInput(refs, { supportOfficers: [{ officerId: support.id, position: 2 }] }),
       );
       await repos.cases.save(sampleCaseInput(cr.id, refs), null);
-      for (const id of [
-        refs.office,
-        refs.offencePuds,
-        support.id,
-        refs.court,
-        refs.prosecutor,
-      ]) {
+      for (const id of [refs.office, refs.offencePuds, support.id, refs.court, refs.prosecutor]) {
         expect(await repos.references.usageCount(id), id).toBe(1);
       }
       expect(await repos.references.usageCount(refs.otherCourt)).toBe(0);

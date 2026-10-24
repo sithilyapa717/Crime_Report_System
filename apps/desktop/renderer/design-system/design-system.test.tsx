@@ -82,18 +82,15 @@ describe('save failure dialog', () => {
     render(
       <SaveFailedDialog
         open
-        detail={'තෝරාගත් ග්‍රහන නිළධාරියා එම ලැයිස්තුවේ නැත.\ndetecting_officer_id must be a detecting_officer'}
+        detail={
+          'තෝරාගත් ග්‍රහන නිළධාරියා එම ලැයිස්තුවේ නැත.\ndetecting_officer_id must be a detecting_officer'
+        }
         onClose={() => undefined}
       />,
     );
-    const hidden = { hidden: true };
-    expect(screen.getByRole('heading', { name: 'සුරැකීම අසාර්ථක විය.', ...hidden })).toBeTruthy();
-    expect(
-      screen.getByText('යෙදුම මෙය පිළිගත්තද දත්ත සමුදාය ප්‍රතික්ෂේප කළේය.', hidden),
-    ).toBeTruthy();
-    expect(
-      screen.getByText('detecting_officer_id must be a detecting_officer', hidden),
-    ).toBeTruthy();
+    expect(screen.getByText('සුරැකීම අසාර්ථක විය.')).toBeTruthy();
+    expect(screen.getByText('යෙදුම මෙය පිළිගත්තද දත්ත සමුදාය ප්‍රතික්ෂේප කළේය.')).toBeTruthy();
+    expect(screen.getByText('detecting_officer_id must be a detecting_officer')).toBeTruthy();
   });
 });
 

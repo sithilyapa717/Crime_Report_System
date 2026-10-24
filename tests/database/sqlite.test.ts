@@ -68,9 +68,7 @@ describe('SQLite database', () => {
 
     const driver = await repos.references.insert('driver', { value: 'Driver One' });
     await expect(
-      repos.crs.insert(
-        sampleCrInput(refs, { crNumber: '2/2026', detectingOfficerId: driver.id }),
-      ),
+      repos.crs.insert(sampleCrInput(refs, { crNumber: '2/2026', detectingOfficerId: driver.id })),
     ).rejects.toThrow(/detecting_officer/);
 
     const savedCase = await repos.cases.save(sampleCaseInput(saved.id, refs), null);
