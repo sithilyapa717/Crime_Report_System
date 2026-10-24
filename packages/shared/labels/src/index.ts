@@ -406,6 +406,7 @@ export const LABELS = {
   'seized.cannabis_mixture': l('කංසා (ගංජා) මිශ්‍රිත ප්‍රමාණය', 'Cannabis mixture'),
   'seized.toddy': l('මහ රා ප්‍රමාණය ලීටර්', 'Toddy (L)'),
   'seized.ice': l('අයිස් ප්‍රමාණය මිලි ග්රෑම්', 'Ice (mg)'),
+  'seized.unit': l('ඒකකය', 'Unit'),
   'seized.overQuantity': l('සාම්පලය ගත් පසු ඉතිරි ප්‍රමාණය', 'left after sampling'),
   'cr.quantity': l('ප්‍රමාණය', 'Quantity'),
   'cr.quantityExtra': l('ප්‍රමාණය 1', 'Quantity 1'),
