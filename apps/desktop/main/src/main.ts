@@ -5,6 +5,7 @@ import {
   DocumentGenerator,
   JsonLinesGenerationLog,
   JsonTemplateSource,
+  loadWordFonts,
   TemplateRegistry,
   wordPdfExporter,
 } from '@excise/documents';
@@ -137,6 +138,10 @@ async function start(): Promise<void> {
       : {}),
   });
 
+  // The Sinhala font for print-outs (PDF and "Open in Word"); see print-layouts/word.ts.
+  const printFonts = await loadWordFonts(join(documentsRoot, 'print-layouts', 'fonts'));
+  if (!printFonts) log.info("print-out fonts missing; Sinhala depends on the PC's fonts");
+
   let win: BrowserWindow | null = null;
   const dialogs = createDialogs(() => win);
   const host = createServiceHost(repos, {
@@ -144,7 +149,8 @@ async function start(): Promise<void> {
     filesDir,
     ...(backup ? { backup } : {}),
     documents: { generator, registry, log: generationLog },
-    printOutput: createPrintOutput(dialogs.pickSavePath),
+    printOutput: createPrintOutput(dialogs.pickSavePath, printFonts),
+    ...(printFonts ? { wordFonts: printFonts } : {}),
     printoutDir: join(
       process.env.EXCISE_DOCUMENTS_DIR ?? join(app.getPath('documents'), 'Excise documents'),
       'Print-outs',

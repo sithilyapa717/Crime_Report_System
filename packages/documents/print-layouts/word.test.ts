@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { join } from 'node:path';
 import { test } from 'node:test';
 import type { ConvictRow, ReportResult } from '../../shared/contract/src/index.ts';
 import { xmlProblem } from '../../../tests/documents-fidelity/fidelity-lib.ts';
@@ -7,7 +8,7 @@ import { visibleText } from '../engine/xml.ts';
 import { renderCertificateE48 } from './certificate-e48.ts';
 import { renderConvictsList } from './convicts-list.ts';
 import { renderRegister } from './register.ts';
-import { buildDocx, type WordDoc } from './word.ts';
+import { buildDocx, loadWordFonts, obfuscateFont, type WordDoc } from './word.ts';
 import { CONVICTS_LIST, E48 } from './wording.ts';
 
 const row = (extra: Partial<ConvictRow> = {}): ConvictRow => ({
@@ -49,6 +50,56 @@ test('a built .docx is a zip with every part Word needs, all well-formed XML', (
     assert.equal(xmlProblem(zip.getText(part)!), null, part);
   }
   assert.match(zip.getText('word/footer1.xml')!, /PAGE[\s\S]*NUMPAGES/);
+});
+
+test('Sinhala uses Noto Sans Sinhala (hAnsi and cs slots), ASCII Times New Roman; nothing embedded by default', () => {
+  const zip = open({ landscape: false, blocks: [{ kind: 'para', text: 'මීගමුව Negombo' }] });
+  const rFonts =
+    '<w:rFonts w:ascii="Times New Roman" w:hAnsi="Noto Sans Sinhala" w:eastAsia="Times New Roman" w:cs="Noto Sans Sinhala"/>';
+  assert.ok(zip.getText('word/document.xml')!.includes(rFonts));
+  assert.ok(zip.getText('word/styles.xml')!.includes(rFonts));
+  assert.ok(!zip.getText('word/document.xml')!.includes('Iskoola Pota'));
+  assert.ok(!zip.has('word/fontTable.xml'));
+});
+
+test('with fonts, the Sinhala font is embedded obfuscated and Word is told to keep it', async () => {
+  const fonts = await loadWordFonts(join(import.meta.dirname, 'fonts'));
+  assert.ok(fonts, 'print-layouts/fonts is missing; run scripts/make-word-fonts.ts');
+  const zip = DocxZip.read(
+    buildDocx({ landscape: false, blocks: [{ kind: 'para', text: 'මීගමුව' }] }, fonts),
+  );
+  for (const part of [
+    '[Content_Types].xml',
+    'word/_rels/document.xml.rels',
+    'word/fontTable.xml',
+    'word/_rels/fontTable.xml.rels',
+    'word/settings.xml',
+  ]) {
+    assert.equal(xmlProblem(zip.getText(part)!), null, part);
+  }
+  assert.match(zip.getText('[Content_Types].xml')!, /Extension="odttf"[^>]*obfuscatedFont/);
+  assert.match(zip.getText('word/_rels/document.xml.rels')!, /fontTable[\s\S]*settings/);
+  assert.match(zip.getText('word/settings.xml')!, /<w:embedTrueTypeFonts\/>/);
+  const table = zip.getText('word/fontTable.xml')!;
+  assert.match(
+    table,
+    /<w:font w:name="Noto Sans Sinhala">[\s\S]*<w:embedRegular r:id="rId1"[\s\S]*<w:embedBold r:id="rId2"/,
+  );
+
+  // De-obfuscating with the key from fontTable.xml gives back the original font, byte for byte.
+  const key = table.match(/w:embedRegular r:id="rId1" w:fontKey="([^"]+)"/)![1]!;
+  const stored = zip.get('word/fonts/font1.odttf')!;
+  assert.ok(!stored.equals(fonts.regular));
+  assert.ok(obfuscateFont(stored, key).equals(fonts.regular));
+  assert.ok(zip.get('word/fonts/font2.odttf')!.subarray(32).equals(fonts.bold.subarray(32)));
+});
+
+test('obfuscation XORs the first 32 bytes with the GUID bytes in reverse order', () => {
+  const out = obfuscateFont(Buffer.alloc(40), '{00112233-4455-6677-8899-AABBCCDDEEFF}');
+  assert.deepEqual([...out.subarray(0, 4)], [0xff, 0xee, 0xdd, 0xcc]);
+  assert.deepEqual([...out.subarray(16, 20)], [0xff, 0xee, 0xdd, 0xcc]);
+  assert.equal(out[15], 0x00);
+  assert.ok(out.subarray(32).every((b) => b === 0));
 });
 
 test('text is escaped, control characters dropped, page orientation set', () => {

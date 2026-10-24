@@ -34,6 +34,7 @@ import {
   type DocumentGenerator,
   type GenerationLog,
   type TemplateRegistry,
+  type WordFonts,
 } from '@excise/documents';
 import { cleanOrphanFiles, DefaultFileService } from '@excise/files';
 import { DefaultImportService, reportCsv, type AccdbReader } from '@excise/migration';
@@ -77,6 +78,8 @@ export interface HostOptions {
   printOutput?: PrintOutput;
   /** Where "Open in Word" saves the print-outs (needs `openPath`). */
   printoutDir?: string;
+  /** Sinhala font embedded in those print-outs, so PCs without one still show Sinhala. */
+  wordFonts?: WordFonts;
   /** Called after a restore replaced the database; the main process restarts the app. */
   onRestored?: () => void;
   /** The main-process log file, for "show the log file" (support). */
@@ -127,7 +130,11 @@ export function createServiceHost(repos: Repositories, opts: HostOptions) {
       ? async (layout, defaultName) => {
           const dir = opts.printoutDir as string;
           await mkdir(dir, { recursive: true });
-          const { filePath, fileName } = await writeNew(dir, defaultName, buildDocx(layout.word));
+          const { filePath, fileName } = await writeNew(
+            dir,
+            defaultName,
+            buildDocx(layout.word, opts.wordFonts),
+          );
           await repos.audit.record({
             userId: current().userId,
             action: 'document_generate',
