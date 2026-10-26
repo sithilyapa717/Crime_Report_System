@@ -12,6 +12,23 @@
   flex-direction: column;
   gap: var(--space-3);
 }
+/* A thin line between the groups (period, person, type, summary, links) so each reads on its own.
+   An inset shadow, not a border: a fieldset draws its top border through the legend. */
+.report-form > * + * {
+  padding-top: var(--space-4);
+  box-shadow: inset 0 1px 0 var(--border-strong);
+}
+.report-form > fieldset + *,
+.report-form > * + fieldset {
+  padding-top: var(--space-4);
+}
+.report-form > * + fieldset > legend {
+  float: left;
+  width: 100%;
+}
+.report-form > * + fieldset > legend + * {
+  clear: both;
+}
 .report-person {
   display: flex;
   flex-wrap: wrap;
@@ -26,6 +43,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--border);
+}
+.report-links__clear {
+  margin-left: auto;
 }

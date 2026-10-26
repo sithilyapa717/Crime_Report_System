@@ -9,7 +9,6 @@ import {
   Badge,
   Button,
   Dialog,
-  FieldGrid,
   FormSection,
   PasswordField,
   Select,
@@ -20,6 +19,7 @@ import {
 import { useNav } from '../../shell/navigation.js';
 import { call, IpcError } from '../../src/ipc.js';
 import { ErrorLine } from '../shared/results.js';
+import './admin.css';
 
 const ROLES: Role[] = ['oic', 'detecting', 'observation', 'supervising'];
 
@@ -98,19 +98,19 @@ export function UsersScreen() {
               <span className="ex-check">
                 {u.id !== session.userId && (
                   <Button
-                    variant="ghost"
+                    variant={u.active ? 'warn' : 'ok'}
                     onClick={act(() => call('users.setActive', u.id, !u.active))}
                   >
                     {label(u.active ? 'users.deactivate' : 'users.activate')}
                   </Button>
                 )}
                 {u.locked && (
-                  <Button variant="ghost" onClick={act(() => call('auth.unlockUser', u.id))}>
+                  <Button variant="ok" onClick={act(() => call('auth.unlockUser', u.id))}>
                     {label('users.unlock')}
                   </Button>
                 )}
                 <Button
-                  variant="ghost"
+                  variant="edit"
                   onClick={() => {
                     setTemp('');
                     setResetFor(u);
@@ -125,7 +125,7 @@ export function UsersScreen() {
       />
       <form onSubmit={add} aria-label={label('users.add')}>
         <FormSection title={label('users.add')}>
-          <FieldGrid>
+          <div className="ex-filters users-add">
             <TextField label={label('login.username')} value={username} onChange={setUsername} />
             <Select
               label={label('users.role')}
@@ -138,12 +138,10 @@ export function UsersScreen() {
               value={password}
               onChange={setPassword}
             />
-          </FieldGrid>
-          <Actions>
             <Button type="submit" variant="primary" disabled={!username || !password || !role}>
               {label('users.add')}
             </Button>
-          </Actions>
+          </div>
         </FormSection>
       </form>
       <Dialog

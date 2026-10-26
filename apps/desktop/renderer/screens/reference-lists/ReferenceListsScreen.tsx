@@ -1,26 +1,29 @@
 // A11: the 14 lookup lists of the old `menu form4`, one tab each with the old Sinhala titles.
 // Add, rename (records keep the id, so the new name shows everywhere), activate / deactivate,
 // delete only when no CR uses the item. Offences have a code; officers may have a rank.
+// The add row sits above the list, so it stays in the same place whichever list is open and
+// however long it is; after adding, the name box is ready for the next item.
 import type { ReferenceItem } from '@excise/contract';
 import { label, REFERENCE_KIND_LABEL } from '@excise/labels';
 import { OFFICER_KINDS, type ReferenceKind } from '@excise/schemas';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
   Actions,
   Badge,
   Button,
   ConfirmDialog,
+  Card,
   Dialog,
-  FieldGrid,
-  FormSection,
   Table,
   Tabs,
   TextField,
+  useToast,
 } from '../../design-system/index.js';
 import { call, IpcError } from '../../src/ipc.js';
 import { useSaveFailure } from '../../src/save-failure.js';
 import { forgetLists } from '../../src/references.js';
 import { ErrorLine } from '../shared/results.js';
+import './reference-lists.css';
 
 const KINDS = Object.keys(REFERENCE_KIND_LABEL) as ReferenceKind[];
 const isOfficer = (k: ReferenceKind) => (OFFICER_KINDS as readonly string[]).includes(k);
@@ -54,6 +57,8 @@ function ListEditor({ kind }: { kind: ReferenceKind }) {
   const [deleting, setDeleting] = useState<ReferenceItem | null>(null);
   const [usage, setUsage] = useState<Record<string, number>>({});
   const saveFailure = useSaveFailure();
+  const toast = useToast();
+  const addForm = useRef<HTMLFormElement>(null);
 
   const refresh = () =>
     call('reference.list', kind, { includeInactive: true })
@@ -84,15 +89,41 @@ function ListEditor({ kind }: { kind: ReferenceKind }) {
 
   const add = async (e: FormEvent) => {
     e.preventDefault();
+    const added = value.trim();
     if (await act(() => call('reference.add', kind, input(value, code, rank)))) {
       setValue('');
       setCode('');
       setRank('');
+      toast(`${label('lists.added')}: ${added}`);
+      addForm.current?.querySelector('input')?.focus();
     }
   };
 
   return (
     <>
+      <Card title={label('lists.add')}>
+        <form
+          ref={addForm}
+          onSubmit={add}
+          className="ex-filters ref-add"
+          aria-label={`${label('lists.add')}: ${label(REFERENCE_KIND_LABEL[kind])}`}
+        >
+          {kind === 'offence' && (
+            <TextField label={label('lists.code')} value={code} onChange={setCode} />
+          )}
+          {isOfficer(kind) && (
+            <TextField label={label('lists.rank')} value={rank} onChange={setRank} />
+          )}
+          <TextField label={label('lists.value')} value={value} onChange={setValue} />
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={!value.trim() || (kind === 'offence' && !code.trim())}
+          >
+            {label('lists.add')}
+          </Button>
+        </form>
+      </Card>
       <ErrorLine error={error} />
       <Table
         caption={label(REFERENCE_KIND_LABEL[kind])}
@@ -126,17 +157,17 @@ function ListEditor({ kind }: { kind: ReferenceKind }) {
             value: () => null,
             render: (i) => (
               <span className="ex-check">
-                <Button variant="ghost" onClick={() => setEditing(i)}>
+                <Button variant="edit" onClick={() => setEditing(i)}>
                   {label('lists.rename')}
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant={i.active ? 'warn' : 'ok'}
                   onClick={() => void act(() => call('reference.setActive', i.id, !i.active))}
                 >
                   {label(i.active ? 'users.deactivate' : 'users.activate')}
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant="danger"
                   onClick={async () => {
                     const n = await call('reference.usageCount', i.id).catch(() => undefined);
                     if (n !== undefined) setUsage((u) => ({ ...u, [i.id]: n }));
@@ -150,31 +181,6 @@ function ListEditor({ kind }: { kind: ReferenceKind }) {
           },
         ]}
       />
-      <form
-        onSubmit={add}
-        aria-label={`${label('lists.add')}: ${label(REFERENCE_KIND_LABEL[kind])}`}
-      >
-        <FormSection title={label('lists.add')}>
-          <FieldGrid>
-            {kind === 'offence' && (
-              <TextField label={label('lists.code')} value={code} onChange={setCode} />
-            )}
-            {isOfficer(kind) && (
-              <TextField label={label('lists.rank')} value={rank} onChange={setRank} />
-            )}
-            <TextField label={label('lists.value')} value={value} onChange={setValue} />
-          </FieldGrid>
-          <Actions>
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={!value.trim() || (kind === 'offence' && !code.trim())}
-            >
-              {label('lists.add')}
-            </Button>
-          </Actions>
-        </FormSection>
-      </form>
       {editing && (
         <RenameDialog
           item={editing}

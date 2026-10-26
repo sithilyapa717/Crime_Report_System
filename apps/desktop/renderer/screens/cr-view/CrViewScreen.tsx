@@ -1,8 +1,9 @@
 // C5: one CR, read-only (old `Detection search1`): every entry field plus the case details.
 // Prints with the system print dialog (the print stylesheet hides the app's controls).
+import type { CrListRow } from '@excise/contract';
 import type { CaseRecord, CrimeReport } from '@excise/schemas';
 import { label } from '@excise/labels';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import {
   Actions,
   Alert,
@@ -18,7 +19,8 @@ import { call, IpcError } from '../../src/ipc.js';
 import { useRefNames } from '../../src/references.js';
 import { DocumentsButton } from '../../documents-dialog/DocumentsDialog.js';
 import { Pictures } from '../cr-entry/Pictures.js';
-import { FindBar } from '../shared/CrPicker.js';
+import { FindBar, type CrQuery } from '../shared/CrPicker.js';
+import { CrResults, ErrorLine } from '../shared/results.js';
 import { SEIZED } from '../shared/cr-model.js';
 import '../cr-entry/cr-entry.css';
 
@@ -34,6 +36,49 @@ function Rows({ rows }: { rows: [string, ReactNode][] }) {
         </div>
       ))}
     </dl>
+  );
+}
+
+/** No CR chosen yet: the office's CRs for the year are listed under the picker and narrow down
+ *  as the number is typed (5 → 5/2026, 50/2026, …). Every CR shows, even one with fields still
+ *  empty; a click opens it. */
+function FindCr({ onFound }: { onFound: (cr: CrimeReport) => void }) {
+  const { replace } = useNav();
+  const [q, setQ] = useState<CrQuery>({ officeId: undefined, year: undefined, seq: undefined });
+  const [rows, setRows] = useState<CrListRow[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const onQuery = useCallback((next: CrQuery) => setQ(next), []);
+  const { officeId, year, seq } = q;
+
+  useEffect(() => {
+    setRows(null);
+    if (!officeId || !year) return;
+    let live = true;
+    call('search.crimeReports', { kind: 'year', officeId, year })
+      .then((r) => {
+        if (live) {
+          setRows(r);
+          setError(null);
+        }
+      })
+      .catch((e: unknown) => {
+        if (live) setError(e instanceof IpcError ? e.caption : label('error.unknown'));
+      });
+    return () => {
+      live = false;
+    };
+  }, [officeId, year]);
+
+  const shown =
+    rows && seq !== undefined ? rows.filter((r) => r.crNumber.startsWith(String(seq))) : rows;
+  return (
+    <>
+      <section className="ex-card cr-head">
+        <FindBar onFound={onFound} onQuery={onQuery} />
+      </section>
+      <ErrorLine error={error} />
+      {shown && <CrResults rows={shown} onOpen={(r) => replace('crView', { id: r.id })} />}
+    </>
   );
 }
 
@@ -70,13 +115,7 @@ export function CrViewScreen() {
       .catch((e: unknown) => setError(e instanceof IpcError ? e.caption : label('error.unknown')));
   }, [id]);
 
-  if (!id) {
-    return (
-      <section className="ex-card cr-head">
-        <FindBar onFound={(c) => replace('crView', { id: c.id })} />
-      </section>
-    );
-  }
+  if (!id) return <FindCr onFound={(c) => replace('crView', { id: c.id })} />;
   if (error) return <Alert kind="error">{error}</Alert>;
   if (!cr) return <Spinner />;
 

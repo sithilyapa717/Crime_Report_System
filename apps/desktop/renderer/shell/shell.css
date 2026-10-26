@@ -72,7 +72,8 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
-  align-items: start;
+  /* Cards in a row share one height, so their bottoms line up. */
+  align-items: stretch;
   margin-top: var(--space-3);
 }
 .home-group {
@@ -178,9 +179,35 @@
   display: none;
 }
 
-/* Administration page: the four admin screens in one card, two per row. */
+/* Administration page: the four admin screens as large outlined tiles, two per row, each the same
+   size, so the page reads as a menu of choices rather than a short list in an empty card. */
 .admin-hub {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  padding: 12px;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+.admin-hub .home-item {
+  align-items: center;
+  min-height: 112px;
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+.admin-hub .home-item:hover,
+.admin-hub .home-item:focus-visible {
+  border-color: var(--text);
+  box-shadow: var(--shadow-raised);
+}
+.admin-hub .home-item__icon {
+  width: 56px;
+  height: 56px;
+}
+.admin-hub .home-item__name {
+  font-size: var(--text-lg);
+}
+@media (max-width: 700px) {
+  .admin-hub {
+    grid-template-columns: 1fr;
+  }
 }

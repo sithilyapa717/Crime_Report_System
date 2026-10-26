@@ -104,7 +104,7 @@ export function ResultsCard({
   children: ReactNode;
 }) {
   return (
-    <Card title={title}>
+    <Card title={title} className="ex-card--fill">
       {children}
       <div className="ex-results-foot">
         <span className="ex-results-foot__count" role="status">
@@ -116,7 +116,16 @@ export function ResultsCard({
   );
 }
 
-export function CrResults({ rows, actions }: { rows: CrListRow[]; actions?: ReactNode }) {
+export function CrResults({
+  rows,
+  actions,
+  onOpen,
+}: {
+  rows: CrListRow[];
+  actions?: ReactNode;
+  /** What a row click does; the CR view by default. */
+  onOpen?: (row: CrListRow) => void;
+}) {
   const { go } = useNav();
   const columns: Column<CrListRow>[] = [
     { key: 'crNumber', title: c('crNumber'), value: (r) => r.crNumber },
@@ -147,7 +156,7 @@ export function CrResults({ rows, actions }: { rows: CrListRow[]; actions?: Reac
         rowKey={(r) => r.id}
         columns={columns}
         filterable={rows.length > 20}
-        onRowClick={(r) => go('crView', { id: r.id })}
+        onRowClick={onOpen ?? ((r) => go('crView', { id: r.id }))}
       />
     </ResultsCard>
   );

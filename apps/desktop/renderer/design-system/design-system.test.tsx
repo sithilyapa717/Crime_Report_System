@@ -8,6 +8,7 @@ import { SaveFailedDialog } from './feedback.js';
 import { DateField, NumberField, Select } from './fields.js';
 import { Tabs } from './layout.js';
 import { Table } from './table.js';
+import { applyTextSize, nextTextSize, storedTextSize } from './text-size.js';
 
 afterEach(cleanup);
 
@@ -20,6 +21,43 @@ describe('dates and money', () => {
     expect(parseDateInput('2026.02.30')).toBeNull();
     expect(parseDateInput('02.01.2026')).toBeNull();
     expect(formatMoney(150050)).toBe('1,500.50');
+  });
+});
+
+describe('date picker', () => {
+  it('fills the field from the calendar', () => {
+    const seen: (string | undefined)[] = [];
+    function Host() {
+      const [v, setV] = useState<string | undefined>();
+      return (
+        <DateField
+          label="Date"
+          value={v}
+          onChange={(x) => {
+            seen.push(x);
+            setV(x);
+          }}
+        />
+      );
+    }
+    const { container } = render(<Host />);
+    expect(screen.getByRole('button', { name: /Date/ })).toBeTruthy();
+    fireEvent.change(container.querySelector('input[type="date"]')!, {
+      target: { value: '2026-03-04' },
+    });
+    expect(seen.at(-1)).toBe('2026-03-04');
+    expect((screen.getByLabelText('Date') as HTMLInputElement).value).toBe('2026.03.04');
+  });
+});
+
+describe('text size', () => {
+  it('cycles normal → large → larger and is remembered', () => {
+    expect(nextTextSize('normal')).toBe('large');
+    expect(nextTextSize('larger')).toBe('normal');
+    applyTextSize('large');
+    expect(document.documentElement.dataset.textSize).toBe('large');
+    expect(storedTextSize()).toBe('large');
+    applyTextSize('normal');
   });
 });
 

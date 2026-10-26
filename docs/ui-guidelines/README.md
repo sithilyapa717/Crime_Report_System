@@ -30,17 +30,18 @@ The screens follow the Figma file "Crime Report System - UI" (frames 01-08 and t
 
 The values are the Figma variables (`color/*`, `radius/*`, `space/*`).
 
-| Token                                      | Value                | Use                                                                              |
-| ------------------------------------------ | -------------------- | -------------------------------------------------------------------------------- |
-| `--bg`                                     | `#efece7`            | page background (also behind the top bar)                                        |
-| `--surface`, `--surface-alt`               | `#ffffff`, `#f6f3ee` | cards; filled inputs, table rows, the find-a-CR strip                            |
-| `--text`, `--text-muted`                   | `#1e1e1e`, `#6b655c` | body text; labels, captions, table headers                                       |
-| `--border`                                 | `#e4ded5`            | inputs, secondary buttons, chips                                                 |
-| `--primary`, `--primary-soft`              | `#1e1e1e`, `#f1ece4` | black pill buttons, selected role card; badges and the access chip               |
-| `--accent`, `--accent-soft`                | `#f5cb45`, `#fbf0c9` | focus ring, selected chips, hovered or opened table rows, menu icon on hover     |
-| `--danger`, `--ok`                         | `#d64545`, `#2e9a5c` | delete buttons and errors; the "saved" toast                                     |
-| `--radius-sm`, `--radius`, `--radius-card` | 6, 12, 22 px         | thumbnails; inputs and rows; cards                                               |
-| Font                                       |                      | Noto Sans Sinhala, bundled (`@fontsource/noto-sans-sinhala`); no internet needed |
+| Token                                      | Value                | Use                                                                                  |
+| ------------------------------------------ | -------------------- | ------------------------------------------------------------------------------------ |
+| `--bg`                                     | `#efece7`            | page background (also behind the top bar)                                            |
+| `--surface`, `--surface-alt`               | `#ffffff`, `#f6f3ee` | cards; filled inputs, table rows, the find-a-CR strip                                |
+| `--text`, `--text-muted`                   | `#1e1e1e`, `#4d473f` | body text; labels, captions, table headers                                           |
+| `--border`                                 | `#d3cabd`            | inputs, secondary buttons, chips                                                     |
+| `--primary`, `--primary-soft`              | `#1e1e1e`, `#f1ece4` | black pill buttons, selected role card; badges and the access chip                   |
+| `--accent`, `--accent-soft`                | `#f5cb45`, `#fbf0c9` | focus ring, selected chips, hovered or opened table rows, menu icon on hover         |
+| `--danger`, `--ok`                         | `#c23434`, `#2e9a5c` | delete buttons and errors; the "saved" toast                                         |
+| `--edit`, `--edit-bg`                      | `#2a64b8`, `#e7effa` | edit / rename buttons in list rows (deactivate is amber, activate green, delete red) |
+| `--radius-sm`, `--radius`, `--radius-card` | 6, 12, 22 px         | thumbnails; inputs and rows; cards                                                   |
+| Font                                       |                      | Noto Sans Sinhala, bundled (`@fontsource/noto-sans-sinhala`); no internet needed     |
 
 ## Components (`design-system/index.ts`)
 

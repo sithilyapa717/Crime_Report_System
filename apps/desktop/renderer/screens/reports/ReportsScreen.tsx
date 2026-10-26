@@ -110,6 +110,15 @@ export function ReportsScreen() {
         groups: await call('reports.summary', p, by),
       }));
   };
+  // Back to the screen's starting choices (the office and year stay: they are asked once).
+  const clear = () => {
+    setPeriod('month');
+    setPerson('none');
+    setOfficerId(undefined);
+    setMonth(String(new Date().getMonth() + 1));
+    setHalf('first');
+    s.setResult(null);
+  };
   const exportTo = (format: 'xlsx' | 'csv') => async () => {
     if (s.result?.kind !== 'report') return;
     const p = params(s.result.type);
@@ -221,6 +230,9 @@ export function ReportsScreen() {
           <Button onClick={() => go('caseNumberSearch')}>{label('reports.byCaseNumber')}</Button>
           <Button onClick={() => go('nameNicSearch')}>{label('reports.byNameNic')}</Button>
           <Button onClick={() => go('previousByCourt')}>{label('reports.previousByCourt')}</Button>
+          <Button variant="ghost" className="report-links__clear" onClick={clear}>
+            {label('report.clear')}
+          </Button>
         </div>
       </Card>
 

@@ -25,12 +25,21 @@ export function lastOffice(): string | undefined {
   }
 }
 
+/** What is typed in the picker so far, for screens that list matching CRs as staff type. */
+export interface CrQuery {
+  officeId: string | undefined;
+  year: number | undefined;
+  seq: number | undefined;
+}
+
 export function CrPicker({
   onFound,
+  onQuery,
   extra,
   inline,
 }: {
   onFound: (cr: CrimeReport) => void;
+  onQuery?: (q: CrQuery) => void;
   extra?: ReactNode;
   /** One row of fields with the Open button beside them (Figma CR entry header). */
   inline?: boolean;
@@ -45,6 +54,9 @@ export function CrPicker({
   useEffect(() => {
     if (!officeId && offices.length === 1) setOfficeId(offices[0]!.value);
   }, [offices, officeId]);
+  useEffect(() => {
+    onQuery?.({ officeId, year, seq });
+  }, [onQuery, officeId, year, seq]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -126,14 +138,16 @@ export function CrPicker({
  *  the picker on the left, the screen's own buttons or summary on the right. */
 export function FindBar({
   onFound,
+  onQuery,
   children,
 }: {
   onFound: (cr: CrimeReport) => void;
+  onQuery?: (q: CrQuery) => void;
   children?: ReactNode;
 }) {
   return (
     <div className="find-bar">
-      <CrPicker inline onFound={onFound} />
+      <CrPicker inline onFound={onFound} {...(onQuery ? { onQuery } : {})} />
       {children && <div className="find-bar__end">{children}</div>}
     </div>
   );

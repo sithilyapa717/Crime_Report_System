@@ -4,26 +4,29 @@
 
 :root {
   --font: 'Noto Sans Sinhala', 'Iskoola Pota', 'Nirmala UI', system-ui, sans-serif;
-  /* Figma variables */
+  /* Figma variables; muted text, borders and red darkened after review for more contrast on
+     office monitors (muted text ~9:1 on white, borders visible against the input fill). */
   --text: #1e1e1e;
-  --text-muted: #6b655c;
+  --text-muted: #4d473f;
   --bg: #efece7;
   --surface: #ffffff;
   --surface-alt: #f6f3ee;
-  --border: #e4ded5;
+  --border: #d3cabd;
   --primary: #1e1e1e;
   --primary-text: #ffffff;
   --primary-soft: #f1ece4;
   --accent: #f5cb45;
   --accent-soft: #fbf0c9;
-  --danger: #d64545;
+  --danger: #c23434;
   --ok: #2e9a5c;
   /* Derived */
-  --border-strong: #cfc6b8;
+  --border-strong: #b3a894;
   --danger-bg: #fbeaea;
   --ok-bg: #e5f4ec;
   --warn: #8a6a00;
   --warn-bg: var(--accent-soft);
+  --edit: #2a64b8;
+  --edit-bg: #e7effa;
   --focus-ring: 0 0 0 4px rgb(245 203 69 / 0.55);
   --shadow-raised: 0 10px 24px rgb(38 26 13 / 0.08);
 
@@ -57,6 +60,14 @@ body,
 #root {
   height: 100%;
   margin: 0;
+}
+
+/* Text size from the top bar (text-size.ts): the whole page scales, so layouts keep their shape. */
+html[data-text-size='large'] {
+  zoom: 1.12;
+}
+html[data-text-size='larger'] {
+  zoom: 1.25;
 }
 
 body {
@@ -126,6 +137,27 @@ h3 {
 }
 .ex-button--danger:hover:not(:disabled) {
   background: var(--danger-bg);
+}
+.ex-button--edit {
+  border-color: var(--edit);
+  color: var(--edit);
+}
+.ex-button--edit:hover:not(:disabled) {
+  background: var(--edit-bg);
+}
+.ex-button--warn {
+  border-color: var(--accent);
+  color: var(--warn);
+}
+.ex-button--warn:hover:not(:disabled) {
+  background: var(--warn-bg);
+}
+.ex-button--ok {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+.ex-button--ok:hover:not(:disabled) {
+  background: var(--ok-bg);
 }
 .ex-button--ghost {
   border-color: transparent;
@@ -212,6 +244,42 @@ h3 {
 .ex-textarea[aria-invalid='true'] {
   border-color: var(--danger);
 }
+.ex-date {
+  position: relative;
+}
+.ex-date > .ex-input {
+  padding-right: 48px;
+}
+.ex-date__button {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.ex-date__button:hover:not(:disabled) {
+  background: var(--accent-soft);
+}
+/* The system picker opens next to this invisible date input at the field's right edge. */
+.ex-date__picker {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
 .ex-input--number {
   text-align: left;
   font-variant-numeric: tabular-nums;
@@ -248,19 +316,26 @@ h3 {
   margin-bottom: 6px;
 }
 
-/* Field groups inside a card: a quiet heading, no box. `tone` adds the old colour as a dot. */
+/* Field groups inside a card: each in its own outlined box with its heading inside, so the form
+   splits into clear parts (review board). `tone` adds the old colour as a dot. */
 .ex-section {
-  border: 0;
-  padding: 0;
-  margin: 0 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  margin: 0 0 var(--space-4);
   min-width: 0;
 }
 .ex-section > legend {
+  float: left;
+  width: 100%;
   padding: 0;
   margin-bottom: var(--space-3);
   font-size: var(--text-md);
-  font-weight: 500;
-  color: var(--text-muted);
+  font-weight: 600;
+  color: var(--text);
+}
+.ex-section > legend + * {
+  clear: both;
 }
 .ex-section--times > legend::before,
 .ex-section--cash > legend::before,
@@ -569,7 +644,8 @@ h3 {
 /* ---------- Layout ---------- */
 .ex-page {
   width: 100%;
-  max-width: 1440px;
+  /* Wide enough to use a large monitor, with the side padding kept as a margin (review board). */
+  max-width: 1760px;
   margin: 0 auto;
   padding: var(--space-5);
   padding-top: var(--space-2);
@@ -585,6 +661,16 @@ h3 {
   background: var(--surface);
   border-radius: var(--radius-card);
   padding: var(--space-5);
+}
+/* A results card fills the rest of the screen; long lists scroll inside it, header kept. */
+.ex-card--fill {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.ex-card--fill .ex-table-wrap {
+  flex: 1;
+  max-height: calc(100vh - 300px);
 }
 .ex-card--outline {
   border: 1px solid var(--border);

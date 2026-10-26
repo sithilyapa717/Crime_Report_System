@@ -65,6 +65,19 @@
   flex: 1 1 760px;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
 }
+/* Keep the header inputs on one line: a label that wraps grows upwards, and the CR number's
+   `n/yyyy` hint hangs below its input instead of pushing the row down. */
+.cr-head__fields .ex-field {
+  position: relative;
+  justify-content: flex-end;
+}
+.cr-head__fields .ex-field__hint {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 2px;
+  white-space: nowrap;
+}
 .cr-picker__title {
   font-size: var(--text-md);
   margin-bottom: var(--space-2);
