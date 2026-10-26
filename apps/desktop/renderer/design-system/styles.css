@@ -621,7 +621,8 @@ h3 {
 /* ---------- Layout ---------- */
 .ex-page {
   width: 100%;
-  max-width: 1440px;
+  /* Wide enough to use a large monitor, with the side padding kept as a margin (review board). */
+  max-width: 1760px;
   margin: 0 auto;
   padding: var(--space-5);
   padding-top: var(--space-2);
@@ -637,6 +638,16 @@ h3 {
   background: var(--surface);
   border-radius: var(--radius-card);
   padding: var(--space-5);
+}
+/* A results card fills the rest of the screen; long lists scroll inside it, header kept. */
+.ex-card--fill {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.ex-card--fill .ex-table-wrap {
+  flex: 1;
+  max-height: calc(100vh - 300px);
 }
 .ex-card--outline {
   border: 1px solid var(--border);

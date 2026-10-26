@@ -104,7 +104,7 @@ export function ResultsCard({
   children: ReactNode;
 }) {
   return (
-    <Card title={title}>
+    <Card title={title} className="ex-card--fill">
       {children}
       <div className="ex-results-foot">
         <span className="ex-results-foot__count" role="status">
