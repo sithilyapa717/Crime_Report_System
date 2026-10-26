@@ -12,6 +12,7 @@ import {
   DateField,
   FieldGrid,
   FormSection,
+  Icon,
   NumberField,
   RadioGroup,
   Select,
@@ -335,6 +336,8 @@ function HeaderFields({ draft, set, errors }: TabProps) {
   );
 }
 
+const MAX_SUPPORT = 10;
+
 function DetectionTab({ draft, set, errors }: TabProps) {
   const offences = useRefOptions('offence');
   const police = useRefOptions('police_area');
@@ -347,6 +350,16 @@ function DetectionTab({ draft, set, errors }: TabProps) {
   const oic = useRefOptions('oic');
   const drivers = useRefOptions('driver');
   const pick = (key: keyof CrDraft) => (v: string | undefined) => set((d) => ({ ...d, [key]: v }));
+  // Support officers: up to 10, but only as many boxes as are filled (at least one); "add" opens
+  // the next one.
+  const filled = Math.max(
+    0,
+    ...Object.keys(draft.support)
+      .map(Number)
+      .filter((p) => draft.support[p]),
+  );
+  const [wanted, setWanted] = useState(1);
+  const shown = Math.min(MAX_SUPPORT, Math.max(wanted, filled));
   return (
     <>
       <FieldGrid>
@@ -410,7 +423,7 @@ function DetectionTab({ draft, set, errors }: TabProps) {
       </FieldGrid>
       <FormSection title={label('cr.supportOfficer')}>
         <FieldGrid>
-          {Array.from({ length: 10 }, (_, i) => i + 1).map((pos) => (
+          {Array.from({ length: shown }, (_, i) => i + 1).map((pos) => (
             <Select
               key={pos}
               label={`${label('cr.supportOfficer')} ${pos}`}
@@ -420,6 +433,12 @@ function DetectionTab({ draft, set, errors }: TabProps) {
             />
           ))}
         </FieldGrid>
+        {shown < MAX_SUPPORT && (
+          <Button onClick={() => setWanted(shown + 1)}>
+            <Icon name="plus" size={18} />
+            {label('cr.addSupportOfficer')}
+          </Button>
+        )}
       </FormSection>
       <FormSection title={label('cr.notes')}>
         <TextArea

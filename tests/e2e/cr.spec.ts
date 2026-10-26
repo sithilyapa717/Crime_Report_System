@@ -63,6 +63,9 @@ test('enter a CR through every tab, then record the case and see it everywhere',
   await field(page, 'cr.place').fill('කොච්චිකඩේ');
   await field(page, 'cr.offence').selectOption({ label: 'PUDS – ස්ප්‍රීතු ළඟ තබා ගැනීම' });
   await field(page, 'cr.detectingOfficer').selectOption({ label: 'IP Perera' });
+  // Support officer boxes open one at a time.
+  await button(page, 'cr.addSupportOfficer').click();
+  await button(page, 'cr.addSupportOfficer').click();
   await page
     .getByLabel(`${label('cr.supportOfficer')} 3`, { exact: true })
     .selectOption({ label: 'PC Fernando' });

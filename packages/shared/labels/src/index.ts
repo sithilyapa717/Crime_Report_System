@@ -133,6 +133,7 @@ export const LABELS = {
   'cr.halfYear.first': l('පළමු අඩවසර', 'First half-year'),
   'cr.halfYear.second': l('දෙවන අඩවසර', 'Second half-year'),
   'cr.supportOfficer': l('ග්‍රහන සහය නිළධාරියා', 'Support officer'),
+  'cr.addSupportOfficer': l('තවත් සහය නිළධාරියෙකු එක් කරන්න', 'Add another support officer'),
   'cr.productions': l('සාක්ෂි භාණ්ඩ විස්තරය', 'Production list'),
   'accused.sex.male': l('පුරුෂ', 'Male'),
   'accused.sex.female': l('ස්ත්‍රී', 'Female'),
