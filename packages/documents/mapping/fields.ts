@@ -79,8 +79,8 @@ export const FIELDS: FieldDef[] = [
   n('Cash_1000', 'Rs 1000 notes used'),
   n('Cash_500', 'Rs 500 notes used'),
   n('Cash_100', 'Rs 100 notes used'),
-  t('Cash_Number', 'Serial numbers of the notes given to the decoy buyer'),
-  t('Cash_Number_1', 'More serial numbers of the decoy notes'),
+  t('Cash_Number', 'Note serial numbers (meaning to confirm)'),
+  t('Cash_Number_1', 'Note serial numbers 2 (meaning to confirm)'),
   n('Cash2_1000', 'Rs 1000 notes (Cash2 group)'),
   n('Cash3_500', 'Rs 500 notes (Cash3 group)'),
 

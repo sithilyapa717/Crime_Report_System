@@ -155,13 +155,11 @@ export function CashTab({ draft, set, errors }: TabProps) {
         />
         <TextField
           label={label('cash.serials')}
-          hint={label('cash.serialsHint')}
           value={draft.cashSerials}
           onChange={(v) => set((d) => ({ ...d, cashSerials: v }))}
         />
         <TextField
           label={label('cash.serials1')}
-          hint={label('cash.serials1Hint')}
           value={draft.cashSerials1}
           onChange={(v) => set((d) => ({ ...d, cashSerials1: v }))}
         />
