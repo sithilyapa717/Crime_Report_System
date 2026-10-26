@@ -349,6 +349,10 @@ export const LABELS = {
   // Shell
   'shell.logout': l('පිටවන්න', 'Log out'),
   'shell.home': l('ප්‍රධාන මෙනුව', 'Main menu'),
+  'shell.textSize': l('අකුරු ප්‍රමාණය', 'Text size'),
+  'shell.textSize.normal': l('සාමාන්‍ය', 'Normal'),
+  'shell.textSize.large': l('විශාල', 'Large'),
+  'shell.textSize.larger': l('වඩා විශාල', 'Larger'),
   'menu.admin': l('පරිපාලනය', 'Administration'),
   'menu.notBuilt': l('මෙම තිරය පසු අදියරකදී සාදනු ලැබේ.', 'This screen is built in a later phase.'),
 

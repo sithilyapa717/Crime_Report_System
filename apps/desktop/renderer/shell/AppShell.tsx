@@ -4,7 +4,14 @@
 // in SCREENS; the ones not built yet show a placeholder.
 import { label } from '@excise/labels';
 import { useEffect, useState, type ComponentType } from 'react';
-import { Alert, Icon, type IconName } from '../design-system/index.js';
+import {
+  Alert,
+  Icon,
+  applyTextSize,
+  nextTextSize,
+  storedTextSize,
+  type IconName,
+} from '../design-system/index.js';
 import { call } from '../src/ipc.js';
 import { lastOffice } from '../screens/shared/CrPicker.js';
 import { useNav } from './navigation.js';
@@ -39,6 +46,8 @@ export function AppShell({ screens, onLogout }: { screens: Screens; onLogout: ()
   const where = useWhere();
   const atHome = route.name === 'home';
   const Screen = screens[route.name] ?? NotBuilt;
+  const [textSize, setTextSize] = useState(storedTextSize);
+  const textSizeTitle = `${label('shell.textSize')}: ${label(`shell.textSize.${textSize}`)}`;
   return (
     <div className="shell">
       <header className="topbar">
@@ -68,6 +77,19 @@ export function AppShell({ screens, onLogout }: { screens: Screens; onLogout: ()
             <Icon name="home" size={18} />
           </button>
         )}
+        <button
+          type="button"
+          className="topbar__icon"
+          aria-label={textSizeTitle}
+          title={textSizeTitle}
+          onClick={() => {
+            const next = nextTextSize(textSize);
+            applyTextSize(next);
+            setTextSize(next);
+          }}
+        >
+          <Icon name="type" size={18} />
+        </button>
         <button
           type="button"
           className="topbar__icon"

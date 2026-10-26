@@ -8,6 +8,7 @@ import { SaveFailedDialog } from './feedback.js';
 import { DateField, NumberField, Select } from './fields.js';
 import { Tabs } from './layout.js';
 import { Table } from './table.js';
+import { applyTextSize, nextTextSize, storedTextSize } from './text-size.js';
 
 afterEach(cleanup);
 
@@ -20,6 +21,17 @@ describe('dates and money', () => {
     expect(parseDateInput('2026.02.30')).toBeNull();
     expect(parseDateInput('02.01.2026')).toBeNull();
     expect(formatMoney(150050)).toBe('1,500.50');
+  });
+});
+
+describe('text size', () => {
+  it('cycles normal → large → larger and is remembered', () => {
+    expect(nextTextSize('normal')).toBe('large');
+    expect(nextTextSize('larger')).toBe('normal');
+    applyTextSize('large');
+    expect(document.documentElement.dataset.textSize).toBe('large');
+    expect(storedTextSize()).toBe('large');
+    applyTextSize('normal');
   });
 });
 

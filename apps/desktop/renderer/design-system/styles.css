@@ -60,6 +60,14 @@ body,
   margin: 0;
 }
 
+/* Text size from the top bar (text-size.ts): the whole page scales, so layouts keep their shape. */
+html[data-text-size='large'] {
+  zoom: 1.12;
+}
+html[data-text-size='larger'] {
+  zoom: 1.25;
+}
+
 body {
   font-family: var(--font);
   font-size: var(--text-md);
