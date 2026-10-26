@@ -6,11 +6,18 @@ import {
   FieldGrid,
   FormSection,
   NumberField,
+  formatMoney,
   TextArea,
   TextField,
   TimeField,
 } from '../../design-system/index.js';
-import { DENOMINATIONS, SEIZED, type CrDraft, type Denomination } from '../shared/cr-model.js';
+import {
+  DENOMINATIONS,
+  SEIZED,
+  cashTotal,
+  type CrDraft,
+  type Denomination,
+} from '../shared/cr-model.js';
 import './tabs.css';
 
 export interface TabProps {
@@ -53,6 +60,7 @@ function EntryTable<R>({
   rows,
   rowKey,
   cells,
+  foot,
 }: {
   caption: string;
   narrow?: boolean;
@@ -60,6 +68,8 @@ function EntryTable<R>({
   rows: readonly R[];
   rowKey: (row: R) => string;
   cells: (row: R) => ReactNode[];
+  /** A totals row under the table, one cell per heading. */
+  foot?: ReactNode[];
 }) {
   return (
     <div className={narrow ? 'cr-tabs-table cr-tabs-table--narrow' : 'cr-tabs-table'}>
@@ -86,6 +96,17 @@ function EntryTable<R>({
               </tr>
             ))}
           </tbody>
+          {foot && (
+            <tfoot>
+              <tr>
+                {foot.map((c, i) => (
+                  <td key={i} className={headings[i]?.numeric ? 'num' : undefined}>
+                    {c}
+                  </td>
+                ))}
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
     </div>
@@ -115,6 +136,15 @@ export function CashTab({ draft, set, errors }: TabProps) {
         rows={DENOMINATIONS}
         rowKey={String}
         cells={(n) => [`${label('cash.rupees')} ${n}`, cell('used', n), cell('left', n)]}
+        foot={[
+          label('cash.total'),
+          <output key="used" aria-label={`${label('cash.used')}: ${label('cash.total')}`}>
+            {label('cash.rupees')} {formatMoney(cashTotal(draft.cash, 'used') * 100)}
+          </output>,
+          <output key="left" aria-label={`${label('cash.left')}: ${label('cash.total')}`}>
+            {label('cash.rupees')} {formatMoney(cashTotal(draft.cash, 'left') * 100)}
+          </output>,
+        ]}
       />
       <FieldGrid>
         <TextField

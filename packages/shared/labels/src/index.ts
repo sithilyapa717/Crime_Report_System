@@ -447,6 +447,7 @@ export const LABELS = {
   'cash.left': l('ඉතිරි මුදල්', 'Notes left over'),
   'cash.note': l('සටහන', 'Note'),
   'cash.rupees': l('රු', 'Rs'),
+  'cash.total': l('මුළු මුදල', 'Total'),
   'cash.foundPlace': l('මුදල් තිබු තැන', 'Where the cash was found'),
   'cash.serials': l('මුදල් අංක', 'Cash number'),
   'cash.serials1': l('මුදල් අංක 1', 'Cash number 1'),

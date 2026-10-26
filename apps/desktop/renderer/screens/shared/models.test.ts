@@ -3,7 +3,7 @@
 import type { CaseRecord, CrimeReport } from '@excise/schemas';
 import { describe, expect, it } from 'vitest';
 import { caseDraft, caseInput } from '../case-progress/CaseProgressScreen.js';
-import { emptyDraft, fromReport, tabOf, toInput } from './cr-model.js';
+import { cashTotal, emptyDraft, fromReport, noteCount, tabOf, toInput } from './cr-model.js';
 
 const ID = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 
@@ -134,5 +134,16 @@ describe('case form model', () => {
       kind: 'summons',
       date: '2026-04-01',
     });
+  });
+});
+
+describe('cash totals', () => {
+  it('counts one note per serial and sums by denomination', () => {
+    expect(noteCount('S/426 672487')).toBe(1);
+    expect(noteCount('A1, A2;\nA3, ')).toBe(3);
+    expect(noteCount(undefined)).toBe(0);
+    const cash = { 'used:1000': 'A1, A2', 'used:50': 'B1', 'left:5000': 'C1' };
+    expect(cashTotal(cash, 'used')).toBe(2050);
+    expect(cashTotal(cash, 'left')).toBe(5000);
   });
 });

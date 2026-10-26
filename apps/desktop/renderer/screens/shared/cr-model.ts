@@ -31,6 +31,17 @@ export const SEIZED: { type: SeizedType; unit: string }[] = [
 
 export const DENOMINATIONS: Denomination[] = [5000, 1000, 500, 100, 50, 20, 10];
 
+/** Notes in one cash box: staff type one serial per note, separated by commas, semicolons or new
+ *  lines (a serial itself may contain spaces, e.g. "S/426 672487"). */
+export function noteCount(text: string | undefined): number {
+  return (text ?? '').split(/[,;\n]/).filter((s) => s.trim() !== '').length;
+}
+
+/** Rupees in the used or left-over boxes: each box's notes times its denomination. */
+export function cashTotal(cash: CrDraft['cash'], kind: 'used' | 'left'): number {
+  return DENOMINATIONS.reduce((sum, n) => sum + noteCount(cash[`${kind}:${n}`]) * n, 0);
+}
+
 export interface CrDraft {
   officeId?: string;
   crYear?: number;
