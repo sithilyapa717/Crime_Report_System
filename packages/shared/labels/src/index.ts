@@ -763,6 +763,7 @@ export const LABELS = {
   ),
   'report.scope': l('පරාසය', 'Scope'),
   'report.personNone': l('නැත', 'None'),
+  'report.clear': l('තේරීම් ඉවත් කරන්න', 'Clear choices'),
   'report.export': l('Excel ලෙස ලබාගන්න', 'Export Excel'),
   'report.crCount': l('වාර්තා ගණන', 'CR count'),
   'report.fines': l('දඩ මුදල', 'Fines'),

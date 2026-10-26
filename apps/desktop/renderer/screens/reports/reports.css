@@ -29,3 +29,6 @@
   padding-top: var(--space-3);
   border-top: 1px solid var(--border);
 }
+.report-links__clear {
+  margin-left: auto;
+}
