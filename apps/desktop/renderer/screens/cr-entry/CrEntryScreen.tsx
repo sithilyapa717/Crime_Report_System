@@ -362,65 +362,67 @@ function DetectionTab({ draft, set, errors }: TabProps) {
   const shown = Math.min(MAX_SUPPORT, Math.max(wanted, filled));
   return (
     <>
-      <FieldGrid>
-        <DateField
-          label={label('cr.detectionDate')}
-          value={draft.detectionDate}
-          error={errors.detectionDate}
-          onChange={pick('detectionDate')}
-        />
-        <TextField
-          label={label('cr.place')}
-          value={draft.place}
-          error={errors.place}
-          onChange={(v) => set((d) => ({ ...d, place: v }))}
-        />
-        <Select
-          label={label('cr.offence')}
-          value={draft.offenceTypeId}
-          error={errors.offenceTypeId}
-          options={offences}
-          onChange={pick('offenceTypeId')}
-        />
-        <Select
-          label={label('cr.policeArea')}
-          value={draft.policeAreaId}
-          options={police}
-          onChange={pick('policeAreaId')}
-        />
-        <Select
-          label={label('cr.divisionalSecretariat')}
-          value={draft.divisionalSecretariatId}
-          options={secretariats}
-          onChange={pick('divisionalSecretariatId')}
-        />
-        <Select
-          label={label('cr.detectingOfficer')}
-          value={draft.detectingOfficerId}
-          options={detecting}
-          onChange={pick('detectingOfficerId')}
-        />
-        <Select
-          label={label('cr.informant')}
-          value={draft.informantId}
-          options={informants}
-          onChange={pick('informantId')}
-        />
-        <Select label={label('cr.ac')} value={draft.acId} options={ac} onChange={pick('acId')} />
-        <Select label={label('cr.sc')} value={draft.scId} options={sc} onChange={pick('scId')} />
-        <Select
-          label={label('cr.oic')}
-          value={draft.oicId}
-          options={oic}
-          onChange={pick('oicId')}
-        />
-        <Select
-          label={label('cr.driver')}
-          value={draft.driverId}
-          options={drivers}
-          onChange={pick('driverId')}
-        />
-      </FieldGrid>
+      <FormSection title={label('cr.detectionDetails')}>
+        <FieldGrid>
+          <DateField
+            label={label('cr.detectionDate')}
+            value={draft.detectionDate}
+            error={errors.detectionDate}
+            onChange={pick('detectionDate')}
+          />
+          <TextField
+            label={label('cr.place')}
+            value={draft.place}
+            error={errors.place}
+            onChange={(v) => set((d) => ({ ...d, place: v }))}
+          />
+          <Select
+            label={label('cr.offence')}
+            value={draft.offenceTypeId}
+            error={errors.offenceTypeId}
+            options={offences}
+            onChange={pick('offenceTypeId')}
+          />
+          <Select
+            label={label('cr.policeArea')}
+            value={draft.policeAreaId}
+            options={police}
+            onChange={pick('policeAreaId')}
+          />
+          <Select
+            label={label('cr.divisionalSecretariat')}
+            value={draft.divisionalSecretariatId}
+            options={secretariats}
+            onChange={pick('divisionalSecretariatId')}
+          />
+          <Select
+            label={label('cr.detectingOfficer')}
+            value={draft.detectingOfficerId}
+            options={detecting}
+            onChange={pick('detectingOfficerId')}
+          />
+          <Select
+            label={label('cr.informant')}
+            value={draft.informantId}
+            options={informants}
+            onChange={pick('informantId')}
+          />
+          <Select label={label('cr.ac')} value={draft.acId} options={ac} onChange={pick('acId')} />
+          <Select label={label('cr.sc')} value={draft.scId} options={sc} onChange={pick('scId')} />
+          <Select
+            label={label('cr.oic')}
+            value={draft.oicId}
+            options={oic}
+            onChange={pick('oicId')}
+          />
+          <Select
+            label={label('cr.driver')}
+            value={draft.driverId}
+            options={drivers}
+            onChange={pick('driverId')}
+          />
+        </FieldGrid>
+      </FormSection>
       <FormSection title={label('cr.supportOfficer')}>
         <FieldGrid>
           {Array.from({ length: shown }, (_, i) => i + 1).map((pos) => (

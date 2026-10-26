@@ -410,6 +410,7 @@ export const LABELS = {
   'tab.seized': l('අත්අඩංගුවට ගන්නා ලද ප්‍රමාණය', 'Seized items'),
   'tab.court': l('උසාවිය', 'Court'),
   'cr.detectionDate': l('අල්ලාගත් දිනය', 'Date of detection'),
+  'cr.detectionDetails': l('වැටලීමේ විස්තර', 'Detection details'),
   'cr.place': l('වරදකළ ස්ථානය', 'Place of detection'),
   'cr.offence': l('වරද', 'Offence'),
   'cr.policeArea': l('අදාළ පොලිස් බල ප්‍රදේශය', 'Police area'),

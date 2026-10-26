@@ -293,19 +293,26 @@ h3 {
   margin-bottom: 6px;
 }
 
-/* Field groups inside a card: a quiet heading, no box. `tone` adds the old colour as a dot. */
+/* Field groups inside a card: each in its own outlined box with its heading inside, so the form
+   splits into clear parts (review board). `tone` adds the old colour as a dot. */
 .ex-section {
-  border: 0;
-  padding: 0;
-  margin: 0 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  margin: 0 0 var(--space-4);
   min-width: 0;
 }
 .ex-section > legend {
+  float: left;
+  width: 100%;
   padding: 0;
   margin-bottom: var(--space-3);
   font-size: var(--text-md);
-  font-weight: 500;
-  color: var(--text-muted);
+  font-weight: 600;
+  color: var(--text);
+}
+.ex-section > legend + * {
+  clear: both;
 }
 .ex-section--times > legend::before,
 .ex-section--cash > legend::before,
