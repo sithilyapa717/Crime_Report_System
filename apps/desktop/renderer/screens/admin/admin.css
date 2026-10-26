@@ -14,3 +14,8 @@
 .import__numbers dd {
   margin: 0;
 }
+/* Users: the add fields and button in one row, inputs on one line even when the temporary
+   password's long label wraps (it grows upwards). */
+.users-add > .ex-field:nth-of-type(3) {
+  width: 320px;
+}
