@@ -12,6 +12,7 @@ export interface Label {
 }
 
 const l = (si: string | null, en: string): Label => ({ si, en });
+// Action buttons (add, edit, delete, save, ...) have `si: null` on purpose: they show in English.
 
 export const LABELS = {
   // Roles and start screen (§1.2)
@@ -133,7 +134,7 @@ export const LABELS = {
   'cr.halfYear.first': l('පළමු අඩවසර', 'First half-year'),
   'cr.halfYear.second': l('දෙවන අඩවසර', 'Second half-year'),
   'cr.supportOfficer': l('ග්‍රහන සහය නිළධාරියා', 'Support officer'),
-  'cr.addSupportOfficer': l('තවත් සහය නිළධාරියෙකු එක් කරන්න', 'Add another support officer'),
+  'cr.addSupportOfficer': l(null, 'Add another support officer'),
   'cr.productions': l('සාක්ෂි භාණ්ඩ විස්තරය', 'Production list'),
   'accused.sex.male': l('පුරුෂ', 'Male'),
   'accused.sex.female': l('ස්ත්‍රී', 'Female'),
@@ -358,12 +359,12 @@ export const LABELS = {
   'menu.notBuilt': l('මෙම තිරය පසු අදියරකදී සාදනු ලැබේ.', 'This screen is built in a later phase.'),
 
   // Common words
-  'common.save': l('සුරකින්න', 'Save'),
-  'common.cancel': l('අවලංගු', 'Cancel'),
-  'common.close': l('වසන්න', 'Close'),
-  'common.ok': l('හරි', 'OK'),
-  'common.yes': l('ඔව්', 'Yes'),
-  'common.no': l('නැත', 'No'),
+  'common.save': l(null, 'Save'),
+  'common.cancel': l(null, 'Cancel'),
+  'common.close': l(null, 'Close'),
+  'common.ok': l(null, 'OK'),
+  'common.yes': l(null, 'Yes'),
+  'common.no': l(null, 'No'),
   'common.loading': l('පූරණය වෙමින්…', 'Loading…'),
   'common.empty': l('පෙන්වීමට කිසිවක් නැත.', 'Nothing to show.'),
   'common.filter': l('පෙරහන', 'Filter'),
@@ -382,9 +383,9 @@ export const LABELS = {
     'Some fields need attention: see the tabs marked ⚠.',
   ),
   'cr.new': l('නව', 'New CR'),
-  'cr.undo': l('වෙනස්කම් ඉවත් කරන්න', 'Undo changes'),
-  'cr.delete': l('මකන්න', 'Delete'),
-  'cr.restore': l('ප්‍රතිස්ථාපනය කරන්න', 'Restore'),
+  'cr.undo': l(null, 'Undo changes'),
+  'cr.delete': l(null, 'Delete'),
+  'cr.restore': l(null, 'Restore'),
   'cr.deleted': l('මෙම අපරාධ වාර්තාව මකා ඇත.', 'This CR is deleted.'),
   'cr.saved': l('සුරකින ලදී.', 'Saved.'),
   'cr.notFound': l('අපරාධ වාර්තාව හමු නොවීය.', 'No CR with this number in this office.'),
@@ -396,12 +397,12 @@ export const LABELS = {
     'මෙම අපරාධ වාර්තාව මකන්නද? (පසුව නැවත ලබාගත හැක)',
     'Delete this CR? It can be restored later.',
   ),
-  'cr.attach': l('පින්තුරය ඇතුලත් කිරීම', 'Add picture'),
-  'cr.remove': l('ඉවත් කරන්න', 'Remove'),
+  'cr.attach': l(null, 'Add picture'),
+  'cr.remove': l(null, 'Remove'),
   'cr.openFile': l('විවෘත කරන්න', 'Open'),
   'cr.saveFirst': l('මුලින් අපරාධ වාර්තාව සුරකින්න.', 'Save the CR first.'),
-  'cr.print': l('මුද්‍රණය', 'Print'),
-  'cr.edit': l('සංස්කරණය', 'Edit'),
+  'cr.print': l(null, 'Print'),
+  'cr.edit': l(null, 'Edit'),
   'tab.detection': l('වැටලීම', 'Detection'),
   'tab.accused': l('විත්තිකරු', 'Accused'),
   'tab.surety': l('ඇපකරු', 'Surety'),
@@ -500,7 +501,7 @@ export const LABELS = {
   ),
   'case.withdrawn': l('නඩුව ඉල්ලා අස්කර ගැනීම', 'Case withdrawn'),
   'case.accusedDied': l('චුදිත මියයෑම නිසා නඩුව අවසන්', 'Accused died, case ended'),
-  'case.addHearing': l('නඩු දිනයක් එක් කරන්න', 'Add hearing date'),
+  'case.addHearing': l(null, 'Add hearing date'),
   'case.memo': l('සටහන', 'Memo'),
   'case.outcomes': l('නඩු තීන්දුව', 'Result of the case'),
   'case.fineAmount': l('දඩ මුදල (රු.)', 'Fine amount (Rs)'),
@@ -520,7 +521,7 @@ export const LABELS = {
   'case.handoverDate': l('බාර දුන් දිනය', 'Hand-over date'),
   'case.noCase': l('තවමත් නඩුවක් පවරා නැත.', 'No case filed yet.'),
   // Searches and reports (C7, C8). Screen titles reuse the old menu captions (menu.*).
-  'search.go': l('සොයන්න', 'Search'),
+  'search.go': l(null, 'Search'),
   'search.date': l('දිනය', 'Date'),
   'search.name': l('නම හෝ නමේ කොටසක්', 'Name or part of the name'),
   'search.nic': l('හැදුනුම්පත් අංකය', 'NIC number'),
@@ -591,7 +592,7 @@ export const LABELS = {
     'Word ආකෘති වල භාවිතා වන අකුරු මෙම පරිගණකයේ නොමැති බැවින් මුද්‍රිත ලේඛන වෙනස් ලෙස පෙනිය හැක (වචන වෙනස් නොවේ). අස්ථානගත අකුරු:',
     'Fonts used by the Word templates are missing on this PC, so printed documents may look different (the wording is unchanged). Missing:',
   ),
-  'users.add': l('පරිශීලකයෙක් එක් කරන්න', 'Add a user'),
+  'users.add': l(null, 'Add a user'),
   'users.role': l('භූමිකාව', 'Section (role)'),
   'users.tempPassword': l(
     'තාවකාලික මුරපදය (පළමු පිවිසුමේදී ඔවුන් වෙනස් කරයි)',
@@ -600,9 +601,9 @@ export const LABELS = {
   'users.active': l('සක්‍රිය', 'Active'),
   'users.locked': l('අගුළු දමා ඇත', 'Locked'),
   'users.mustChange': l('මුරපදය වෙනස් කළ යුතුය', 'Must change password'),
-  'users.activate': l('සක්‍රිය කරන්න', 'Activate'),
-  'users.deactivate': l('අක්‍රිය කරන්න', 'Deactivate'),
-  'users.unlock': l('අගුළු ඇරින්න', 'Unlock'),
+  'users.activate': l(null, 'Activate'),
+  'users.deactivate': l(null, 'Deactivate'),
+  'users.unlock': l(null, 'Unlock'),
   'users.reset': l('මුරපදය යළි සකසන්න', 'Reset password'),
   'users.created': l('පරිශීලකයා එක් කරන ලදී.', 'User added.'),
   'users.resetDone': l(
@@ -655,12 +656,20 @@ export const LABELS = {
   'lists.value': l('නම', 'Name'),
   'lists.code': l('වරද කේතය', 'Offence code'),
   'lists.rank': l('තනතුර', 'Rank'),
-  'lists.add': l('එක් කරන්න', 'Add'),
+  'lists.group.places': l('ස්ථාන සහ අධිකරණ', 'Places and courts'),
+  'lists.group.officers': l('නිලධාරින්', 'Officers'),
+  'lists.group.cases': l('වරද සහ වර්ෂ', 'Offences and years'),
+  'lists.items': l('අයිතම', 'items'),
+  'lists.emptyHint': l(
+    'තවම අයිතම නැත. ඉහත නම ඇතුළත් කර “එක් කරන්න” ඔබන්න.',
+    'No items yet. Type a name above and press Add.',
+  ),
+  'lists.add': l(null, 'Add'),
   'lists.added': l('එක් කරන ලදී', 'Added'),
-  'lists.rename': l('නම වෙනස් කරන්න', 'Rename'),
+  'lists.rename': l(null, 'Rename'),
   'lists.inactive': l('අක්‍රිය', 'inactive'),
   'lists.used': l('අපරාධ වාර්තා වල භාවිතය:', 'Used by CRs:'),
-  'lists.delete': l('මකන්න', 'Delete'),
+  'lists.delete': l(null, 'Delete'),
   'lists.confirmDelete': l(
     'මෙම අයිතමය මකන්නද? කිසිදු අපරාධ වාර්තාවක් භාවිතා නොකරන විට පමණක් කළ හැක.',
     'Delete this item? Only possible when no CR uses it.',
@@ -772,7 +781,11 @@ export const LABELS = {
   ),
   'report.scope': l('පරාසය', 'Scope'),
   'report.personNone': l('නැත', 'None'),
-  'report.clear': l('තේරීම් ඉවත් කරන්න', 'Clear choices'),
+  'report.fillFilters': l(
+    'වාර්තා පෙන්වීමට ඉහත සුරාබදු ස්ථානය, කාලය සහ නිලධාරියා තෝරන්න',
+    'Choose the office, period and officer above to show a report',
+  ),
+  'report.clear': l(null, 'Clear choices'),
   'report.export': l('Excel ලෙස ලබාගන්න', 'Export Excel'),
   'report.crCount': l('වාර්තා ගණන', 'CR count'),
   'report.fines': l('දඩ මුදල', 'Fines'),
@@ -850,6 +863,34 @@ export function errorLabel(code: string | undefined): string {
   const key = `error.${code ?? 'unknown'}`;
   return key in LABELS ? label(key) : label('error.unknown');
 }
+
+/** Action buttons (add, edit, delete, save, ...) that show in English on purpose: `si` is null. */
+export const ENGLISH_ACTION_KEYS: readonly string[] = [
+  'common.save',
+  'common.cancel',
+  'common.close',
+  'common.ok',
+  'common.yes',
+  'common.no',
+  'lists.add',
+  'lists.rename',
+  'lists.delete',
+  'users.add',
+  'users.activate',
+  'users.deactivate',
+  'users.unlock',
+  'cr.delete',
+  'cr.restore',
+  'cr.undo',
+  'cr.remove',
+  'cr.attach',
+  'cr.edit',
+  'cr.print',
+  'cr.addSupportOfficer',
+  'case.addHearing',
+  'search.go',
+  'report.clear',
+];
 
 /** The caption to show: Sinhala when known, otherwise English; unknown keys show the key. */
 export function label(key: string): string {

@@ -14,8 +14,8 @@ import {
   ConfirmDialog,
   Card,
   Dialog,
+  EmptyState,
   Table,
-  Tabs,
   TextField,
   useToast,
 } from '../../design-system/index.js';
@@ -25,7 +25,27 @@ import { forgetLists } from '../../src/references.js';
 import { ErrorLine } from '../shared/results.js';
 import './reference-lists.css';
 
-const KINDS = Object.keys(REFERENCE_KIND_LABEL) as ReferenceKind[];
+/** The 14 lists, grouped in the side menu. */
+const GROUPS: { title: string; kinds: ReferenceKind[] }[] = [
+  {
+    title: 'lists.group.places',
+    kinds: ['office', 'police_area', 'divisional_secretariat', 'court'],
+  },
+  {
+    title: 'lists.group.officers',
+    kinds: [
+      'oic',
+      'sc',
+      'ac',
+      'detecting_officer',
+      'informant',
+      'prosecuting_officer',
+      'support_officer',
+      'driver',
+    ],
+  },
+  { title: 'lists.group.cases', kinds: ['offence', 'year'] },
+];
 const isOfficer = (k: ReferenceKind) => (OFFICER_KINDS as readonly string[]).includes(k);
 
 export function ReferenceListsScreen() {
@@ -33,22 +53,39 @@ export function ReferenceListsScreen() {
   return (
     <>
       <h1>{label('menu.referenceLists')}</h1>
-      <Tabs
-        label={label('menu.referenceLists')}
-        active={kind}
-        onChange={(k) => setKind(k as ReferenceKind)}
-        tabs={KINDS.map((k) => ({
-          key: k,
-          title: label(REFERENCE_KIND_LABEL[k]),
-          content: k === kind ? <ListEditor kind={k} /> : null,
-        }))}
-      />
+      <div className="ref-layout">
+        <nav className="ref-menu" aria-label={label('menu.referenceLists')}>
+          {GROUPS.map((g) => (
+            <div key={g.title} className="ref-menu__group" role="presentation">
+              <div className="ref-menu__title">{label(g.title)}</div>
+              <div role="tablist" aria-orientation="vertical">
+                {g.kinds.map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    role="tab"
+                    aria-selected={k === kind}
+                    className="ref-menu__item"
+                    onClick={() => setKind(k)}
+                  >
+                    {label(REFERENCE_KIND_LABEL[k])}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </nav>
+        <div className="ref-panel" role="tabpanel">
+          <ListEditor key={kind} kind={kind} />
+        </div>
+      </div>
     </>
   );
 }
 
 function ListEditor({ kind }: { kind: ReferenceKind }) {
   const [items, setItems] = useState<ReferenceItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [value, setValue] = useState('');
   const [code, setCode] = useState('');
@@ -62,7 +99,10 @@ function ListEditor({ kind }: { kind: ReferenceKind }) {
 
   const refresh = () =>
     call('reference.list', kind, { includeInactive: true })
-      .then(setItems)
+      .then((r) => {
+        setItems(r);
+        setLoaded(true);
+      })
       .catch((e: unknown) => setError(e instanceof IpcError ? e.caption : label('error.unknown')));
   useEffect(() => {
     void refresh();
@@ -101,7 +141,16 @@ function ListEditor({ kind }: { kind: ReferenceKind }) {
 
   return (
     <>
-      <Card title={label('lists.add')}>
+      <Card
+        title={label(REFERENCE_KIND_LABEL[kind])}
+        actions={
+          loaded && (
+            <span className="ex-muted">
+              {items.length} {label('lists.items')}
+            </span>
+          )
+        }
+      >
         <form
           ref={addForm}
           onSubmit={add}
@@ -123,64 +172,68 @@ function ListEditor({ kind }: { kind: ReferenceKind }) {
             {label('lists.add')}
           </Button>
         </form>
-      </Card>
-      <ErrorLine error={error} />
-      <Table
-        caption={label(REFERENCE_KIND_LABEL[kind])}
-        rows={items}
-        rowKey={(i) => i.id}
-        filterable={items.length > 15}
-        columns={[
-          ...(kind === 'offence'
-            ? [{ key: 'code', title: label('lists.code'), value: (i: ReferenceItem) => i.code }]
-            : []),
-          {
-            key: 'value',
-            title: label('lists.value'),
-            value: (i) => i.value,
-            render: (i) => (
-              <>
-                {i.rank ? `${i.rank} ` : ''}
-                {i.value} {!i.active && <Badge kind="warn">{label('lists.inactive')}</Badge>}
-                {usage[i.id] !== undefined && (
-                  <span className="ex-muted">
-                    {' '}
-                    · {label('lists.used')} {usage[i.id]}
+        <ErrorLine error={error} />
+        {loaded && items.length === 0 ? (
+          <EmptyState>{label('lists.emptyHint')}</EmptyState>
+        ) : (
+          <Table
+            caption={label(REFERENCE_KIND_LABEL[kind])}
+            rows={items}
+            rowKey={(i) => i.id}
+            filterable={items.length > 15}
+            columns={[
+              ...(kind === 'offence'
+                ? [{ key: 'code', title: label('lists.code'), value: (i: ReferenceItem) => i.code }]
+                : []),
+              {
+                key: 'value',
+                title: label('lists.value'),
+                value: (i) => i.value,
+                render: (i) => (
+                  <>
+                    {i.rank ? `${i.rank} ` : ''}
+                    {i.value} {!i.active && <Badge kind="warn">{label('lists.inactive')}</Badge>}
+                    {usage[i.id] !== undefined && (
+                      <span className="ex-muted">
+                        {' '}
+                        · {label('lists.used')} {usage[i.id]}
+                      </span>
+                    )}
+                  </>
+                ),
+              },
+              {
+                key: 'actions',
+                title: '',
+                value: () => null,
+                render: (i) => (
+                  <span className="ex-check">
+                    <Button variant="edit" onClick={() => setEditing(i)}>
+                      {label('lists.rename')}
+                    </Button>
+                    <Button
+                      variant={i.active ? 'warn' : 'ok'}
+                      onClick={() => void act(() => call('reference.setActive', i.id, !i.active))}
+                    >
+                      {label(i.active ? 'users.deactivate' : 'users.activate')}
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={async () => {
+                        const n = await call('reference.usageCount', i.id).catch(() => undefined);
+                        if (n !== undefined) setUsage((u) => ({ ...u, [i.id]: n }));
+                        setDeleting(i);
+                      }}
+                    >
+                      {label('lists.delete')}
+                    </Button>
                   </span>
-                )}
-              </>
-            ),
-          },
-          {
-            key: 'actions',
-            title: '',
-            value: () => null,
-            render: (i) => (
-              <span className="ex-check">
-                <Button variant="edit" onClick={() => setEditing(i)}>
-                  {label('lists.rename')}
-                </Button>
-                <Button
-                  variant={i.active ? 'warn' : 'ok'}
-                  onClick={() => void act(() => call('reference.setActive', i.id, !i.active))}
-                >
-                  {label(i.active ? 'users.deactivate' : 'users.activate')}
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={async () => {
-                    const n = await call('reference.usageCount', i.id).catch(() => undefined);
-                    if (n !== undefined) setUsage((u) => ({ ...u, [i.id]: n }));
-                    setDeleting(i);
-                  }}
-                >
-                  {label('lists.delete')}
-                </Button>
-              </span>
-            ),
-          },
-        ]}
-      />
+                ),
+              },
+            ]}
+          />
+        )}
+      </Card>
       {editing && (
         <RenameDialog
           item={editing}

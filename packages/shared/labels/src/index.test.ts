@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LABELS, label } from './index.js';
+import { ENGLISH_ACTION_KEYS, LABELS, label } from './index.js';
 
 describe('labels', () => {
   it('shows Sinhala, and the key when unknown', () => {
@@ -12,9 +12,19 @@ describe('labels', () => {
     const sinhala = /[඀-෿]/;
     // the Tamil line of the trilingual title is the only caption that is not Sinhala
     const missing = Object.entries(LABELS)
-      .filter(([key, { si }]) => key !== 'start.titleTamil' && !(si && sinhala.test(si)))
+      .filter(
+        ([key, { si }]) =>
+          key !== 'start.titleTamil' &&
+          !ENGLISH_ACTION_KEYS.includes(key) &&
+          !(si && sinhala.test(si)),
+      )
       .map(([key]) => key);
     expect(missing).toEqual([]);
+  });
+
+  it('shows the action buttons in English', () => {
+    for (const key of ENGLISH_ACTION_KEYS)
+      expect(label(key), key).toBe(LABELS[key as keyof typeof LABELS].en);
   });
 
   it('has no empty captions', () => {

@@ -6,12 +6,11 @@
 import type { ReportResult, SummaryGroup } from '@excise/contract';
 import { label } from '@excise/labels';
 import type { ReportParams, ReportType, SummaryGroupBy } from '@excise/schemas';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Actions,
   Button,
   Card,
-  ChipGroup,
   Select,
   Table,
   formatDate,
@@ -97,6 +96,23 @@ export function ReportsScreen() {
   };
   const ready = params('register') !== null;
 
+  // Changing a filter re-runs the report on show (or clears it while a choice is missing).
+  const filterKey = JSON.stringify(params('register'));
+  const shownRef = useRef(s.result);
+  shownRef.current = s.result;
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    const shown = shownRef.current;
+    if (!shown) return;
+    if (!ready) s.setResult(null);
+    else if (shown.kind === 'report') runReport(shown.type);
+    else runSummary(shown.by);
+  }, [filterKey]);
+
   const runReport = (type: ReportType) => {
     const p = params(type);
     if (p) void s.run(async () => ({ kind: 'report', type, result: await call('reports.run', p) }));
@@ -133,9 +149,19 @@ export function ReportsScreen() {
 
   return (
     <div className="reports">
-      <Card className="report-form">
+      <Card className="report-filters">
         <div className="ex-filters">
           {fields}
+          <Select
+            label={label('report.scope')}
+            value={period}
+            onChange={(v) => setPeriod((v as Period) ?? 'month')}
+            options={[
+              { value: 'year', label: label('cr.year') },
+              { value: 'month', label: label('cr.month') },
+              { value: 'half_year', label: label('report.half') },
+            ]}
+          />
           {period === 'month' && (
             <Select
               label={label('cr.month')}
@@ -155,24 +181,12 @@ export function ReportsScreen() {
               ]}
             />
           )}
-        </div>
-        <ChipGroup<Period>
-          label={label('report.scope')}
-          value={period}
-          onChange={setPeriod}
-          options={[
-            { value: 'year', label: label('cr.year') },
-            { value: 'month', label: label('cr.month') },
-            { value: 'half_year', label: label('report.half') },
-          ]}
-        />
-        {byOfficerAllowed && (
-          <div className="report-person">
-            <ChipGroup<Person>
+          {byOfficerAllowed && (
+            <Select
               label={label('report.person')}
               value={person}
-              onChange={(p) => {
-                setPerson(p);
+              onChange={(v) => {
+                setPerson((v as Person) ?? 'none');
                 setOfficerId(undefined);
               }}
               options={[
@@ -181,64 +195,71 @@ export function ReportsScreen() {
                 { value: 'informant', label: label('reports.byInformant') },
               ]}
             />
-            {person !== 'none' && (
-              <Select
-                label={label(person === 'informant' ? 'cr.informant' : 'cr.detectingOfficer')}
-                value={officerId}
-                options={officers}
-                onChange={setOfficerId}
-              />
-            )}
-          </div>
-        )}
-        {/* Each type runs its report straight away, as the old type buttons did. */}
-        <fieldset className="ex-chips">
-          <legend className="ex-chips__label">{label('report.type')}</legend>
-          <div className="ex-chips__list">
-            {TYPES.map((t) => (
-              <button
-                key={t}
-                type="button"
-                className="ex-chip"
-                aria-pressed={s.result?.kind === 'report' && s.result.type === t}
-                disabled={!ready || s.busy}
-                onClick={() => runReport(t)}
-              >
-                {label(`report.typeChip.${t}`)}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-        <fieldset className="ex-chips">
-          <legend className="ex-chips__label">{label('report.summary')}</legend>
-          <div className="ex-chips__list">
-            {SUMMARIES.map((by) => (
-              <button
-                key={by}
-                type="button"
-                className="ex-chip"
-                aria-pressed={s.result?.kind === 'summary' && s.result.by === by}
-                disabled={!ready || s.busy}
-                onClick={() => runSummary(by)}
-              >
-                {label(`report.summary.${by}`)}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-        <div className="report-links">
-          <Button onClick={() => go('caseNumberSearch')}>{label('reports.byCaseNumber')}</Button>
-          <Button onClick={() => go('nameNicSearch')}>{label('reports.byNameNic')}</Button>
-          <Button onClick={() => go('previousByCourt')}>{label('reports.previousByCourt')}</Button>
-          <Button variant="ghost" className="report-links__clear" onClick={clear}>
+          )}
+          {byOfficerAllowed && person !== 'none' && (
+            <Select
+              label={label(person === 'informant' ? 'cr.informant' : 'cr.detectingOfficer')}
+              value={officerId}
+              options={officers}
+              onChange={setOfficerId}
+            />
+          )}
+          <Button variant="ghost" className="report-filters__clear" onClick={clear}>
             {label('report.clear')}
           </Button>
         </div>
       </Card>
 
+      {/* Each choice runs its report straight away and shows it below; changing a filter
+          above re-runs whatever is showing. */}
+      <Card className="report-pick">
+        {!ready && <p className="ex-muted">{label('report.fillFilters')}</p>}
+        <div className="report-pick__groups">
+          <fieldset className="ex-chips">
+            <legend className="ex-chips__label">{label('report.type')}</legend>
+            <div className="ex-chips__list">
+              {TYPES.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  className="ex-chip"
+                  aria-pressed={s.result?.kind === 'report' && s.result.type === t}
+                  disabled={!ready || s.busy}
+                  onClick={() => runReport(t)}
+                >
+                  {label(`report.typeChip.${t}`)}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="ex-chips">
+            <legend className="ex-chips__label">{label('report.summary')}</legend>
+            <div className="ex-chips__list">
+              {SUMMARIES.map((by) => (
+                <button
+                  key={by}
+                  type="button"
+                  className="ex-chip"
+                  aria-pressed={s.result?.kind === 'summary' && s.result.by === by}
+                  disabled={!ready || s.busy}
+                  onClick={() => runSummary(by)}
+                >
+                  {label(`report.summary.${by}`)}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+        <div className="report-links">
+          <Button onClick={() => go('caseNumberSearch')}>{label('reports.byCaseNumber')}</Button>
+          <Button onClick={() => go('nameNicSearch')}>{label('reports.byNameNic')}</Button>
+          <Button onClick={() => go('previousByCourt')}>{label('reports.previousByCourt')}</Button>
+        </div>
+      </Card>
+
       <ErrorLine error={s.error} />
       {s.result?.kind === 'report' && (
-        <Card title={label(`report.typeChip.${s.result.type}`)}>
+        <Card title={label(`report.typeChip.${s.result.type}`)} className="ex-card--fill">
           <ReportTable result={s.result.result} />
           <div className="ex-results-foot">
             <span />
@@ -255,7 +276,10 @@ export function ReportsScreen() {
         </Card>
       )}
       {s.result?.kind === 'summary' && (
-        <Card title={`${label('report.summary')} – ${label(`report.summary.${s.result.by}`)}`}>
+        <Card
+          title={`${label('report.summary')} – ${label(`report.summary.${s.result.by}`)}`}
+          className="ex-card--fill"
+        >
           <SummaryTable groups={s.result.groups} />
         </Card>
       )}

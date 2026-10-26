@@ -1,4 +1,4 @@
-/* Reports (Figma "05 Reports"): period fields, the chip groups, then the look-up buttons. */
+/* Reports: a filter bar on top, the report choices under it, the report below. */
 .reports {
   display: flex;
   flex-direction: column;
@@ -7,43 +7,38 @@
 .reports > * {
   margin: 0;
 }
-.report-form {
+.report-filters .ex-filters {
+  gap: var(--space-3) var(--space-4);
+}
+.report-filters .ex-filters > .ex-field {
+  width: 200px;
+}
+.report-filters__clear {
+  margin-left: auto;
+}
+.report-pick {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
-/* A thin line between the groups (period, person, type, summary, links) so each reads on its own.
-   An inset shadow, not a border: a fieldset draws its top border through the legend. */
-.report-form > * + * {
-  padding-top: var(--space-4);
-  box-shadow: inset 0 1px 0 var(--border-strong);
+.report-pick > p {
+  margin: 0;
 }
-.report-form > fieldset + *,
-.report-form > * + fieldset {
-  padding-top: var(--space-4);
+.report-pick__groups {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--space-5);
+  align-items: start;
 }
-.report-form > * + fieldset > legend {
-  float: left;
-  width: 100%;
-}
-.report-form > * + fieldset > legend + * {
-  clear: both;
-}
-.report-person {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 0 var(--space-5);
-}
-.report-person .ex-field {
-  width: 280px;
-  margin-bottom: 0;
+@media (max-width: 1100px) {
+  .report-pick__groups {
+    grid-template-columns: 1fr;
+  }
 }
 .report-links {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
-}
-.report-links__clear {
-  margin-left: auto;
+  padding-top: var(--space-4);
+  box-shadow: inset 0 1px 0 var(--border-strong);
 }

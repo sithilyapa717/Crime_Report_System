@@ -244,8 +244,8 @@
 }
 .cr-view dt {
   font-size: var(--text-md);
-  font-weight: 500;
-  color: var(--text-muted);
+  font-weight: 600;
+  color: var(--text);
 }
 .cr-view dd {
   margin: 0;
