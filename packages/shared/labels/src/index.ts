@@ -473,6 +473,15 @@ export const LABELS = {
   'seized.overQuantity': l('සාම්පලය ගත් පසු ඉතිරි ප්‍රමාණය', 'left after sampling'),
   'cr.quantity': l('ප්‍රමාණය', 'Quantity'),
   'cr.quantityExtra': l('ප්‍රමාණය 1', 'Quantity 1'),
+  // Draft Sinhala: which documents print each quantity (the old Quantity and Quantity1 columns).
+  'cr.quantityHint': l(
+    'අල්ලාගත් ප්‍රමාණය (මිලි ලීටර් හෝ ගණන). බොහෝ ලේඛනවල මෙය මුද්‍රණය වේ',
+    'The amount seized (mL, or a count). Most documents print this one',
+  ),
+  'cr.quantityExtraHint': l(
+    'බලපත්‍ර සීමාව ඉක්මවූ චෝදනා (UPT, UPA, UPFL) සහ මුද්‍රා කළ කෑනය සඳහා පමණි',
+    'Only for over-the-limit charges (UPT, UPA, UPFL) and the sealed can; otherwise leave empty',
+  ),
   'cr.overQuantity': l('වැඩිපුර ප්‍රමාණය', 'Over quantity'),
   'cr.production1': l('සාක්ෂි භාණ්ඩ 1', 'Production 1'),
   'cr.production2': l('සාක්ෂි භාණ්ඩ 2', 'Production 2'),

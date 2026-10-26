@@ -201,12 +201,14 @@ export function SeizedTab({ draft, set, errors }: TabProps) {
       <FieldGrid>
         <NumberField
           label={label('cr.quantity')}
+          hint={label('cr.quantityHint')}
           value={draft.quantity}
           error={errors.quantity}
           onChange={(v) => set((d) => ({ ...d, quantity: v }))}
         />
         <NumberField
           label={label('cr.quantityExtra')}
+          hint={label('cr.quantityExtraHint')}
           value={draft.quantityExtra}
           error={errors.quantityExtra}
           onChange={(v) => set((d) => ({ ...d, quantityExtra: v }))}
