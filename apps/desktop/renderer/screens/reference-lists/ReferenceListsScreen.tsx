@@ -157,17 +157,17 @@ function ListEditor({ kind }: { kind: ReferenceKind }) {
             value: () => null,
             render: (i) => (
               <span className="ex-check">
-                <Button variant="ghost" onClick={() => setEditing(i)}>
+                <Button variant="edit" onClick={() => setEditing(i)}>
                   {label('lists.rename')}
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant={i.active ? 'warn' : 'ok'}
                   onClick={() => void act(() => call('reference.setActive', i.id, !i.active))}
                 >
                   {label(i.active ? 'users.deactivate' : 'users.activate')}
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant="danger"
                   onClick={async () => {
                     const n = await call('reference.usageCount', i.id).catch(() => undefined);
                     if (n !== undefined) setUsage((u) => ({ ...u, [i.id]: n }));

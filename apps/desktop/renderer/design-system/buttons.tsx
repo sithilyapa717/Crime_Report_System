@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-type Variant = 'default' | 'primary' | 'danger' | 'ghost';
+/** `edit`, `warn` and `ok` colour row actions: rename/edit blue, deactivate amber, activate green. */
+type Variant = 'default' | 'primary' | 'danger' | 'ghost' | 'edit' | 'warn' | 'ok';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;

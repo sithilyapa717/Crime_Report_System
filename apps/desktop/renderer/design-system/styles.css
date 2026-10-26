@@ -25,6 +25,8 @@
   --ok-bg: #e5f4ec;
   --warn: #8a6a00;
   --warn-bg: var(--accent-soft);
+  --edit: #2a64b8;
+  --edit-bg: #e7effa;
   --focus-ring: 0 0 0 4px rgb(245 203 69 / 0.55);
   --shadow-raised: 0 10px 24px rgb(38 26 13 / 0.08);
 
@@ -135,6 +137,27 @@ h3 {
 }
 .ex-button--danger:hover:not(:disabled) {
   background: var(--danger-bg);
+}
+.ex-button--edit {
+  border-color: var(--edit);
+  color: var(--edit);
+}
+.ex-button--edit:hover:not(:disabled) {
+  background: var(--edit-bg);
+}
+.ex-button--warn {
+  border-color: var(--accent);
+  color: var(--warn);
+}
+.ex-button--warn:hover:not(:disabled) {
+  background: var(--warn-bg);
+}
+.ex-button--ok {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+.ex-button--ok:hover:not(:disabled) {
+  background: var(--ok-bg);
 }
 .ex-button--ghost {
   border-color: transparent;

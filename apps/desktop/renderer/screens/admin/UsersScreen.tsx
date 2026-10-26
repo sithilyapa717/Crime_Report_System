@@ -98,19 +98,19 @@ export function UsersScreen() {
               <span className="ex-check">
                 {u.id !== session.userId && (
                   <Button
-                    variant="ghost"
+                    variant={u.active ? 'warn' : 'ok'}
                     onClick={act(() => call('users.setActive', u.id, !u.active))}
                   >
                     {label(u.active ? 'users.deactivate' : 'users.activate')}
                   </Button>
                 )}
                 {u.locked && (
-                  <Button variant="ghost" onClick={act(() => call('auth.unlockUser', u.id))}>
+                  <Button variant="ok" onClick={act(() => call('auth.unlockUser', u.id))}>
                     {label('users.unlock')}
                   </Button>
                 )}
                 <Button
-                  variant="ghost"
+                  variant="edit"
                   onClick={() => {
                     setTemp('');
                     setResetFor(u);
