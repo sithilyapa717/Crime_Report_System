@@ -656,6 +656,7 @@ export const LABELS = {
   'lists.code': l('වරද කේතය', 'Offence code'),
   'lists.rank': l('තනතුර', 'Rank'),
   'lists.add': l('එක් කරන්න', 'Add'),
+  'lists.added': l('එක් කරන ලදී', 'Added'),
   'lists.rename': l('නම වෙනස් කරන්න', 'Rename'),
   'lists.inactive': l('අක්‍රිය', 'inactive'),
   'lists.used': l('අපරාධ වාර්තා වල භාවිතය:', 'Used by CRs:'),

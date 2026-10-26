@@ -1,0 +1,5 @@
+/* Reference lists: the add row on top, its name box wider than the code and rank boxes. */
+.ref-add > .ex-field:last-of-type {
+  flex: 1 1 320px;
+  max-width: 520px;
+}
