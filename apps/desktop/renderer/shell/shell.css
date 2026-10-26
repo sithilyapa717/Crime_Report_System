@@ -72,7 +72,8 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 20px;
-  align-items: start;
+  /* Cards in a row share one height, so their bottoms line up. */
+  align-items: stretch;
   margin-top: var(--space-3);
 }
 .home-group {
