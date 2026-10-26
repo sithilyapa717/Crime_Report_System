@@ -4,22 +4,23 @@
 
 :root {
   --font: 'Noto Sans Sinhala', 'Iskoola Pota', 'Nirmala UI', system-ui, sans-serif;
-  /* Figma variables */
+  /* Figma variables; muted text, borders and red darkened after review for more contrast on
+     office monitors (muted text ~9:1 on white, borders visible against the input fill). */
   --text: #1e1e1e;
-  --text-muted: #6b655c;
+  --text-muted: #4d473f;
   --bg: #efece7;
   --surface: #ffffff;
   --surface-alt: #f6f3ee;
-  --border: #e4ded5;
+  --border: #d3cabd;
   --primary: #1e1e1e;
   --primary-text: #ffffff;
   --primary-soft: #f1ece4;
   --accent: #f5cb45;
   --accent-soft: #fbf0c9;
-  --danger: #d64545;
+  --danger: #c23434;
   --ok: #2e9a5c;
   /* Derived */
-  --border-strong: #cfc6b8;
+  --border-strong: #b3a894;
   --danger-bg: #fbeaea;
   --ok-bg: #e5f4ec;
   --warn: #8a6a00;
