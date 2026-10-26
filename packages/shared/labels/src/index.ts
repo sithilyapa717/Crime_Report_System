@@ -367,6 +367,7 @@ export const LABELS = {
   'common.empty': l('පෙන්වීමට කිසිවක් නැත.', 'Nothing to show.'),
   'common.filter': l('පෙරහන', 'Filter'),
   'common.required': l('අවශ්‍යයි', 'Required'),
+  'date.pick': l('දිනය තෝරන්න', 'Choose the date'),
   // CR entry (C4, §1.4). Sinhala where the plan quotes the old form; English until approved.
   'cr.office': l('සුරාබදු ස්ථානය හෝ ඒකකය', 'Office / unit'),
   'cr.year': l('වර්ෂය', 'Year'),

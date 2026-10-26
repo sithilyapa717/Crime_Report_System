@@ -221,6 +221,42 @@ h3 {
 .ex-textarea[aria-invalid='true'] {
   border-color: var(--danger);
 }
+.ex-date {
+  position: relative;
+}
+.ex-date > .ex-input {
+  padding-right: 48px;
+}
+.ex-date__button {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  transform: translateY(-50%);
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.ex-date__button:hover:not(:disabled) {
+  background: var(--accent-soft);
+}
+/* The system picker opens next to this invisible date input at the field's right edge. */
+.ex-date__picker {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
 .ex-input--number {
   text-align: left;
   font-variant-numeric: tabular-nums;

@@ -3,6 +3,7 @@
 import {
   useEffect,
   useId,
+  useRef,
   useState,
   type InputHTMLAttributes,
   type ReactNode,
@@ -11,6 +12,7 @@ import {
 } from 'react';
 import { label as caption } from '@excise/labels';
 import { formatDate, parseDateInput } from './dates.js';
+import { Icon } from './icons.js';
 
 interface FieldFrame {
   label: string;
@@ -165,7 +167,8 @@ export function NumberField({
   );
 }
 
-/** Shows and accepts `YYYY.MM.DD`; the value is ISO (`YYYY-MM-DD`) or undefined. */
+/** Shows and accepts `YYYY.MM.DD`; the value is ISO (`YYYY-MM-DD`) or undefined. The calendar
+ *  button opens the system date picker, for staff who would rather choose than type. */
 export function DateField({
   value,
   onChange,
@@ -176,6 +179,7 @@ export function DateField({
   ...rest
 }: InputBase & { value: string | undefined; onChange: (v: string | undefined) => void }) {
   const id = useId();
+  const picker = useRef<HTMLInputElement>(null);
   const [text, setText] = useState(formatDate(value));
   useEffect(() => {
     setText((t) => (parseDateInput(t) === (value ?? null) ? t : formatDate(value)));
@@ -189,24 +193,49 @@ export function DateField({
       hint={hint}
       tag={tag}
     >
-      <input
-        id={id}
-        className="ex-input"
-        placeholder="YYYY.MM.DD"
-        value={text}
-        onChange={(e) => {
-          setText(e.target.value);
-          const iso = parseDateInput(e.target.value);
-          if (e.target.value.trim() === '') onChange(undefined);
-          else if (iso) onChange(iso);
-        }}
-        onBlur={() => {
-          const iso = parseDateInput(text);
-          if (iso) setText(formatDate(iso));
-        }}
-        {...aria(id, error ?? (bad ? 'x' : undefined), hint)}
-        {...rest}
-      />
+      <div className="ex-date">
+        <input
+          id={id}
+          className="ex-input"
+          placeholder="YYYY.MM.DD"
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+            const iso = parseDateInput(e.target.value);
+            if (e.target.value.trim() === '') onChange(undefined);
+            else if (iso) onChange(iso);
+          }}
+          onBlur={() => {
+            const iso = parseDateInput(text);
+            if (iso) setText(formatDate(iso));
+          }}
+          {...aria(id, error ?? (bad ? 'x' : undefined), hint)}
+          {...rest}
+        />
+        <button
+          type="button"
+          className="ex-date__button"
+          aria-label={`${label}: ${caption('date.pick')}`}
+          title={caption('date.pick')}
+          disabled={rest.disabled}
+          onClick={() => picker.current?.showPicker?.()}
+        >
+          <Icon name="calendar" size={18} />
+        </button>
+        <input
+          ref={picker}
+          type="date"
+          className="ex-date__picker"
+          tabIndex={-1}
+          aria-hidden="true"
+          value={parseDateInput(text) ?? ''}
+          onChange={(e) => {
+            const iso = e.target.value || undefined;
+            setText(formatDate(iso));
+            onChange(iso);
+          }}
+        />
+      </div>
     </Field>
   );
 }
