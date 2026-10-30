@@ -23,6 +23,8 @@
   --border-strong: #8a7e69;
   /* Headings (group titles, section titles, column heads): a tinted band, bold dark text. */
   --heading-bg: #e6dfd2;
+  /* Text boxes and drop-downs: a light outline, darker on hover and focus. */
+  --field-border: #c9bfae;
   --danger-bg: #fbeaea;
   --ok-bg: #e5f4ec;
   --warn: #8a6a00;
@@ -106,7 +108,7 @@ h3 {
   gap: var(--space-2);
   min-height: 48px;
   padding: 10px 22px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text);
@@ -121,7 +123,7 @@ h3 {
 }
 .ex-button:hover:not(:disabled) {
   background: var(--heading-bg);
-  border-color: var(--text);
+  border-color: var(--border-strong);
 }
 .ex-button:active:not(:disabled) {
   box-shadow: none;
@@ -234,7 +236,7 @@ h3 {
   width: 100%;
   min-height: 48px;
   padding: 10px 16px;
-  border: 2px solid var(--border-strong);
+  border: 1px solid var(--field-border);
   border-radius: var(--radius);
   background-color: var(--surface-alt);
   color: var(--text);
@@ -250,17 +252,15 @@ h3 {
 .ex-input:hover,
 .ex-select:hover,
 .ex-textarea:hover {
-  border-color: var(--text);
+  border-color: var(--border-strong);
 }
 /* Figma "State=Focus": white, dark 1.5px border, yellow ring. */
 .ex-input:focus,
 .ex-select:focus,
 .ex-textarea:focus {
   outline: none;
-  border-color: var(--text);
-  box-shadow:
-    inset 0 0 0 0.5px var(--text),
-    var(--focus-ring);
+  border-color: var(--border-strong);
+  box-shadow: var(--focus-ring);
   background-color: var(--surface);
 }
 .ex-input:disabled,
@@ -439,9 +439,9 @@ h3 {
 }
 /* Selected: colour and an outside ring only. A heavier weight would widen the text and re-flow the rows. */
 .ex-chip[aria-pressed='true'] {
-  border-color: var(--text);
+  border-color: var(--warn);
   background: var(--accent-soft);
-  box-shadow: 0 0 0 1px var(--text);
+  box-shadow: 0 0 0 1px var(--warn);
 }
 
 /* ---------- Feedback ---------- */
