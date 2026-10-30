@@ -360,6 +360,19 @@ function DetectionTab({ draft, set, errors }: TabProps) {
   );
   const [wanted, setWanted] = useState(1);
   const shown = Math.min(MAX_SUPPORT, Math.max(wanted, filled));
+  // Removing a box moves the officers below it up one, so the numbering stays without gaps.
+  const removeSupport = (pos: number) => {
+    set((d) => {
+      const next: CrDraft['support'] = {};
+      for (const [p, id] of Object.entries(d.support)) {
+        const n = Number(p);
+        if (n < pos) next[n] = id;
+        else if (n > pos) next[n - 1] = id;
+      }
+      return { ...d, support: next };
+    });
+    setWanted(Math.max(1, shown - 1));
+  };
   return (
     <>
       <FormSection title={label('cr.detectionDetails')}>
@@ -425,15 +438,29 @@ function DetectionTab({ draft, set, errors }: TabProps) {
       </FormSection>
       <FormSection title={label('cr.supportOfficer')}>
         <FieldGrid>
-          {Array.from({ length: shown }, (_, i) => i + 1).map((pos) => (
-            <Select
-              key={pos}
-              label={`${label('cr.supportOfficer')} ${pos}`}
-              value={draft.support[pos]}
-              options={support}
-              onChange={(v) => set((d) => ({ ...d, support: { ...d.support, [pos]: v } }))}
-            />
-          ))}
+          {Array.from({ length: shown }, (_, i) => i + 1).map((pos) => {
+            const caption = `${label('cr.supportOfficer')} ${pos}`;
+            return (
+              <div className="cr-support-slot" key={pos}>
+                <Select
+                  label={caption}
+                  value={draft.support[pos]}
+                  options={support}
+                  onChange={(v) => set((d) => ({ ...d, support: { ...d.support, [pos]: v } }))}
+                />
+                {(shown > 1 || draft.support[pos]) && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => removeSupport(pos)}
+                    aria-label={`${label('cr.remove')} ${caption}`}
+                    title={label('cr.remove')}
+                  >
+                    ✕
+                  </Button>
+                )}
+              </div>
+            );
+          })}
         </FieldGrid>
         {shown < MAX_SUPPORT && (
           <Button onClick={() => setWanted(shown + 1)}>
