@@ -451,8 +451,17 @@ export const LABELS = {
   'cash.rupees': l('රු', 'Rs'),
   'cash.total': l('මුළු මුදල', 'Total'),
   'cash.foundPlace': l('මුදල් තිබු තැන', 'Where the cash was found'),
-  'cash.serials': l('මුදල් අංක', 'Cash number'),
-  'cash.serials1': l('මුදල් අංක 1', 'Cash number 1'),
+  'cash.serials': l('මුදල් අංක', 'Note serial numbers'),
+  'cash.serials1': l('මුදල් අංක 1', 'Note serial numbers 1'),
+  // Draft Sinhala: what the two fields hold, as the legal documents print them (P02 envelope).
+  'cash.serialsHint': l(
+    'ව්‍යාජ ගැනුම්කරුට දුන් මුදල් නෝට්ටුවල අංක (උදා. U/257 391858)',
+    'Serial numbers of the notes given to the decoy buyer (e.g. U/257 391858)',
+  ),
+  'cash.serials1Hint': l(
+    'අංක වැඩි නම් ඉතිරි අංක මෙහි',
+    'More serial numbers, if they do not fit in the first box',
+  ),
   'seized.spirit': l('ස්ප්‍රීතු ප්‍රමාණය ලීටර්', 'Spirit (L)'),
   'seized.kasippu': l('සාදන ලද මත්පැන් (කරිඤ්ඤං) ලීටර්', 'Made liquor – කරිඤ්ඤං (L)'),
   'seized.goda': l('සාදන ලද මත්පැන් (ගොඩා) ලීටර්', 'Made liquor – ගොඩා (L)'),
