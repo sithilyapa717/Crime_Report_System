@@ -41,7 +41,7 @@ The values are the Figma variables (`color/*`, `radius/*`, `space/*`).
 | `--danger`, `--ok`                         | `#c23434`, `#2e9a5c` | delete buttons and errors; the "saved" toast                                         |
 | `--edit`, `--edit-bg`                      | `#2a64b8`, `#e7effa` | edit / rename buttons in list rows (deactivate is amber, activate green, delete red) |
 | `--radius-sm`, `--radius`, `--radius-card` | 6, 12, 22 px         | thumbnails; inputs and rows; cards                                                   |
-| Font                                       |                      | Noto Sans Sinhala, bundled (`@fontsource/noto-sans-sinhala`); no internet needed     |
+| Font                                       |                      | Noto Sans Sinhala, bundled unhinted (`design-system/fonts/`); no internet needed     |
 
 ## Components (`design-system/index.ts`)
 

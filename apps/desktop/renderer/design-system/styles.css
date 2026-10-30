@@ -2,6 +2,17 @@
    Colours and sizes follow the Figma file "Crime Report System - UI" (variables color/*, radius/*,
    space/*; Components frame), set in Noto Sans Sinhala. */
 
+/* The screen font, bundled (the CSP allows only the app's own files). Unhinted on purpose:
+   hinted builds look jagged on Windows at these sizes (fonts/README.md). One variable file
+   covers every weight, so 600 is real, not synthesised. */
+@font-face {
+  font-family: 'Noto Sans Sinhala';
+  src: url('./fonts/NotoSansSinhala-VF-unhinted.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+
 :root {
   --font: 'Noto Sans Sinhala', 'Iskoola Pota', 'Nirmala UI', system-ui, sans-serif;
   /* Figma variables; muted text, borders and red darkened after review for more contrast on
