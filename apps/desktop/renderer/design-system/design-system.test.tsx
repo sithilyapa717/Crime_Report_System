@@ -41,12 +41,12 @@ describe('date picker', () => {
       );
     }
     const { container } = render(<Host />);
-    expect(screen.getByRole('button', { name: /Date/ })).toBeTruthy();
-    fireEvent.change(container.querySelector('input[type="date"]')!, {
-      target: { value: '2026-03-04' },
-    });
-    expect(seen.at(-1)).toBe('2026-03-04');
-    expect((screen.getByLabelText('Date') as HTMLInputElement).value).toBe('2026.03.04');
+    // The calendar button opens a month of days (this month); a day fills the field.
+    fireEvent.click(screen.getByRole('button', { name: /Date/ }));
+    fireEvent.click(screen.getByRole('button', { name: '4' }));
+    expect(seen.at(-1)).toMatch(/^\d{4}-\d{2}-04$/);
+    expect((screen.getByLabelText('Date') as HTMLInputElement).value).toMatch(/^\d{4}\.\d{2}\.04$/);
+    expect(container.querySelector('.ex-cal')).toBeNull();
   });
 });
 

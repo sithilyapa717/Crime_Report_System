@@ -86,6 +86,8 @@ const ALLOWED: Record<Channel, Role[]> = {
   'import.lastReport': OIC,
   'import.saveReport': OIC,
   'support.fontCheck': OIC,
+  'saved.open': EVERYONE,
+  'saved.reveal': EVERYONE,
   'support.showLogFile': EVERYONE,
 };
 
@@ -235,6 +237,8 @@ describe('every IPC channel refuses the roles it should, and only those', () => 
         'import.lastReport': [],
         'import.saveReport': [],
         'support.fontCheck': [],
+        'saved.open': ['C:\not-saved-by-the-app.txt'],
+        'saved.reveal': ['C:\not-saved-by-the-app.txt'],
         'support.showLogFile': [],
       };
 

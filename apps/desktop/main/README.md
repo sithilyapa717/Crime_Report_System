@@ -69,7 +69,7 @@ Files are only ever named, never passed as paths: `documents.open(crId, fileName
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Templates, registry, `docx-to-pdf.ps1` | `packages/documents` in development; `resources/documents` in the installed app (outside asar)                 |
 | Generated documents                    | `Documents/Excise documents`                                                                                   |
-| "Open in Word" print-outs (`word`)     | `Documents/Excise documents/Print-outs`, a new file each time, opened in Word for editing                      |
+| "Open in Word" print-outs (`word`)     | `<userData>/Print-outs`, a new file each time, opened in Word for editing                                      |
 | Generation log                         | `<userData>/generated-documents.jsonl` (until the `generated_documents` table)                                 |
 | Pictures                               | `<userData>/files`, random file names                                                                          |
 | Backups                                | the folder the OIC chooses; one `excise-backup-…` folder per backup; daily automatic backup checked every hour |

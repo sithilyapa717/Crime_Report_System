@@ -37,6 +37,14 @@ export function noteCount(text: string | undefined): number {
   return (text ?? '').split(/[,;\n]/).filter((s) => s.trim() !== '').length;
 }
 
+/** The note serial numbers typed or stored as one text: one entry per comma, semicolon or line. */
+export function splitSerials(text: string | undefined): string[] {
+  return (text ?? '')
+    .split(/[,;\n]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 /** Rupees in the used or left-over boxes: each box's notes times its denomination. */
 export function cashTotal(cash: CrDraft['cash'], kind: 'used' | 'left'): number {
   return DENOMINATIONS.reduce((sum, n) => sum + noteCount(cash[`${kind}:${n}`]) * n, 0);
@@ -101,8 +109,6 @@ export function emptyDraft(defaults: Partial<CrDraft> = {}): CrDraft {
   const now = new Date();
   return {
     crYear: now.getFullYear(),
-    month: now.getMonth() + 1,
-    halfYear: now.getMonth() < 6 ? 'first' : 'second',
     place: '',
     notes: '',
     informantHelp: '',

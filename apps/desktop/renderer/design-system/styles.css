@@ -1599,3 +1599,449 @@ h3 {
     background: var(--sidebar-bg);
   }
 }
+
+/* ---------- Motion: tab panels fade in; changing screen fades the old one out, then the new in ---------- */
+@keyframes ex-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ex-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+/* The wrapper takes the place of .ex-page for the screen inside it. It is the one part of the page
+   that takes part in the screen-change transition (view-transition-name); the sidebar and top bar
+   stay put. */
+.ex-screen {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-4);
+  view-transition-name: ex-screen;
+}
+.ex-screen > * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-group(ex-screen) {
+  animation: none;
+}
+::view-transition-old(ex-screen) {
+  animation: ex-fade-out 140ms ease-in both;
+}
+::view-transition-new(ex-screen) {
+  animation: ex-fade-in 240ms ease-out 140ms both;
+}
+.ex-tabs__panel:not([hidden]) {
+  animation: ex-fade-in 220ms ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ex-tabs__panel:not([hidden]) {
+    animation: none;
+  }
+}
+
+/* ---------- Tabs: the white pill slides to the chosen tab ---------- */
+.ex-tabs__list {
+  position: relative;
+}
+.ex-tabs__indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  box-shadow: 0 2px 8px rgb(20 58 75 / 0.12);
+  pointer-events: none;
+}
+.ex-tabs__indicator--glide {
+  transition:
+    transform 320ms cubic-bezier(0.4, 0, 0.2, 1),
+    width 320ms cubic-bezier(0.4, 0, 0.2, 1),
+    height 320ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* The tab itself is transparent; the pill behind it is the highlight. */
+.ex-tabs__tab {
+  z-index: 1;
+}
+.ex-tabs__tab[aria-selected='true'] {
+  background: transparent;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ex-tabs__indicator--glide {
+    transition: none;
+  }
+}
+
+/* ---------- Drop-downs: the closed box and the open list both follow the theme ---------- */
+.ex-select,
+.ex-select::picker(select) {
+  appearance: base-select;
+}
+.ex-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-right: 12px;
+  background-image: none;
+  cursor: pointer;
+}
+.ex-select::picker-icon {
+  content: '';
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23143a4b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transition: rotate 160ms ease;
+}
+.ex-select:open::picker-icon {
+  rotate: 180deg;
+}
+.ex-select::picker(select) {
+  box-sizing: border-box;
+  max-height: min(320px, 50vh);
+  margin-block: 4px;
+  padding: 6px;
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-dialog);
+  font-family: var(--font);
+  font-size: var(--text-md);
+}
+.ex-select option {
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.ex-select option:hover,
+.ex-select option:focus-visible {
+  background: var(--primary-soft);
+  outline: none;
+}
+.ex-select option:checked {
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+.ex-select option::checkmark {
+  display: none;
+}
+
+/* ---------- Toasts: a compact dark panel; a long file path wraps instead of stretching it ---------- */
+.ex-toast,
+.ex-toast--error {
+  align-items: flex-start;
+  max-width: 340px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.ex-toast::before {
+  margin-top: 6px;
+}
+
+/* A toast with buttons: the message, then the buttons under it. */
+.ex-toast__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.ex-toast__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ex-toast__button {
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  padding: 5px 12px;
+  border: 1px solid rgb(255 255 255 / 0.35);
+  border-radius: var(--radius-sm);
+  background: rgb(255 255 255 / 0.12);
+  color: var(--primary-text);
+  cursor: pointer;
+}
+.ex-toast__button:hover {
+  background: rgb(255 255 255 / 0.24);
+}
+
+/* A round icon-only button, and the box corner it can sit in. */
+.ex-button--icon {
+  width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border-radius: 50%;
+}
+.ex-section {
+  position: relative;
+}
+.ex-section__action {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+}
+
+.ex-toast__close {
+  flex: none;
+  margin: -2px -6px 0 0;
+  padding: 2px 6px;
+  border: 0;
+  background: none;
+  color: rgb(255 255 255 / 0.75);
+  font: inherit;
+  cursor: pointer;
+}
+.ex-toast__close:hover {
+  color: var(--primary-text);
+}
+
+/* ---------- Fields in a grid line up: labels share one row, so a label that wraps to two lines
+   no longer pushes its box down. (Only when every item in the grid is a field.) ---------- */
+.ex-field__control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.ex-grid:not(:has(> :not(.ex-field))) > .ex-field {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+}
+.ex-grid:not(:has(> :not(.ex-field))) > .ex-field > .ex-field__label {
+  padding-bottom: 6px;
+}
+.ex-grid:not(:has(> :not(.ex-field))) > .ex-field > .ex-field__hint,
+.ex-grid:not(:has(> :not(.ex-field))) > .ex-field > .ex-field__error {
+  padding-top: 6px;
+}
+
+/* ---------- A list of entries (note serial numbers): one box to type in, the entries as chips ---------- */
+.ex-chiplist {
+  max-width: 720px;
+}
+.ex-chiplist__add {
+  display: flex;
+  gap: var(--space-2);
+}
+.ex-chiplist__add .ex-input {
+  flex: 1;
+}
+.ex-chiplist__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 200px;
+  margin: 4px 0 0;
+  padding: 2px;
+  overflow-y: auto;
+  list-style: none;
+}
+.ex-chiplist__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px 4px 12px;
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-size: var(--text-md);
+}
+.ex-chiplist__item button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.ex-chiplist__item button:hover:not(:disabled) {
+  background: var(--danger-bg);
+  color: var(--danger-ink);
+}
+.ex-chiplist__count {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+/* ---------- Date and time pickers: a themed popover in the top layer ---------- */
+.ex-popover {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-dialog);
+  font-size: var(--text-md);
+}
+.ex-popover:not(:popover-open) {
+  display: none;
+}
+.ex-cal {
+  width: 304px;
+}
+.ex-cal__head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: var(--space-2);
+}
+.ex-cal__title {
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+}
+.ex-cal__nav {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.ex-cal__nav:hover {
+  background: var(--primary-soft);
+}
+.ex-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+.ex-cal__weekday {
+  padding: 4px 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.ex-cal__day {
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.ex-cal__day:hover {
+  background: var(--primary-soft);
+}
+.ex-cal__day[data-today] {
+  border-color: var(--accent);
+}
+.ex-cal__day[aria-pressed='true'] {
+  background: var(--primary);
+  color: var(--primary-text);
+  font-weight: 600;
+}
+.ex-cal__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}
+.ex-cal__link {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--edit-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ex-cal__link:hover {
+  background: var(--primary-soft);
+}
+.ex-cal__link--done {
+  background: var(--primary);
+  color: var(--primary-text);
+}
+.ex-cal__link--done:hover {
+  background: var(--primary-hover);
+}
+.ex-time {
+  width: 184px;
+}
+.ex-time__cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+.ex-time__col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  height: 224px;
+  padding-right: 2px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.ex-time__item {
+  flex: none;
+  height: 36px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.ex-time__item:hover {
+  background: var(--primary-soft);
+}
+.ex-time__item[aria-selected='true'] {
+  background: var(--primary);
+  color: var(--primary-text);
+  font-weight: 600;
+}
+
+/* A field that lines up in the grid fills its column, whatever its content or its parent's alignment. */
+.ex-grid:not(:has(> :not(.ex-field))) > .ex-field {
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: stretch;
+}
+.ex-popover {
+  overflow: visible;
+}
+.ex-time {
+  width: 232px;
+}

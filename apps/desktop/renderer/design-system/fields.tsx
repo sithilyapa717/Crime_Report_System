@@ -13,6 +13,7 @@ import {
 import { label as caption } from '@excise/labels';
 import { formatDate, parseDateInput } from './dates.js';
 import { Icon } from './icons.js';
+import { DatePopover, TimePopover, parseTime } from './pickers.js';
 
 interface FieldFrame {
   label: string;
@@ -37,7 +38,7 @@ function Field({
       >
         {label}
       </label>
-      {children}
+      <div className="ex-field__control">{children}</div>
       {hint && !error && (
         <span id={`${id}-hint`} className="ex-field__hint">
           {hint}
@@ -179,7 +180,8 @@ export function DateField({
   ...rest
 }: InputBase & { value: string | undefined; onChange: (v: string | undefined) => void }) {
   const id = useId();
-  const picker = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
+  const frame = useRef<HTMLDivElement>(null);
   const [text, setText] = useState(formatDate(value));
   useEffect(() => {
     setText((t) => (parseDateInput(t) === (value ?? null) ? t : formatDate(value)));
@@ -193,7 +195,7 @@ export function DateField({
       hint={hint}
       tag={tag}
     >
-      <div className="ex-date">
+      <div className="ex-date" ref={frame}>
         <input
           id={id}
           className="ex-input"
@@ -218,31 +220,183 @@ export function DateField({
           aria-label={`${label}: ${caption('date.pick')}`}
           title={caption('date.pick')}
           disabled={rest.disabled}
-          onClick={() => picker.current?.showPicker?.()}
+          onClick={() => setOpen((o) => !o)}
         >
           <Icon name="calendar" size={18} />
         </button>
-        <input
-          ref={picker}
-          type="date"
-          className="ex-date__picker"
-          tabIndex={-1}
-          aria-hidden="true"
-          value={parseDateInput(text) ?? ''}
-          onChange={(e) => {
-            const iso = e.target.value || undefined;
-            setText(formatDate(iso));
-            onChange(iso);
-          }}
-        />
+        {open && (
+          <DatePopover
+            anchor={frame.current}
+            value={parseDateInput(text) ?? undefined}
+            onClose={() => setOpen(false)}
+            onPick={(iso) => {
+              setText(formatDate(iso));
+              onChange(iso);
+            }}
+          />
+        )}
       </div>
     </Field>
   );
 }
 
-/** Free text kept as typed (times such as 14.45 or 14:45). */
-export function TimeField(props: InputBase & { value: string; onChange: (v: string) => void }) {
-  return <TextField inputMode="numeric" placeholder="14.45" {...props} />;
+/** Free text kept as typed (times such as 14.45 or 14:45). The clock button opens the system
+ *  time picker, for staff who would rather choose than type (like the calendar on dates). */
+export function TimeField({
+  value,
+  onChange,
+  label,
+  error,
+  hint,
+  tag,
+  ...rest
+}: InputBase & { value: string; onChange: (v: string) => void }) {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  const frame = useRef<HTMLDivElement>(null);
+  return (
+    <Field id={id} label={label} error={error} hint={hint} tag={tag}>
+      <div className="ex-date" ref={frame}>
+        <input
+          id={id}
+          className="ex-input"
+          inputMode="numeric"
+          placeholder="14.45"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          {...aria(id, error, hint)}
+          {...rest}
+        />
+        <button
+          type="button"
+          className="ex-date__button"
+          aria-label={`${label}: ${caption('time.pick')}`}
+          title={caption('time.pick')}
+          disabled={rest.disabled}
+          onClick={() => setOpen((o) => !o)}
+        >
+          <Icon name="clock" size={18} />
+        </button>
+        {open && (
+          <TimePopover
+            anchor={frame.current}
+            value={parseTime(value) ? value : ''}
+            onClose={() => setOpen(false)}
+            onPick={onChange}
+          />
+        )}
+      </div>
+    </Field>
+  );
+}
+
+/** Splits typed or pasted text into separate entries (commas, semicolons or new lines). */
+const splitEntries = (text: string) =>
+  text
+    .split(/[,;\n]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+/** A list of short entries (such as note serial numbers): type one and press Enter or Add, paste
+ *  many at once, and remove any one with its ✕. Meant for 20 or 30 entries without a box each. */
+export function ChipListField({
+  values,
+  onChange,
+  label,
+  hint,
+  placeholder,
+  addLabel,
+  removeLabel,
+  countLabel,
+  disabled,
+}: {
+  values: string[];
+  onChange: (values: string[]) => void;
+  label: string;
+  hint?: string | undefined;
+  placeholder?: string;
+  addLabel: string;
+  removeLabel: string;
+  countLabel: string;
+  disabled?: boolean;
+}) {
+  const id = useId();
+  const [text, setText] = useState('');
+  const add = (raw: string) => {
+    const seen = new Set(values.map((v) => v.toLowerCase()));
+    const fresh: string[] = [];
+    for (const entry of splitEntries(raw)) {
+      if (seen.has(entry.toLowerCase())) continue;
+      seen.add(entry.toLowerCase());
+      fresh.push(entry);
+    }
+    if (fresh.length) onChange([...values, ...fresh]);
+    setText('');
+  };
+  return (
+    <div className="ex-field ex-chiplist">
+      <label htmlFor={id} className="ex-field__label">
+        {label}
+      </label>
+      <div className="ex-chiplist__add">
+        <input
+          id={id}
+          className="ex-input"
+          value={text}
+          placeholder={placeholder}
+          disabled={disabled}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              add(text);
+            } else if (e.key === 'Backspace' && text === '' && values.length) {
+              onChange(values.slice(0, -1));
+            }
+          }}
+          onPaste={(e) => {
+            const pasted = e.clipboardData.getData('text');
+            if (/[,;\n]/.test(pasted)) {
+              e.preventDefault();
+              add(text + pasted);
+            }
+          }}
+        />
+        <button
+          type="button"
+          className="ex-button ex-button--primary"
+          disabled={disabled || text.trim() === ''}
+          onClick={() => add(text)}
+        >
+          {addLabel}
+        </button>
+      </div>
+      {hint && <span className="ex-field__hint">{hint}</span>}
+      {values.length > 0 && (
+        <>
+          <ul className="ex-chiplist__items">
+            {values.map((v) => (
+              <li key={v} className="ex-chiplist__item">
+                <span>{v}</span>
+                <button
+                  type="button"
+                  aria-label={`${removeLabel} ${v}`}
+                  title={removeLabel}
+                  disabled={disabled}
+                  onClick={() => onChange(values.filter((x) => x !== v))}
+                >
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+          <span className="ex-chiplist__count" role="status">
+            {countLabel}: {values.length}
+          </span>
+        </>
+      )}
+    </div>
+  );
 }
 
 export interface Option {

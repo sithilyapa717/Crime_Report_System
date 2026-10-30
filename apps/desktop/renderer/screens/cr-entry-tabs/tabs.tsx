@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { label } from '@excise/labels';
 import {
+  ChipListField,
   FieldGrid,
   FormSection,
   NumberField,
@@ -15,6 +16,7 @@ import {
   DENOMINATIONS,
   SEIZED,
   cashTotal,
+  splitSerials,
   type CrDraft,
   type Denomination,
 } from '../shared/cr-model.js';
@@ -153,19 +155,21 @@ export function CashTab({ draft, set, errors }: TabProps) {
           error={errors.cashFoundPlace}
           onChange={(v) => set((d) => ({ ...d, cashFoundPlace: v }))}
         />
-        <TextField
-          label={label('cash.serials')}
-          hint={label('cash.serialsHint')}
-          value={draft.cashSerials}
-          onChange={(v) => set((d) => ({ ...d, cashSerials: v }))}
-        />
-        <TextField
-          label={label('cash.serials1')}
-          hint={label('cash.serials1Hint')}
-          value={draft.cashSerials1}
-          onChange={(v) => set((d) => ({ ...d, cashSerials1: v }))}
-        />
       </FieldGrid>
+      {/* One list for all the serial numbers. Older records kept them in two boxes; both are shown
+          here and saved together in the first. */}
+      <ChipListField
+        label={label('cash.serials')}
+        hint={label('cash.serialsHint')}
+        placeholder={label('cash.serialsPlaceholder')}
+        addLabel={label('chips.add')}
+        removeLabel={label('cr.remove')}
+        countLabel={label('cash.serialsCount')}
+        values={[...splitSerials(draft.cashSerials), ...splitSerials(draft.cashSerials1)]}
+        onChange={(values) =>
+          set((d) => ({ ...d, cashSerials: values.join(', '), cashSerials1: '' }))
+        }
+      />
     </>
   );
 }

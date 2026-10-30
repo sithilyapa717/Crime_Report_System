@@ -28,6 +28,7 @@ import {
   PrintButtons,
   useOfficeYear,
   useRun,
+  useSavedToast,
 } from '../shared/results.js';
 import './reports.css';
 
@@ -68,18 +69,19 @@ type Shown =
 export function ReportsScreen() {
   const { session, go } = useNav();
   const toast = useToast();
+  const saved = useSavedToast();
   const byOfficerAllowed = session.role !== 'observation';
-  const { officeId, year, fields } = useOfficeYear();
-  const [period, setPeriod] = useState<Period>('month');
+  const { officeId, year, fields, clear: clearOfficeYear } = useOfficeYear({ blank: true });
+  const [period, setPeriod] = useState<Period | undefined>();
   const [person, setPerson] = useState<Person>('none');
-  const [month, setMonth] = useState<string | undefined>(String(new Date().getMonth() + 1));
+  const [month, setMonth] = useState<string | undefined>();
   const [half, setHalf] = useState<'first' | 'second'>('first');
   const [officerId, setOfficerId] = useState<string | undefined>();
   const officers = useRefOptions(person === 'informant' ? 'informant' : 'detecting_officer');
   const s = useRun<Shown>();
 
   const params = (type: ReportType): ReportParams | null => {
-    if (!officeId || !year) return null;
+    if (!officeId || !year || !period) return null;
     if (period === 'month' && !month) return null;
     if (person !== 'none' && !officerId) return null;
     const scope =
@@ -126,12 +128,13 @@ export function ReportsScreen() {
         groups: await call('reports.summary', p, by),
       }));
   };
-  // Back to the screen's starting choices (the office and year stay: they are asked once).
+  // Empties every choice: office, year, scope and month; "person" goes back to "none".
   const clear = () => {
-    setPeriod('month');
+    clearOfficeYear();
+    setPeriod(undefined);
     setPerson('none');
     setOfficerId(undefined);
-    setMonth(String(new Date().getMonth() + 1));
+    setMonth(undefined);
     setHalf('first');
     s.setResult(null);
   };
@@ -141,7 +144,7 @@ export function ReportsScreen() {
     if (!p) return;
     try {
       const path = await call('reports.export', p, format);
-      if (path) toast(`${label('report.exported')} ${path}`);
+      if (path) saved(path);
     } catch (e) {
       toast(e instanceof IpcError ? e.caption : label('error.unknown'), 'error');
     }
@@ -155,7 +158,7 @@ export function ReportsScreen() {
           <Select
             label={label('report.scope')}
             value={period}
-            onChange={(v) => setPeriod((v as Period) ?? 'month')}
+            onChange={(v) => setPeriod(v as Period | undefined)}
             options={[
               { value: 'year', label: label('cr.year') },
               { value: 'month', label: label('cr.month') },
@@ -204,7 +207,7 @@ export function ReportsScreen() {
               onChange={setOfficerId}
             />
           )}
-          <Button variant="ghost" className="report-filters__clear" onClick={clear}>
+          <Button className="report-filters__clear" onClick={clear}>
             {label('report.clear')}
           </Button>
         </div>

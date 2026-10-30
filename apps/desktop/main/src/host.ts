@@ -107,6 +107,16 @@ function need<T>(value: T | undefined, what: string): T {
 
 export function createServiceHost(repos: Repositories, opts: HostOptions) {
   const sessions = new SessionHolder();
+  // Files this process saved (print-outs, exports): the screen may ask to open or show only these.
+  const saved = new Set<string>();
+  const remember = <T>(path: T): T => {
+    if (typeof path === 'string') saved.add(path);
+    return path;
+  };
+  const savedFile = (path: string) => {
+    if (!saved.has(path)) throw new NotAvailableError('file');
+    return path;
+  };
   const current = sessions.current;
 
   const auth = new DefaultAuthService(repos.users, sessions, repos.audit);
@@ -268,7 +278,7 @@ export function createServiceHost(repos: Repositories, opts: HostOptions) {
     'reports.export': async (params: ReportParams, format: 'xlsx' | 'csv') => {
       assertCan(current().role, 'reports.basic');
       const path = await opts.pickSavePath(`report-${params.type}.${format}`);
-      return path ? reports.exportToFile(params, format, path) : null;
+      return path ? remember(await reports.exportToFile(params, format, path)) : null;
     },
 
     'docdata.buildFor': (crimeReportId: string) => docdata.buildFor(crimeReportId),
@@ -322,12 +332,20 @@ export function createServiceHost(repos: Repositories, opts: HostOptions) {
       need(opts.showItemInFolder, 'shell')(await generatedFile(crimeReportId, fileName));
     },
 
-    'print.certificateE48': (...a: Parameters<DefaultPrintService['certificateE48']>) =>
-      need(print, 'print').certificateE48(...a),
-    'print.convictsList': (...a: Parameters<DefaultPrintService['convictsList']>) =>
-      need(print, 'print').convictsList(...a),
-    'print.register': (...a: Parameters<DefaultPrintService['register']>) =>
-      need(print, 'print').register(...a),
+    'print.certificateE48': async (...a: Parameters<DefaultPrintService['certificateE48']>) =>
+      remember(await need(print, 'print').certificateE48(...a)),
+    'print.convictsList': async (...a: Parameters<DefaultPrintService['convictsList']>) =>
+      remember(await need(print, 'print').convictsList(...a)),
+    'print.register': async (...a: Parameters<DefaultPrintService['register']>) =>
+      remember(await need(print, 'print').register(...a)),
+
+    /** Open / show a file this process just saved (a path the screen got back from a save). */
+    'saved.open': async (path: string) => {
+      await need(opts.openPath, 'shell')(savedFile(path));
+    },
+    'saved.reveal': async (path: string) => {
+      need(opts.showItemInFolder, 'shell')(savedFile(path));
+    },
 
     'backup.settings': () => backupAdmin().settings(),
     'backup.updateSettings': (patch: BackupSettingsInput) => backupAdmin().updateSettings(patch),
@@ -386,7 +404,7 @@ export function createServiceHost(repos: Repositories, opts: HostOptions) {
       if (!report) throw new NotAvailableError('report');
       const path = await opts.pickSavePath('import-report.csv');
       if (path) await writeFile(path, reportCsv(report), 'utf8');
-      return path;
+      return remember(path);
     },
 
     /** OIC: which template fonts are missing on this PC. */

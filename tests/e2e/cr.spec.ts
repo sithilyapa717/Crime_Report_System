@@ -46,7 +46,6 @@ async function setUp(page: Page) {
 
 test('enter a CR through every tab, then record the case and see it everywhere', async () => {
   const { page } = run;
-  page.on('dialog', (d) => void (d.message() === label('cr.unsaved') ? d.dismiss() : d.accept()));
   await setUp(page);
 
   await button(page, 'menu.crEntry').click();
@@ -127,10 +126,13 @@ test('enter a CR through every tab, then record the case and see it everywhere',
   });
   expect(stored.kase).toMatchObject({ courtDate: '2026-01-10', version: 1 });
 
-  // Unsaved changes: leaving asks; dismissing keeps the screen.
+  // Unsaved changes: leaving asks in the app's own dialog; "No" keeps the screen.
   await page.getByRole('tab', { name: label('tab.detection') }).click();
   await field(page, 'cr.place').fill('Changed place');
   await button(page, 'login.back').click();
+  const leave = page.getByRole('dialog');
+  await expect(leave).toContainText(label('leave.message'));
+  await leave.getByRole('button', { name: label('common.no'), exact: true }).click();
   await expect(page.getByRole('heading', { name: label('menu.crEntry') })).toBeVisible();
   await button(page, 'cr.undo').click();
   await expect(field(page, 'cr.place')).toHaveValue('කොච්චිකඩේ');
