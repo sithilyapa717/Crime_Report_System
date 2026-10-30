@@ -42,7 +42,7 @@
 }
 .ref-menu__item[aria-selected='true'] {
   background: var(--accent-soft);
-  box-shadow: inset 4px 0 0 var(--text);
+  box-shadow: inset 4px 0 0 var(--warn);
 }
 .ref-panel {
   min-width: 0;
