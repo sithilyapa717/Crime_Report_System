@@ -40,10 +40,13 @@
   --accent-soft: #dcf0f4;
   /* State sets: fill, border, ink, hover; plus see-through tints for glass controls. */
   --danger: #c23434;
+  /* Text boxes and drop-downs: a light outline, darker on hover and focus (PR #35, in the
+     summit palette). */
+  --field-border: #b9cfd1;
   --danger-bg: #fbeaea;
-  --danger-hover: var(--danger-hover);
-  --danger-ink: var(--danger-ink);
-  --danger-line: var(--danger-line);
+  --danger-hover: #f6d4d4;
+  --danger-ink: #8f1f1f;
+  --danger-line: #f0bcbc;
   --ok: #2f7a5a;
   --ok-bg: #e6f3ec;
   --ok-hover: #d2eadd;
@@ -52,7 +55,7 @@
   --warn: #7a5c00;
   --warn-bg: #fdf1cf;
   --warn-hover: #fbe3a6;
-  --warn-ink: var(--warn-ink);
+  --warn-ink: #5f4800;
   --edit: #1f6f8b;
   --edit-bg: var(--primary-soft);
   --edit-hover: #cde6ee;
@@ -161,7 +164,7 @@ h3 {
   gap: var(--space-2);
   min-height: 48px;
   padding: 10px 22px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text);
@@ -176,7 +179,7 @@ h3 {
 }
 .ex-button:hover:not(:disabled) {
   background: var(--heading-bg);
-  border-color: var(--text);
+  border-color: var(--border-strong);
 }
 .ex-button:active:not(:disabled) {
   box-shadow: none;
@@ -289,7 +292,7 @@ h3 {
   width: 100%;
   min-height: 48px;
   padding: 10px 16px;
-  border: 2px solid var(--border-strong);
+  border: 1px solid var(--field-border);
   border-radius: var(--radius);
   background-color: var(--surface-alt);
   color: var(--text);
@@ -305,17 +308,15 @@ h3 {
 .ex-input:hover,
 .ex-select:hover,
 .ex-textarea:hover {
-  border-color: var(--text);
+  border-color: var(--border-strong);
 }
 /* Figma "State=Focus": white, dark 1.5px border, yellow ring. */
 .ex-input:focus,
 .ex-select:focus,
 .ex-textarea:focus {
   outline: none;
-  border-color: var(--text);
-  box-shadow:
-    inset 0 0 0 0.5px var(--text),
-    var(--focus-ring);
+  border-color: var(--border-strong);
+  box-shadow: var(--focus-ring);
   background-color: var(--surface);
 }
 .ex-input:disabled,
@@ -494,9 +495,9 @@ h3 {
 }
 /* Selected: colour and an outside ring only. A heavier weight would widen the text and re-flow the rows. */
 .ex-chip[aria-pressed='true'] {
-  border-color: var(--text);
+  border-color: var(--accent);
   background: var(--accent-soft);
-  box-shadow: 0 0 0 1px var(--text);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 /* ---------- Feedback ---------- */
