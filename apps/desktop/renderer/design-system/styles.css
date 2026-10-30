@@ -1,53 +1,109 @@
 /* Design system (C1). Tokens first; components use classes only (the app's CSP has no inline styles).
-   Colours and sizes follow the Figma file "Crime Report System - UI" (variables color/*, radius/*,
-   space/*; Components frame), set in Noto Sans Sinhala. */
+   The layout follows the Figma file "Crime Report System - UI"; colours, glass, radii and controls
+   follow the "Crime Report System" design system (summit palette, one wallpaper per screen, frosted
+   glass over it), set in Noto Sans Sinhala. The layers at the end restyle the components below. */
+
+/* The screen font, bundled (the CSP allows only the app's own files). Unhinted on purpose:
+   hinted builds look jagged on Windows at these sizes (fonts/README.md). One variable file
+   covers every weight, so 600 is real, not synthesised. */
+@font-face {
+  font-family: 'Noto Sans Sinhala';
+  src: url('./fonts/NotoSansSinhala-VF-unhinted.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
 
 :root {
   --font: 'Noto Sans Sinhala', 'Iskoola Pota', 'Nirmala UI', system-ui, sans-serif;
-  /* Figma variables; muted text, borders and red darkened after review for more contrast on
-     office monitors (muted text ~9:1 on white, borders visible against the input fill). */
-  --text: #1e1e1e;
-  --text-muted: #332e28;
-  --bg: #dfdad2;
+  /* Palette, sampled from the two summit wallpapers (design-system/backgrounds). */
+  --glacier-mist: #e1f2ef;
+  --frost: #c2ddda;
+  --sky-teal: #4a99ae;
+  --ridge-slate: #29596e;
+  --deep-crevasse: #143a4b;
+  /* Grounds and text. Every text colour holds 4.5:1 on its grounds, glass included. */
+  --bg: #eef6f5;
   --surface: #ffffff;
-  --surface-alt: #f6f3ee;
-  --border: #b5a995;
-  --primary: #1e1e1e;
+  --surface-alt: #f5faf9;
+  --heading-bg: var(--glacier-mist);
+  --text: var(--deep-crevasse);
+  --text-muted: #3f5f69;
+  --border: #d3e3e1;
+  --border-strong: #5f8189;
+  /* Action and signal. */
+  --primary: var(--ridge-slate);
+  --primary-hover: var(--deep-crevasse);
   --primary-text: #ffffff;
-  --primary-soft: #f1ece4;
-  --accent: #f5cb45;
-  --accent-soft: #fbf0c9;
+  --primary-soft: #e3f1f5;
+  --accent: var(--sky-teal);
+  --accent-soft: #dcf0f4;
+  /* State sets: fill, border, ink, hover; plus see-through tints for glass controls. */
   --danger: #c23434;
-  --ok: #2e9a5c;
-  /* Derived */
-  --border-strong: #8a7e69;
-  /* Headings (group titles, section titles, column heads): a tinted band, bold dark text. */
-  --heading-bg: #e6dfd2;
-  /* Text boxes and drop-downs: a light outline, darker on hover and focus. */
-  --field-border: #c9bfae;
+  /* Text boxes and drop-downs: a light outline, darker on hover and focus (PR #35, in the
+     summit palette). */
+  --field-border: #b9cfd1;
   --danger-bg: #fbeaea;
-  --ok-bg: #e5f4ec;
-  --warn: #8a6a00;
-  --warn-bg: var(--accent-soft);
-  --edit: #2a64b8;
-  --edit-bg: #e7effa;
-  --focus-ring: 0 0 0 4px rgb(245 203 69 / 0.55);
-  --shadow-raised: 0 10px 24px rgb(38 26 13 / 0.08);
-
+  --danger-hover: #f6d4d4;
+  --danger-ink: #8f1f1f;
+  --danger-line: #f0bcbc;
+  --ok: #2f7a5a;
+  --ok-bg: #e6f3ec;
+  --ok-hover: #d2eadd;
+  --ok-ink: #245f46;
+  --ok-line: #a9d3bd;
+  --warn: #7a5c00;
+  --warn-bg: #fdf1cf;
+  --warn-hover: #fbe3a6;
+  --warn-ink: #5f4800;
+  --edit: #1f6f8b;
+  --edit-bg: var(--primary-soft);
+  --edit-hover: #cde6ee;
+  --edit-ink: #145066;
+  --edit-tint: rgba(31, 111, 139, 0.12);
+  --edit-tint-line: rgba(31, 111, 139, 0.28);
+  --warn-tint: rgba(201, 151, 26, 0.16);
+  --warn-tint-line: rgba(160, 118, 10, 0.32);
+  --ok-tint: rgba(47, 122, 90, 0.13);
+  --ok-tint-line: rgba(47, 122, 90, 0.28);
+  --danger-tint: rgba(194, 52, 52, 0.11);
+  --danger-tint-line: rgba(194, 52, 52, 0.28);
+  --neutral-tint: rgba(41, 89, 110, 0.1);
+  /* Glass. */
+  --glass: rgba(255, 255, 255, 0.68);
+  --glass-strong: rgba(255, 255, 255, 0.88);
+  --glass-line: rgba(255, 255, 255, 0.72);
+  --glass-button: rgba(255, 255, 255, 0.62);
+  /* The dark glass sidebar. */
+  --sidebar-bg: var(--deep-crevasse);
+  --sidebar-text: #cfe3e1;
+  --sidebar-label: #9fc0c2;
+  --sidebar-active: #1f4d60;
+  --sidebar-line: #2f6378;
   /* Old-screen section colours, kept as a small dot before a section title (REWRITE_PLAN §1.8). */
-  --section-times: #e8913a;
-  --section-cash: #3a7bd5;
-  --section-seized: #8a4fc4;
+  --section-times: #b0762f;
+  --section-cash: var(--edit);
+  --section-seized: #6b5b95;
+  /* Shadows. */
+  --focus-ring: 0 0 0 4px rgba(74, 153, 174, 0.45);
+  --shadow-raised: 0 8px 20px rgba(20, 58, 75, 0.08);
+  --shadow-dialog: 0 20px 60px rgba(20, 58, 75, 0.28);
+  --shadow-button: 0 1px 2px rgba(20, 58, 75, 0.06);
+  --shadow-glass: 0 8px 32px rgba(20, 58, 75, 0.1);
+  --shadow-primary: 0 6px 16px rgba(41, 89, 110, 0.28);
+  --shadow-toast: 0 12px 32px rgba(20, 58, 75, 0.28);
 
-  --radius-sm: 6px;
-  --radius: 12px;
-  --radius-card: 22px;
+  --radius-sm: 8px;
+  --radius: 10px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 24px;
   --space-6: 32px;
+  --sidebar-width: 264px;
   --text-xs: 13px;
   --text-sm: 14px;
   --text-md: 15px;
@@ -119,7 +175,7 @@ h3 {
   /* Long Sinhala captions wrap instead of being cut off (§1.8). */
   white-space: normal;
   text-align: center;
-  box-shadow: 0 1px 0 rgb(38 26 13 / 0.08);
+  box-shadow: var(--shadow-button);
 }
 .ex-button:hover:not(:disabled) {
   background: var(--heading-bg);
@@ -140,45 +196,45 @@ h3 {
   color: var(--primary-text);
 }
 .ex-button--primary:hover:not(:disabled) {
-  background: #3a3a3a;
-  border-color: #3a3a3a;
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 /* Row actions: a tinted fill with a darker border and text of the same hue. */
 .ex-button--danger {
   background: var(--danger-bg);
   border-color: var(--danger);
-  color: #8f1f1f;
+  color: var(--danger-ink);
 }
 .ex-button--danger:hover:not(:disabled) {
-  background: #f6d4d4;
-  border-color: #8f1f1f;
+  background: var(--danger-hover);
+  border-color: var(--danger-ink);
 }
 .ex-button--edit {
   background: var(--edit-bg);
   border-color: var(--edit);
-  color: #1c4a8c;
+  color: var(--edit-ink);
 }
 .ex-button--edit:hover:not(:disabled) {
-  background: #d3e2f6;
-  border-color: #1c4a8c;
+  background: var(--edit-hover);
+  border-color: var(--edit-ink);
 }
 .ex-button--warn {
   background: var(--warn-bg);
   border-color: var(--warn);
-  color: #5f4800;
+  color: var(--warn-ink);
 }
 .ex-button--warn:hover:not(:disabled) {
-  background: #f5e3a0;
-  border-color: #5f4800;
+  background: var(--warn-hover);
+  border-color: var(--warn-ink);
 }
 .ex-button--ok {
   background: var(--ok-bg);
   border-color: var(--ok);
-  color: #1b6a3d;
+  color: var(--ok-ink);
 }
 .ex-button--ok:hover:not(:disabled) {
-  background: #cfead9;
-  border-color: #1b6a3d;
+  background: var(--ok-hover);
+  border-color: var(--ok-ink);
 }
 .ex-button--ghost {
   border-color: transparent;
@@ -245,7 +301,7 @@ h3 {
 .ex-select {
   appearance: none;
   padding-right: 40px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231e1e1e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23143a4b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 16px center;
 }
@@ -429,7 +485,7 @@ h3 {
   min-height: 46px;
   padding: 8px 18px;
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--surface);
   color: var(--text);
   cursor: pointer;
@@ -439,9 +495,9 @@ h3 {
 }
 /* Selected: colour and an outside ring only. A heavier weight would widen the text and re-flow the rows. */
 .ex-chip[aria-pressed='true'] {
-  border-color: var(--warn);
+  border-color: var(--accent);
   background: var(--accent-soft);
-  box-shadow: 0 0 0 1px var(--warn);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 /* ---------- Feedback ---------- */
@@ -453,12 +509,12 @@ h3 {
 }
 .ex-alert--error {
   background: var(--danger-bg);
-  border-color: #f0bcbc;
+  border-color: var(--danger-line);
   color: var(--danger);
 }
 .ex-alert--ok {
   background: var(--ok-bg);
-  border-color: #b7dfc8;
+  border-color: var(--ok-line);
   color: var(--ok);
 }
 .ex-alert--warn {
@@ -469,7 +525,7 @@ h3 {
 .ex-badge {
   display: inline-block;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: var(--text-xs);
   font-weight: 500;
   background: var(--primary-soft);
@@ -519,9 +575,9 @@ h3 {
 .ex-toast {
   max-width: 420px;
   padding: 10px 22px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--ok);
-  color: #fff;
+  color: var(--primary-text);
   font-weight: 600;
   box-shadow: var(--shadow-raised);
 }
@@ -538,10 +594,10 @@ h3 {
   width: min(560px, 92vw);
   color: var(--text);
   background: var(--surface);
-  box-shadow: 0 20px 60px rgb(38 26 13 / 0.25);
+  box-shadow: var(--shadow-dialog);
 }
 .ex-dialog::backdrop {
-  background: rgb(30 30 30 / 0.4);
+  background: rgb(20 58 75 / 0.45);
 }
 .ex-dialog__body {
   padding: var(--space-5) 28px;
@@ -563,7 +619,7 @@ h3 {
   position: relative;
   padding: 8px 18px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--text-muted);
   font-weight: 500;
@@ -577,7 +633,7 @@ h3 {
   color: var(--text);
   box-shadow:
     0 0 0 1px var(--border-strong),
-    0 2px 4px rgb(51 38 26 / 0.08);
+    0 2px 4px rgb(20 58 75 / 0.08);
 }
 /* A tab with errors: a red dot, as in the Figma CR entry. */
 .ex-tabs__tab[data-invalid='true']::after {
@@ -774,4 +830,772 @@ h3 {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+/* ==========================================================================
+   Dashboard look (system layer): hairline-bordered white cards on an
+   off-white page, smaller corners, quiet headings, ruled tables, a dark sidebar, stat cards
+   with trend pills and outlined tags. Overrides the copied app rules above.
+   ========================================================================== */
+
+/* Cards and sections: a hairline instead of contrast. */
+.ex-card {
+  border: 1px solid var(--border);
+  padding: var(--space-5);
+}
+.ex-card__head {
+  margin-bottom: var(--space-4);
+}
+.ex-card__title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+.ex-section {
+  border-color: var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+.ex-section > legend,
+.ex-chips__label {
+  padding: 0 0 var(--space-2);
+  border-radius: 0;
+  background: transparent;
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+/* Buttons: 40px, 8px corners, outline by default. */
+.ex-button {
+  min-height: 40px;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-size: var(--text-md);
+  box-shadow: var(--shadow-button);
+}
+.ex-button:hover:not(:disabled) {
+  background: var(--surface-alt);
+  border-color: var(--text);
+}
+.ex-button--primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+.ex-table td .ex-button {
+  min-height: 32px;
+  padding: 4px 12px;
+  font-size: var(--text-sm);
+}
+
+/* Inputs: 40px, 1px border, white. */
+.ex-input,
+.ex-select,
+.ex-textarea {
+  min-height: 40px;
+  padding: 8px 12px;
+  border-width: 1px;
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  font-size: var(--text-md);
+}
+.ex-select {
+  padding-right: 36px;
+  background-position: right 12px center;
+}
+.ex-input:focus,
+.ex-select:focus,
+.ex-textarea:focus {
+  box-shadow: var(--focus-ring);
+}
+.ex-field__label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.ex-chip {
+  min-height: 36px;
+  padding: 6px 14px;
+  font-size: var(--text-md);
+}
+
+/* Table: ruled rows on white, a pale header strip. */
+.ex-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.ex-table th {
+  padding: 10px 12px;
+  background: var(--heading-bg);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.ex-table th:first-child {
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+.ex-table th:last-child {
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.ex-table td,
+.ex-table td:first-child,
+.ex-table td:last-child {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+  font-size: var(--text-md);
+}
+.ex-table tfoot td,
+.ex-table tfoot td:first-child,
+.ex-table tfoot td:last-child {
+  border-top: 1px solid var(--text);
+  border-bottom: 0;
+  background: transparent;
+}
+
+/* Tags (badges): rectangular, outlined, tinted. */
+.ex-badge {
+  padding: 1px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+.ex-badge--warn {
+  border-color: var(--warn);
+  color: var(--warn-ink);
+}
+.ex-badge--danger {
+  border-color: var(--danger-line);
+  color: var(--danger-ink);
+}
+.ex-badge--ok {
+  border-color: var(--ok-line);
+  color: var(--ok-ink);
+}
+.ex-alert {
+  border-radius: var(--radius);
+}
+
+/* Trend pill: an arrow and a percentage against last period. */
+.ex-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 6px;
+  border: 1px solid var(--ok-line);
+  border-radius: var(--radius-sm);
+  background: var(--ok-bg);
+  color: var(--ok-ink);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+.ex-delta--down {
+  border-color: var(--danger-line);
+  background: var(--danger-bg);
+  color: var(--danger-ink);
+}
+
+/* Stat card: icon and label, the figure, then a footer strip with the trend. */
+.ex-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+.ex-stat {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+.ex-stat__body {
+  padding: var(--space-4);
+}
+.ex-stat__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-md);
+  color: var(--text-muted);
+}
+.ex-stat__value {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.ex-stat__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--border);
+  background: var(--surface-alt);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* Page head: the page title left, actions and the signed-in officer right. */
+.ex-pagehead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+}
+.ex-pagehead__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* ==========================================================================
+   Glass (system layer): one wallpaper per screen, everything else frosted glass over it.
+   - The app: the clear-summit photo fills the window (.ex-backdrop on the shell) under a light
+     ice scrim. The sidebar (shell.css) is dark glass, menu tiles and stat cards light glass,
+     working cards near-opaque glass. No second photo anywhere.
+   - Sign-in: the cloud photo fills the window with one glass panel on it (start-login.css).
+   Both photos are bundled in design-system/backgrounds (the app runs offline).
+   ========================================================================== */
+
+/* The one wallpaper for the working app. */
+.ex-backdrop {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgb(238 246 245 / 0.4), rgb(238 246 245 / 0.4)),
+    url('./backgrounds/summit-clear.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* Light glass: main-menu tiles, stat cards. 68% white + blur: text holds 8:1, muted 4.6:1
+   even over the darkest rock. */
+.ex-glass,
+.ex-backdrop .home-group,
+.ex-backdrop .ex-stat {
+  border: 1px solid var(--glass-line);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: var(--shadow-glass);
+}
+.ex-backdrop .ex-stat__foot {
+  border-top-color: var(--glass-line);
+  background: rgb(255 255 255 / 0.35);
+}
+
+/* The page head never sits bare on the photo: it's a glass strip too. */
+.ex-backdrop .ex-pagehead {
+  margin: var(--space-3) 0 0;
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius-card);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: var(--shadow-glass);
+}
+.ex-backdrop .ex-pagehead .topbar__where {
+  color: var(--text-muted);
+}
+
+/* Working glass: cards that hold tables and forms are near-opaque, so dense text reads as
+   on paper while the edges still catch the photo. */
+.ex-backdrop .ex-card,
+.ex-backdrop .ex-section {
+  border: 1px solid var(--glass-line);
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  backdrop-filter: blur(22px) saturate(1.2);
+  box-shadow: var(--shadow-glass);
+}
+.ex-backdrop .ex-card .ex-table td,
+.ex-backdrop .ex-section .ex-table td {
+  background: transparent;
+}
+.ex-backdrop .ex-table tbody tr:hover td,
+.ex-backdrop .ex-table tbody tr[aria-selected='true'] td {
+  background: var(--accent-soft);
+}
+
+/* Main menu on glass: friendlier tiles that lift on hover, icons in soft sky discs. */
+.ex-backdrop .home-group {
+  padding: 20px 14px 14px;
+  border-radius: var(--radius-card);
+}
+.ex-backdrop .home-group__title {
+  color: var(--text);
+}
+.ex-backdrop .home-item {
+  border-radius: var(--radius);
+  transition:
+    background-color 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.ex-backdrop .home-item:hover,
+.ex-backdrop .home-item:focus-visible {
+  background: rgb(255 255 255 / 0.7);
+  box-shadow: 0 6px 18px rgb(20 58 75 / 0.12);
+  transform: translateY(-1px);
+}
+.ex-backdrop .home-item__icon {
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--edit-ink);
+}
+.ex-backdrop .home-item:hover .home-item__icon,
+.ex-backdrop .home-item:focus-visible .home-item__icon {
+  background: var(--primary);
+  color: var(--primary-text);
+}
+.ex-backdrop .home-item__desc {
+  color: var(--text-muted);
+}
+
+/* Browsers without backdrop-filter: make the glass opaque enough on its own. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ex-backdrop .ex-pagehead,
+  .ex-glass,
+  .ex-backdrop .home-group,
+  .ex-backdrop .ex-stat {
+    background: rgb(255 255 255 / 0.86);
+  }
+}
+
+/* ---------- Tick boxes and radios: drawn, not native ---------- */
+.ex-check {
+  position: relative;
+  gap: 10px;
+  min-height: 40px;
+  font-size: var(--text-md);
+}
+.ex-check input[type='checkbox'],
+.ex-check input[type='radio'] {
+  appearance: none;
+  -webkit-appearance: none;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 7px;
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.ex-check input[type='radio'] {
+  border-radius: 50%;
+}
+.ex-check input[type='checkbox']::after {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transform: scale(0);
+  transition: transform 0.15s;
+}
+.ex-check input[type='radio']::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary-text);
+  transform: scale(0);
+  transition: transform 0.15s;
+}
+.ex-check:hover input[type='checkbox'],
+.ex-check:hover input[type='radio'] {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.ex-check input:checked {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+.ex-check input:checked::after {
+  transform: scale(1);
+}
+.ex-check input:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+  box-shadow: var(--focus-ring);
+}
+.ex-check input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* Tile variant: the whole option is a card, for short lists of choices. */
+.ex-check--tile {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+.ex-check--tile:hover {
+  border-color: var(--border-strong);
+}
+.ex-check--tile:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ex-backdrop .home-item,
+  .ex-check input,
+  .ex-check input::after {
+    transition: none;
+  }
+  .ex-backdrop .home-item:hover {
+    transform: none;
+  }
+}
+@media print {
+  .ex-backdrop {
+    background: #fff;
+  }
+}
+
+/* Warnings stay amber: accent is a teal now, so the app's accent-based warning rules are
+   re-pointed at the warn set. */
+.ex-alert--warn {
+  background: var(--warn-bg);
+  border-color: var(--warn);
+  color: var(--warn-ink);
+}
+.ex-badge--warn {
+  background: var(--warn-bg);
+}
+
+/* ==========================================================================
+   Clean glass controls (system layer): buttons, tags, alerts and toasts as see-through
+   tints with faint edges instead of solid fills with heavy borders. Last, so it wins.
+   ========================================================================== */
+
+/* ---------- Buttons ---------- */
+.ex-button {
+  /* A faint slate edge, so the glass button still reads on white cards and dialogs. */
+  border: 1px solid rgb(20 58 75 / 0.16);
+  background: var(--glass-button);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3);
+  backdrop-filter: blur(12px) saturate(1.3);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow:
+    0 1px 2px rgb(20 58 75 / 0.06),
+    inset 0 1px 0 rgb(255 255 255 / 0.7);
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+.ex-button:hover:not(:disabled) {
+  border-color: rgb(20 58 75 / 0.3);
+  background: rgb(255 255 255 / 0.85);
+  box-shadow:
+    0 4px 12px rgb(20 58 75 / 0.1),
+    inset 0 1px 0 rgb(255 255 255 / 0.8);
+}
+.ex-button:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: inset 0 1px 2px rgb(20 58 75 / 0.12);
+}
+.ex-button--primary {
+  border-color: transparent;
+  background: linear-gradient(180deg, #33677e 0%, var(--primary) 100%);
+  color: var(--primary-text);
+  box-shadow:
+    var(--shadow-primary),
+    inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+.ex-button--primary:hover:not(:disabled) {
+  border-color: transparent;
+  background: linear-gradient(180deg, #2c5f75 0%, var(--primary-hover) 100%);
+  box-shadow:
+    0 8px 20px rgb(41 89 110 / 0.34),
+    inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+.ex-button--edit,
+.ex-button--warn,
+.ex-button--ok,
+.ex-button--danger {
+  box-shadow: none;
+}
+.ex-button--edit {
+  border-color: var(--edit-tint-line);
+  /* The tint over a white glass base, so it reads the same on a card or on the wallpaper. */
+  background: linear-gradient(var(--edit-tint), var(--edit-tint)), rgb(255 255 255 / 0.7);
+  color: var(--edit-ink);
+}
+.ex-button--warn {
+  border-color: var(--warn-tint-line);
+  /* The tint over a white glass base, so it reads the same on a card or on the wallpaper. */
+  background: linear-gradient(var(--warn-tint), var(--warn-tint)), rgb(255 255 255 / 0.7);
+  color: var(--warn-ink);
+}
+.ex-button--ok {
+  border-color: var(--ok-tint-line);
+  /* The tint over a white glass base, so it reads the same on a card or on the wallpaper. */
+  background: linear-gradient(var(--ok-tint), var(--ok-tint)), rgb(255 255 255 / 0.7);
+  color: var(--ok-ink);
+}
+.ex-button--danger {
+  border-color: var(--danger-tint-line);
+  /* The tint over a white glass base, so it reads the same on a card or on the wallpaper. */
+  background: linear-gradient(var(--danger-tint), var(--danger-tint)), rgb(255 255 255 / 0.7);
+  color: var(--danger-ink);
+}
+.ex-button--edit:hover:not(:disabled) {
+  border-color: var(--edit);
+  background:
+    linear-gradient(rgb(31 111 139 / 0.2), rgb(31 111 139 / 0.2)), rgb(255 255 255 / 0.75);
+  box-shadow: none;
+}
+.ex-button--warn:hover:not(:disabled) {
+  border-color: var(--warn);
+  background:
+    linear-gradient(rgb(201 151 26 / 0.26), rgb(201 151 26 / 0.26)), rgb(255 255 255 / 0.75);
+  box-shadow: none;
+}
+.ex-button--ok:hover:not(:disabled) {
+  border-color: var(--ok);
+  background:
+    linear-gradient(rgb(47 122 90 / 0.21), rgb(47 122 90 / 0.21)), rgb(255 255 255 / 0.75);
+  box-shadow: none;
+}
+.ex-button--danger:hover:not(:disabled) {
+  border-color: var(--danger);
+  background:
+    linear-gradient(rgb(194 52 52 / 0.18), rgb(194 52 52 / 0.18)), rgb(255 255 255 / 0.75);
+  box-shadow: none;
+}
+.ex-button--ghost {
+  border-color: transparent;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+.ex-button--ghost:hover:not(:disabled) {
+  border-color: transparent;
+  background: rgb(255 255 255 / 0.55);
+  box-shadow: none;
+}
+.ex-button:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+}
+.ex-button .ex-spinner {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+  border-color: rgb(255 255 255 / 0.35);
+  border-top-color: currentColor;
+}
+
+/* ---------- Tags: soft pills with a status dot ---------- */
+.ex-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px 2px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: var(--neutral-tint);
+  color: var(--text);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.6;
+}
+.ex-badge::before {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.ex-badge--warn {
+  border-color: transparent;
+  background: var(--warn-tint);
+  color: var(--warn-ink);
+}
+.ex-badge--warn::before {
+  background: #c9971a;
+}
+.ex-badge--danger {
+  border-color: transparent;
+  background: var(--danger-tint);
+  color: var(--danger-ink);
+}
+.ex-badge--danger::before {
+  background: var(--danger);
+}
+.ex-badge--ok {
+  border-color: transparent;
+  background: var(--ok-tint);
+  color: var(--ok-ink);
+}
+.ex-badge--ok::before {
+  background: var(--ok);
+}
+.ex-delta {
+  border-color: transparent;
+  border-radius: var(--radius-pill);
+  background: var(--ok-tint);
+  padding: 0 8px;
+}
+.ex-delta--down {
+  border-color: transparent;
+  background: var(--danger-tint);
+}
+
+/* ---------- Alerts: frosted tint with an icon ---------- */
+.ex-alert {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: 12px 16px;
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  backdrop-filter: blur(16px) saturate(1.3);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgb(20 58 75 / 0.06);
+}
+.ex-alert::before {
+  content: '';
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  background: currentColor;
+  -webkit-mask: var(--ex-alert-icon) center / contain no-repeat;
+  mask: var(--ex-alert-icon) center / contain no-repeat;
+}
+.ex-alert--error {
+  border-color: var(--danger-tint-line);
+  /* The tint over a white glass base, so it reads the same on a card or on the wallpaper. */
+  background: linear-gradient(var(--danger-tint), var(--danger-tint)), rgb(255 255 255 / 0.82);
+  color: var(--danger-ink);
+  --ex-alert-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 8v4M12 16h.01'/%3E%3C/svg%3E");
+}
+.ex-alert--warn {
+  border-color: var(--warn-tint-line);
+  /* The tint over a white glass base, so it reads the same on a card or on the wallpaper. */
+  background: linear-gradient(var(--warn-tint), var(--warn-tint)), rgb(255 255 255 / 0.82);
+  color: var(--warn-ink);
+  --ex-alert-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3z'/%3E%3Cpath d='M12 9v4M12 17h.01'/%3E%3C/svg%3E");
+}
+.ex-alert--ok {
+  border-color: var(--ok-tint-line);
+  /* The tint over a white glass base, so it reads the same on a card or on the wallpaper. */
+  background: linear-gradient(var(--ok-tint), var(--ok-tint)), rgb(255 255 255 / 0.82);
+  color: var(--ok-ink);
+  --ex-alert-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m8 12 3 3 5-6'/%3E%3C/svg%3E");
+}
+
+/* ---------- Toasts: dark glass pills with a status dot ---------- */
+.ex-toast,
+.ex-toast--error {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px 10px 14px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: var(--radius-pill);
+  background: rgb(20 58 75 / 0.9);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  backdrop-filter: blur(16px) saturate(1.3);
+  color: var(--primary-text);
+  font-weight: 600;
+  box-shadow: var(--shadow-toast);
+}
+.ex-toast::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5ad19a;
+  box-shadow: 0 0 0 4px rgb(90 209 154 / 0.22);
+}
+.ex-toast--error::before {
+  background: #ff7a7a;
+  box-shadow: 0 0 0 4px rgb(255 122 122 / 0.22);
+}
+
+/* ---------- Tabs and chips on glass ---------- */
+.ex-tabs__list {
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius-pill);
+  background: rgb(255 255 255 / 0.45);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.ex-tabs__tab[aria-selected='true'] {
+  background: var(--surface);
+  box-shadow: 0 2px 8px rgb(20 58 75 / 0.12);
+}
+.ex-chip {
+  border-color: rgb(20 58 75 / 0.16);
+  background: var(--glass-button);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.ex-chip:hover {
+  border-color: var(--edit-tint-line);
+}
+.ex-chip[aria-pressed='true'] {
+  border-color: var(--edit-tint-line);
+  background: var(--edit-tint);
+  color: var(--edit-ink);
+  box-shadow: none;
+  font-weight: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ex-button {
+    transition: none;
+  }
+  .ex-button:active:not(:disabled) {
+    transform: none;
+  }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ex-button,
+  .ex-chip {
+    background: rgb(255 255 255 / 0.9);
+  }
+  .ex-alert {
+    background-color: rgb(255 255 255 / 0.92);
+  }
+  .ex-toast,
+  .ex-toast--error {
+    background: var(--sidebar-bg);
+  }
 }
