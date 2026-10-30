@@ -451,17 +451,8 @@ export const LABELS = {
   'cash.rupees': l('රු', 'Rs'),
   'cash.total': l('මුළු මුදල', 'Total'),
   'cash.foundPlace': l('මුදල් තිබු තැන', 'Where the cash was found'),
-  'cash.serials': l('මුදල් අංක', 'Note serial numbers'),
-  'cash.serials1': l('මුදල් අංක 1', 'Note serial numbers 1'),
-  // Draft Sinhala: what the two fields hold, as the legal documents print them (P02 envelope).
-  'cash.serialsHint': l(
-    'ව්‍යාජ ගැනුම්කරුට දුන් මුදල් නෝට්ටුවල අංක (උදා. U/257 391858)',
-    'Serial numbers of the notes given to the decoy buyer (e.g. U/257 391858)',
-  ),
-  'cash.serials1Hint': l(
-    'අංක වැඩි නම් ඉතිරි අංක මෙහි',
-    'More serial numbers, if they do not fit in the first box',
-  ),
+  'cash.serials': l('මුදල් අංක', 'Cash number'),
+  'cash.serials1': l('මුදල් අංක 1', 'Cash number 1'),
   'seized.spirit': l('ස්ප්‍රීතු ප්‍රමාණය ලීටර්', 'Spirit (L)'),
   'seized.kasippu': l('සාදන ලද මත්පැන් (කරිඤ්ඤං) ලීටර්', 'Made liquor – කරිඤ්ඤං (L)'),
   'seized.goda': l('සාදන ලද මත්පැන් (ගොඩා) ලීටර්', 'Made liquor – ගොඩා (L)'),
@@ -482,6 +473,15 @@ export const LABELS = {
   'seized.overQuantity': l('සාම්පලය ගත් පසු ඉතිරි ප්‍රමාණය', 'left after sampling'),
   'cr.quantity': l('ප්‍රමාණය', 'Quantity'),
   'cr.quantityExtra': l('ප්‍රමාණය 1', 'Quantity 1'),
+  // Draft Sinhala: which documents print each quantity (the old Quantity and Quantity1 columns).
+  'cr.quantityHint': l(
+    'අල්ලාගත් ප්‍රමාණය (මිලි ලීටර් හෝ ගණන). බොහෝ ලේඛනවල මෙය මුද්‍රණය වේ',
+    'The amount seized (mL, or a count). Most documents print this one',
+  ),
+  'cr.quantityExtraHint': l(
+    'බලපත්‍ර සීමාව ඉක්මවූ චෝදනා (UPT, UPA, UPFL) සහ මුද්‍රා කළ කෑනය සඳහා පමණි',
+    'Only for over-the-limit charges (UPT, UPA, UPFL) and the sealed can; otherwise leave empty',
+  ),
   'cr.overQuantity': l('වැඩිපුර ප්‍රමාණය', 'Over quantity'),
   'cr.production1': l('සාක්ෂි භාණ්ඩ 1', 'Production 1'),
   'cr.production2': l('සාක්ෂි භාණ්ඩ 2', 'Production 2'),

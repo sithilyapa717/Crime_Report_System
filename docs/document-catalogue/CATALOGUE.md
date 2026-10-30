@@ -200,8 +200,8 @@ are matched ignoring case; the other names are older spellings found in some tem
 | `Cash_1000` |  | Rs 1000 notes used | plain number | 10 |
 | `Cash_500` |  | Rs 500 notes used | plain number | 18 |
 | `Cash_100` |  | Rs 100 notes used | plain number | 19 |
-| `Cash_Number` |  | Serial numbers of the notes given to the decoy buyer | as entered | 12 |
-| `Cash_Number_1` |  | More serial numbers of the decoy notes | as entered | 5 |
+| `Cash_Number` |  | Note serial numbers (meaning to confirm) | as entered | 12 |
+| `Cash_Number_1` |  | Note serial numbers 2 (meaning to confirm) | as entered | 5 |
 | `Cash2_1000` |  | Rs 1000 notes (Cash2 group) | plain number | 1 |
 | `Cash3_500` |  | Rs 500 notes (Cash3 group) | plain number | 1 |
 | `result` |  | Fine amount | rupees, no separators (to confirm) | 7 |

@@ -155,13 +155,11 @@ export function CashTab({ draft, set, errors }: TabProps) {
         />
         <TextField
           label={label('cash.serials')}
-          hint={label('cash.serialsHint')}
           value={draft.cashSerials}
           onChange={(v) => set((d) => ({ ...d, cashSerials: v }))}
         />
         <TextField
           label={label('cash.serials1')}
-          hint={label('cash.serials1Hint')}
           value={draft.cashSerials1}
           onChange={(v) => set((d) => ({ ...d, cashSerials1: v }))}
         />
@@ -203,12 +201,14 @@ export function SeizedTab({ draft, set, errors }: TabProps) {
       <FieldGrid>
         <NumberField
           label={label('cr.quantity')}
+          hint={label('cr.quantityHint')}
           value={draft.quantity}
           error={errors.quantity}
           onChange={(v) => set((d) => ({ ...d, quantity: v }))}
         />
         <NumberField
           label={label('cr.quantityExtra')}
+          hint={label('cr.quantityExtraHint')}
           value={draft.quantityExtra}
           error={errors.quantityExtra}
           onChange={(v) => set((d) => ({ ...d, quantityExtra: v }))}
