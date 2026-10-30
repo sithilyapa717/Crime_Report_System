@@ -17,7 +17,7 @@ import {
   type Column,
 } from '../../design-system/index.js';
 import { useNav } from '../../shell/navigation.js';
-import { IpcError } from '../../src/ipc.js';
+import { call, IpcError } from '../../src/ipc.js';
 import { useRefOptions } from '../../src/references.js';
 import { lastOffice, rememberOffice } from './CrPicker.js';
 
@@ -67,12 +67,20 @@ export function OfficeSelect({
   );
 }
 
-export function useOfficeYear() {
-  const [officeId, setOfficeId] = useState<string | undefined>(lastOffice());
-  const [year, setYear] = useState<number | undefined>(new Date().getFullYear());
+/** `blank`: start with nothing chosen (the office and year are filled in otherwise). */
+export function useOfficeYear({ blank = false }: { blank?: boolean } = {}) {
+  const [officeId, setOfficeId] = useState<string | undefined>(blank ? undefined : lastOffice());
+  const [year, setYear] = useState<number | undefined>(
+    blank ? undefined : new Date().getFullYear(),
+  );
   return {
     officeId,
     year,
+    /** Empties both boxes. */
+    clear: () => {
+      setOfficeId(undefined);
+      setYear(undefined);
+    },
     fields: (
       <>
         <OfficeSelect value={officeId} onChange={setOfficeId} />
@@ -88,6 +96,21 @@ export const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
 }));
 
 const c = (key: string) => label(`report.col.${key}`);
+
+/** After a file was saved: a toast with where it went and "Open file location", plus "Open file"
+ *  unless the file was already opened (Word print-outs open by themselves). */
+export function useSavedToast() {
+  const toast = useToast();
+  return (path: string, opened = false) => {
+    const actions = [
+      { label: label('saved.showFolder'), onClick: () => void call('saved.reveal', path) },
+      ...(opened
+        ? []
+        : [{ label: label('saved.openFile'), onClick: () => void call('saved.open', path) }]),
+    ];
+    toast(`${label('report.exported')} ${path}`, 'info', actions);
+  };
+}
 
 /** Figma results card: the table, then "ප්‍රතිඵල N" on the left and the buttons on the right. */
 export function ResultsCard({
@@ -245,13 +268,13 @@ export function PrintButtons({
   printLabel?: string;
   disabled?: boolean;
 }) {
-  const toast = useToast();
+  const saved = useSavedToast();
   const [error, setError] = useState<string | null>(null);
   const go = (target: 'printer' | 'pdf' | 'word') => async () => {
     setError(null);
     try {
       const r = await print(target);
-      if (typeof r === 'string') toast(`${label('report.exported')} ${r}`);
+      if (typeof r === 'string') saved(r, target === 'word');
     } catch (e) {
       setError(e instanceof IpcError ? e.caption : label('error.unknown'));
     }

@@ -1,6 +1,10 @@
 /* CR entry, CR view and case progress (Figma frames 06.x, 07, 08). */
 
 /* ---------- Header card: the beige "find a CR" strip, then the CR header fields ---------- */
+:root {
+  /* Column width shared by the find bar and the header fields under it. */
+  --cr-col: 208px;
+}
 .cr-head {
   display: flex;
   flex-direction: column;
@@ -12,9 +16,9 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  border-radius: 16px;
-  background: var(--surface-alt);
+  /* No inset box: the picker fields start at the same left edge as the header fields below. */
+  padding: 0 0 var(--space-3);
+  border-bottom: 1px solid var(--border);
 }
 .find-bar .cr-picker--inline {
   flex: none;
@@ -22,11 +26,10 @@
 .find-bar .ex-filters {
   flex-wrap: nowrap;
 }
-.find-bar .ex-filters > .ex-field {
-  width: 150px;
-}
+/* The same column width as the header fields below, so the two rows line up. */
+.find-bar .ex-filters > .ex-field,
 .find-bar .ex-filters > .ex-field:first-child {
-  width: 230px;
+  width: var(--cr-col);
 }
 .find-bar .ex-field__label {
   white-space: nowrap;
@@ -64,7 +67,7 @@
 }
 .cr-head__fields .ex-grid {
   flex: 1 1 760px;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, var(--cr-col));
 }
 /* Keep the header inputs on one line: a label that wraps grows upwards. */
 .cr-head__fields .ex-field {

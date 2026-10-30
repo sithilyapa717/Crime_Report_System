@@ -5,6 +5,7 @@ import { label } from '@excise/labels';
 import type { Role } from '@excise/schemas';
 import { useEffect, useState, type FormEvent } from 'react';
 import {
+  Card,
   Actions,
   Badge,
   Button,
@@ -71,58 +72,60 @@ export function UsersScreen() {
     <>
       <h1>{label('admin.users')}</h1>
       <ErrorLine error={error} />
-      <Table
-        caption={label('admin.users')}
-        rows={users}
-        rowKey={(u) => u.id}
-        columns={[
-          { key: 'username', title: label('login.username'), value: (u) => u.username },
-          { key: 'role', title: label('users.role'), value: (u) => label(`role.${u.role}`) },
-          {
-            key: 'state',
-            title: '',
-            value: (u) => `${u.active}${u.locked}${u.mustChangePassword}`,
-            render: (u) => (
-              <>
-                {!u.active && <Badge kind="danger">{label('users.deactivate')}</Badge>}{' '}
-                {u.locked && <Badge kind="warn">{label('users.locked')}</Badge>}{' '}
-                {u.mustChangePassword && <Badge>{label('users.mustChange')}</Badge>}
-              </>
-            ),
-          },
-          {
-            key: 'actions',
-            title: '',
-            value: () => null,
-            render: (u) => (
-              <span className="ex-check">
-                {u.id !== session.userId && (
+      <Card>
+        <Table
+          caption={label('admin.users')}
+          rows={users}
+          rowKey={(u) => u.id}
+          columns={[
+            { key: 'username', title: label('login.username'), value: (u) => u.username },
+            { key: 'role', title: label('users.role'), value: (u) => label(`role.${u.role}`) },
+            {
+              key: 'state',
+              title: '',
+              value: (u) => `${u.active}${u.locked}${u.mustChangePassword}`,
+              render: (u) => (
+                <>
+                  {!u.active && <Badge kind="danger">{label('users.deactivate')}</Badge>}{' '}
+                  {u.locked && <Badge kind="warn">{label('users.locked')}</Badge>}{' '}
+                  {u.mustChangePassword && <Badge>{label('users.mustChange')}</Badge>}
+                </>
+              ),
+            },
+            {
+              key: 'actions',
+              title: '',
+              value: () => null,
+              render: (u) => (
+                <span className="ex-check">
+                  {u.id !== session.userId && (
+                    <Button
+                      variant={u.active ? 'warn' : 'ok'}
+                      onClick={act(() => call('users.setActive', u.id, !u.active))}
+                    >
+                      {label(u.active ? 'users.deactivate' : 'users.activate')}
+                    </Button>
+                  )}
+                  {u.locked && (
+                    <Button variant="ok" onClick={act(() => call('auth.unlockUser', u.id))}>
+                      {label('users.unlock')}
+                    </Button>
+                  )}
                   <Button
-                    variant={u.active ? 'warn' : 'ok'}
-                    onClick={act(() => call('users.setActive', u.id, !u.active))}
+                    variant="edit"
+                    onClick={() => {
+                      setTemp('');
+                      setResetFor(u);
+                    }}
                   >
-                    {label(u.active ? 'users.deactivate' : 'users.activate')}
+                    {label('users.reset')}
                   </Button>
-                )}
-                {u.locked && (
-                  <Button variant="ok" onClick={act(() => call('auth.unlockUser', u.id))}>
-                    {label('users.unlock')}
-                  </Button>
-                )}
-                <Button
-                  variant="edit"
-                  onClick={() => {
-                    setTemp('');
-                    setResetFor(u);
-                  }}
-                >
-                  {label('users.reset')}
-                </Button>
-              </span>
-            ),
-          },
-        ]}
-      />
+                </span>
+              ),
+            },
+          ]}
+        />
+      </Card>
       <form onSubmit={add} aria-label={label('users.add')}>
         <FormSection title={label('users.add')}>
           <div className="ex-filters users-add">

@@ -151,10 +151,10 @@ async function start(): Promise<void> {
     documents: { generator, registry, log: generationLog },
     printOutput: createPrintOutput(dialogs.pickSavePath, printFonts),
     ...(printFonts ? { wordFonts: printFonts } : {}),
-    printoutDir: join(
-      process.env.EXCISE_DOCUMENTS_DIR ?? join(app.getPath('documents'), 'Excise documents'),
-      'Print-outs',
-    ),
+    // Print-outs stay with the app's own data (the user's AppData folder), not in the user's
+    // Documents or OneDrive; the install folder itself is read-only for staff and is replaced on
+    // every update.
+    printoutDir: join(process.env.EXCISE_DOCUMENTS_DIR ?? userData, 'Print-outs'),
     logFile: log.file,
     fontCheck: async () =>
       fontStatus(join(documentsRoot, 'registry', 'template-inventory.json'), await windowsFonts()),

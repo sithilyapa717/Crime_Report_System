@@ -7,5 +7,6 @@ export * from './feedback.js';
 export * from './fields.js';
 export * from './icons.js';
 export * from './layout.js';
+export * from './pickers.js';
 export * from './table.js';
 export * from './text-size.js';

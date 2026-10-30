@@ -12,15 +12,14 @@ import {
   FormSection,
   Table,
   formatMoney,
-  useToast,
 } from '../../design-system/index.js';
 import { call } from '../../src/ipc.js';
 import { forgetLists } from '../../src/references.js';
 import './admin.css';
-import { ErrorLine, useRun } from '../shared/results.js';
+import { ErrorLine, useRun, useSavedToast } from '../shared/results.js';
 
 export function ImportScreen() {
-  const toast = useToast();
+  const saved = useSavedToast();
   const s = useRun<ImportReport | null>();
   const [confirm, setConfirm] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -54,7 +53,7 @@ export function ImportScreen() {
           disabled={!report}
           onClick={async () => {
             const path = await call('import.saveReport').catch(() => null);
-            if (path) toast(`${label('report.exported')} ${path}`);
+            if (path) saved(path);
           }}
         >
           {label('import.saveReport')}

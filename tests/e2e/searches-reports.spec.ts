@@ -150,6 +150,23 @@ test('convicts register and previous offences, printed to PDF', async () => {
   await expect(page.getByText(label('report.exported'))).toBeVisible();
   const pdf = savedFiles().find((f) => f.endsWith('.pdf'))!;
   expect(statSync(join(run.userData, pdf)).size).toBeGreaterThan(1000);
+  // A saved PDF can be opened, or shown in its folder (a button closes its message).
+  await button(page, 'saved.openFile').click();
+  await expect.poll(() => openedPaths(run)).toContainEqual(expect.stringMatching(/\.pdf$/));
+  await button(page, 'search.savePdf').click();
+  await button(page, 'saved.showFolder').click();
+  // (the test's save dialog stub builds the path with a forward slash)
+  await expect
+    .poll(() => openedPaths(run))
+    .toContainEqual(expect.stringMatching(/^folder:.*\.pdf$/));
+
+  // "Open in Word" opens the file itself, so its message only offers the folder.
+  await button(page, 'search.openInWord').click();
+  const wordToast = page.locator('.ex-toast').filter({ hasText: 'Print-outs' });
+  await expect(wordToast.getByRole('button', { name: label('saved.showFolder') })).toBeVisible();
+  await expect(
+    wordToast.getByRole('button', { name: label('saved.openFile'), exact: true }),
+  ).toHaveCount(0);
 
   await button(page, 'shell.home').click();
   await button(page, 'menu.convictsCheck').click();
@@ -182,6 +199,9 @@ test('reports: monthly register, fines earned, Excel export and the summary by o
   await seed(page);
   await button(page, 'menu.reports').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
+  await field(page, 'cr.year').fill('2026');
+  // Nothing is chosen at first: pick the scope, then the month.
+  await field(page, 'report.scope').selectOption({ label: label('cr.month') });
   await field(page, 'cr.month').selectOption({ label: label('month.1') });
   await screenButton(page, 'report.typeChip.register').click();
   await expect(page.getByRole('cell', { name: '2/2026', exact: true })).toBeVisible();

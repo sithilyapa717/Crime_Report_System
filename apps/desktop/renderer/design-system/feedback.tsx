@@ -135,31 +135,74 @@ export function ConfirmDialog({
   );
 }
 
+/** A button under a toast's message (for example "Open file location"). */
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface Toast {
   id: number;
   text: string;
   kind: 'info' | 'error';
+  actions: ToastAction[];
 }
 
-const ToastContext = createContext<(text: string, kind?: Toast['kind']) => void>(() => undefined);
+const ToastContext = createContext<
+  (text: string, kind?: Toast['kind'], actions?: ToastAction[]) => void
+>(() => undefined);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const show = useCallback((text: string, kind: Toast['kind'] = 'info') => {
-    const id = Date.now() + Math.random();
-    setToasts((t) => [...t, { id, text, kind }]);
-    setTimeout(
-      () => setToasts((t) => t.filter((x) => x.id !== id)),
-      kind === 'error' ? 8000 : 4000,
-    );
-  }, []);
+  const show = useCallback(
+    (text: string, kind: Toast['kind'] = 'info', actions: ToastAction[] = []) => {
+      const id = Date.now() + Math.random();
+      setToasts((t) => [...t, { id, text, kind, actions }]);
+      // A toast with buttons stays longer, so there is time to press one.
+      setTimeout(
+        () => setToasts((t) => t.filter((x) => x.id !== id)),
+        kind === 'error' || actions.length ? 8000 : 4000,
+      );
+    },
+    [],
+  );
+  const dismiss = (id: number) => setToasts((t) => t.filter((x) => x.id !== id));
   return (
     <ToastContext.Provider value={show}>
       {children}
       <div className="ex-toasts" aria-live="polite">
         {toasts.map((t) => (
           <div key={t.id} className={t.kind === 'error' ? 'ex-toast ex-toast--error' : 'ex-toast'}>
-            {t.text}
+            <div className="ex-toast__body">
+              <span>{t.text}</span>
+              {t.actions.length > 0 && (
+                <span className="ex-toast__actions">
+                  {t.actions.map((a) => (
+                    <button
+                      key={a.label}
+                      type="button"
+                      className="ex-toast__button"
+                      onClick={() => {
+                        a.onClick();
+                        dismiss(t.id);
+                      }}
+                    >
+                      {a.label}
+                    </button>
+                  ))}
+                </span>
+              )}
+            </div>
+            {t.actions.length > 0 && (
+              <button
+                type="button"
+                className="ex-toast__close"
+                aria-label={label('common.close')}
+                onClick={() => dismiss(t.id)}
+              >
+                ✕
+              </button>
+            )}
           </div>
         ))}
       </div>

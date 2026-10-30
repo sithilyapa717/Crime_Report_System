@@ -321,7 +321,14 @@ function HeaderFields({ draft, set, errors }: TabProps) {
         value={draft.month ? String(draft.month) : undefined}
         error={errors.month}
         options={MONTHS}
-        onChange={(v) => set((d) => ({ ...d, month: v ? Number(v) : undefined }))}
+        onChange={(v) =>
+          set((d) => ({
+            ...d,
+            month: v ? Number(v) : undefined,
+            // A new CR starts with both empty; choosing the month suggests its half-year.
+            ...(v && !d.halfYear ? { halfYear: Number(v) <= 6 ? 'first' : 'second' } : {}),
+          }))
+        }
       />
       <Select
         label={label('cr.halfYear')}
@@ -436,7 +443,21 @@ function DetectionTab({ draft, set, errors }: TabProps) {
           />
         </FieldGrid>
       </FormSection>
-      <FormSection title={label('cr.supportOfficer')}>
+      <FormSection
+        title={label('cr.supportOfficer')}
+        action={
+          shown < MAX_SUPPORT && (
+            <Button
+              className="ex-button--icon"
+              onClick={() => setWanted(shown + 1)}
+              aria-label={label('cr.addSupportOfficer')}
+              title={label('cr.addSupportOfficer')}
+            >
+              <Icon name="plus" size={18} />
+            </Button>
+          )
+        }
+      >
         <FieldGrid>
           {Array.from({ length: shown }, (_, i) => i + 1).map((pos) => {
             const caption = `${label('cr.supportOfficer')} ${pos}`;
@@ -462,12 +483,6 @@ function DetectionTab({ draft, set, errors }: TabProps) {
             );
           })}
         </FieldGrid>
-        {shown < MAX_SUPPORT && (
-          <Button onClick={() => setWanted(shown + 1)}>
-            <Icon name="plus" size={18} />
-            {label('cr.addSupportOfficer')}
-          </Button>
-        )}
       </FormSection>
       <FormSection title={label('cr.notes')}>
         <TextArea

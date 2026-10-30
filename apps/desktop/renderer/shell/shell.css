@@ -295,7 +295,8 @@
 
 /* The top bar shows the screen title; a screen's own leading title (older screens, other
    members' screens) would repeat it. */
-.ex-page > h1:first-child {
+.ex-page > h1:first-child,
+.ex-screen > h1:first-child {
   display: none;
 }
 

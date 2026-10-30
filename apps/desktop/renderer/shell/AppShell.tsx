@@ -104,11 +104,12 @@ export function AppShell({ screens, onLogout }: { screens: Screens; onLogout: ()
           </button>
         </header>
         <main className="ex-page">
-          {atHome ? (
-            <HomePage />
-          ) : (
-            <Screen key={`${depth}:${route.name}:${JSON.stringify(route.params ?? {})}`} />
-          )}
+          <div
+            key={atHome ? 'home' : `${depth}:${route.name}:${JSON.stringify(route.params ?? {})}`}
+            className="ex-screen"
+          >
+            {atHome ? <HomePage /> : <Screen />}
+          </div>
         </main>
       </div>
     </div>

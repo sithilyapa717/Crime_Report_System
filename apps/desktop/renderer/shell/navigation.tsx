@@ -11,6 +11,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { flushSync } from 'react-dom';
+import { ConfirmDialog } from '../design-system/index.js';
 import { allowed, type Route, type RouteName } from './routes.js';
 
 interface Nav {
@@ -41,11 +43,18 @@ export function NavigationProvider({
 }) {
   const [stack, setStack] = useState<Route[]>([{ name: 'home' }]);
   const guard = useRef<(() => boolean) | null>(null);
-  const mayLeave = () => {
-    if (!guard.current?.()) return true;
-    if (!window.confirm(label('cr.unsaved'))) return false;
-    guard.current = null;
-    return true;
+  /** Make a screen change. The browser fades the old screen out and the new one in (see the
+   *  `::view-transition` rules in styles.css); where that is not available, it just changes. */
+  const swap = (change: () => void) => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || typeof document.startViewTransition !== 'function') return change();
+    document.startViewTransition(() => flushSync(change));
+  };
+  // Unsaved changes: the app's own dialog asks first (a native confirm() box looks out of place).
+  const [asking, setAsking] = useState<(() => void) | null>(null);
+  const leaveThen = (action: () => void) => {
+    if (!guard.current?.()) return action();
+    setAsking(() => action);
   };
   const nav = useMemo<Nav>(
     () => ({
@@ -53,27 +62,45 @@ export function NavigationProvider({
       depth: stack.length,
       session,
       go: (name, params) => {
-        if (!allowed(session.role, name) || !mayLeave()) return;
-        setStack((s) => [...s, { name, ...(params ? { params } : {}) }]);
+        if (!allowed(session.role, name)) return;
+        leaveThen(() =>
+          swap(() => setStack((s) => [...s, { name, ...(params ? { params } : {}) }])),
+        );
       },
       open: (name) => {
-        if (!allowed(session.role, name) || !mayLeave()) return;
-        setStack([{ name: 'home' }, { name }]);
+        if (!allowed(session.role, name)) return;
+        leaveThen(() => swap(() => setStack([{ name: 'home' }, { name }])));
       },
       replace: (name, params) => {
         if (!allowed(session.role, name)) return;
         guard.current = null;
         setStack((s) => [...s.slice(0, -1), { name, ...(params ? { params } : {}) }]);
       },
-      back: () => mayLeave() && setStack((s) => (s.length > 1 ? s.slice(0, -1) : s)),
-      home: () => mayLeave() && setStack([{ name: 'home' }]),
+      back: () => leaveThen(() => swap(() => setStack((s) => (s.length > 1 ? s.slice(0, -1) : s)))),
+      home: () => leaveThen(() => swap(() => setStack([{ name: 'home' }]))),
       setLeaveGuard: (dirty) => {
         guard.current = dirty;
       },
     }),
     [stack, session],
   );
-  return <NavContext.Provider value={nav}>{children}</NavContext.Provider>;
+  return (
+    <NavContext.Provider value={nav}>
+      {children}
+      <ConfirmDialog
+        open={asking !== null}
+        title={label('leave.title')}
+        message={label('leave.message')}
+        onCancel={() => setAsking(null)}
+        onConfirm={() => {
+          const action = asking;
+          setAsking(null);
+          guard.current = null;
+          action?.();
+        }}
+      />
+    </NavContext.Provider>
+  );
 }
 
 export function useNav(): Nav {
