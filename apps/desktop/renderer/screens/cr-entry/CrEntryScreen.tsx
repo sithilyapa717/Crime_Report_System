@@ -312,7 +312,7 @@ function HeaderFields({ draft, set, errors }: TabProps) {
         tag="pink"
         value={draft.crSeq}
         error={errors.crNumber}
-        hint={draft.crSeq && draft.crYear ? `${draft.crSeq}/${draft.crYear}` : 'n/yyyy'}
+        placeholder="n/yyyy"
         onChange={(v) => set((d) => ({ ...d, crSeq: v }))}
       />
       <Select
