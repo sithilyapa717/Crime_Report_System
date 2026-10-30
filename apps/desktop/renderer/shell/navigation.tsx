@@ -19,6 +19,9 @@ interface Nav {
   depth: number;
   session: Session;
   go: (name: RouteName, params?: Record<string, string>) => void;
+  /** Opens a menu screen from the sidebar: the stack becomes main menu → that screen, so Back
+   *  returns to the main menu instead of through every screen visited before. */
+  open: (name: RouteName) => void;
   /** Replaces the current screen (e.g. after creating a CR, show it under its id). */
   replace: (name: RouteName, params?: Record<string, string>) => void;
   back: () => void;
@@ -52,6 +55,10 @@ export function NavigationProvider({
       go: (name, params) => {
         if (!allowed(session.role, name) || !mayLeave()) return;
         setStack((s) => [...s, { name, ...(params ? { params } : {}) }]);
+      },
+      open: (name) => {
+        if (!allowed(session.role, name) || !mayLeave()) return;
+        setStack([{ name: 'home' }, { name }]);
       },
       replace: (name, params) => {
         if (!allowed(session.role, name)) return;

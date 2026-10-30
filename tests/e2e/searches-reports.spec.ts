@@ -16,6 +16,10 @@ test.afterEach(async () => {
 
 const button = (page: Page, key: LabelKey) =>
   page.getByRole('button', { name: label(key), exact: true });
+/** A button of the screen itself. The sidebar menu is on every screen, and some screens' own
+ *  buttons carry the same caption as their menu item (the search button "වරදකරුවන්ගේ ලේඛනය"). */
+const screenButton = (page: Page, key: LabelKey) =>
+  page.getByRole('main').getByRole('button', { name: label(key), exact: true });
 const field = (page: Page, key: LabelKey) => page.getByLabel(label(key), { exact: true });
 
 /** First run, the lists and two CRs (one with a case, a fine and the convicts flag). */
@@ -109,7 +113,7 @@ test('register searches find the CRs and a row opens the CR view', async () => {
 
   await button(page, 'menu.registerByYear').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
-  await button(page, 'menu.registerByYear').click();
+  await screenButton(page, 'menu.registerByYear').click();
   await expect(page.getByRole('cell', { name: '1/2026', exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: '2/2026', exact: true })).toBeVisible();
   await page.screenshot({ path: join(SHOTS, 'register-by-year.png'), fullPage: true });
@@ -120,7 +124,7 @@ test('register searches find the CRs and a row opens the CR view', async () => {
   await button(page, 'menu.byCourtDate').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
   await field(page, 'case.courtDate').fill('2026.01.10');
-  await button(page, 'menu.byCourtDate').click();
+  await screenButton(page, 'menu.byCourtDate').click();
   await expect(page.getByRole('cell', { name: 'Kumara Silva' })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'Other Person' })).toHaveCount(0);
 
@@ -128,7 +132,7 @@ test('register searches find the CRs and a row opens the CR view', async () => {
   await button(page, 'menu.byDetectionDate').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
   await field(page, 'cr.detectionDate').fill('2026.01.05');
-  await button(page, 'menu.byDetectionDate').click();
+  await screenButton(page, 'menu.byDetectionDate').click();
   await expect(page.getByRole('cell', { name: 'Other Person' })).toBeVisible();
   expect(run.errors).toEqual([]);
 });
@@ -139,7 +143,7 @@ test('convicts register and previous offences, printed to PDF', async () => {
 
   await button(page, 'menu.convicts').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
-  await button(page, 'menu.convicts').click();
+  await screenButton(page, 'menu.convicts').click();
   await expect(page.getByRole('cell', { name: 'Kumara Silva' })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'Other Person' })).toHaveCount(0);
   await button(page, 'search.savePdf').click();
@@ -150,7 +154,7 @@ test('convicts register and previous offences, printed to PDF', async () => {
   await button(page, 'shell.home').click();
   await button(page, 'menu.convictsCheck').click();
   await field(page, 'search.nic').fill('851234567v');
-  await button(page, 'menu.convictsCheck').click();
+  await screenButton(page, 'menu.convictsCheck').click();
   await expect(page.getByRole('cell', { name: 'Kumara Silva' })).toBeVisible();
 
   await button(page, 'shell.home').click();
@@ -179,7 +183,7 @@ test('reports: monthly register, fines earned, Excel export and the summary by o
   await button(page, 'menu.reports').click();
   await field(page, 'cr.office').selectOption({ label: 'මීගමුව' });
   await field(page, 'cr.month').selectOption({ label: label('month.1') });
-  await page.getByRole('button', { name: label('report.typeChip.register'), exact: true }).click();
+  await screenButton(page, 'report.typeChip.register').click();
   await expect(page.getByRole('cell', { name: '2/2026', exact: true })).toBeVisible();
 
   await page

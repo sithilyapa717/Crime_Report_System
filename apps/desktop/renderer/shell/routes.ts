@@ -113,6 +113,12 @@ export const MENUS: Record<Role, { main: MenuItem[]; admin: MenuItem[] }> = {
   supervising: { main: items('crView', ...SEARCHES, 'reports'), admin: [] },
 };
 
+/** The menu item a screen belongs to (a sub-screen belongs to the one that opens it), for the
+ *  sidebar's highlight. */
+export function menuRoute(route: RouteName): RouteName {
+  return SUB_ROUTES[route] ?? route;
+}
+
 /** May this role open the screen at all (also hides direct navigation to it)? */
 export function allowed(role: Role, route: RouteName): boolean {
   if (route === 'home' || route === 'changePassword') return true;

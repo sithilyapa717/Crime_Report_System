@@ -1,12 +1,18 @@
-/* Sign-in, first-run and password screens. Sizes and colours from the Figma frame
-   "01 Start + Login" (1366 x 768): a white shell inset 24px, the beige role panel with two soft
-   glows on the left, the form on the right. */
+/* Sign-in, first-run and password screens. Layout from the Figma frame "01 Start + Login"
+   (1366 x 768): a shell inset 24px, the role panel on the left, the form on the right. Look from
+   the design system: one wallpaper (the cloud photo) fills the window and the shell is a single
+   frosted-glass panel on it, nothing else layered over the photo. */
 
 .auth {
   min-height: 100%;
   padding: var(--space-5);
   display: flex;
-  background: var(--bg);
+  background-color: var(--sidebar-bg);
+  background-image:
+    linear-gradient(rgb(20 58 75 / 0.12), rgb(20 58 75 / 0.12)),
+    url('../../design-system/backgrounds/summit-cloud.webp');
+  background-size: cover;
+  background-position: center;
 }
 
 .auth__shell {
@@ -15,9 +21,13 @@
   grid-template-columns: minmax(0, 690fr) minmax(400px, 628fr);
   min-height: 600px;
   padding: var(--space-2);
-  border-radius: 28px;
-  background: var(--surface);
-  box-shadow: 0 12px 40px rgb(38 26 13 / 0.08);
+  border: 1px solid rgb(255 255 255 / 0.7);
+  border-radius: 24px;
+  /* 78% white + blur: text holds 8:1 and muted text 4.5:1 even over the darkest rock. */
+  background: rgb(255 255 255 / 0.78);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  backdrop-filter: blur(24px) saturate(1.3);
+  box-shadow: 0 24px 60px rgb(20 58 75 / 0.25);
 }
 
 /* ---------- Role panel ---------- */
@@ -29,20 +39,8 @@
   padding: 36px;
   border-radius: var(--radius-card);
   color: var(--text);
-  background:
-    radial-gradient(
-      circle at 40% 67%,
-      rgb(242 131 107 / 0.75) 0,
-      rgb(242 131 107 / 0.15) 9%,
-      rgb(242 131 107 / 0) 19%
-    ),
-    radial-gradient(
-      circle at 69% 58%,
-      rgb(247 208 78 / 0.95) 0,
-      rgb(247 208 78 / 0.25) 15%,
-      rgb(247 208 78 / 0) 28%
-    ),
-    #d8cec0;
+  border: 1px solid rgb(255 255 255 / 0.6);
+  background: rgb(255 255 255 / 0.4);
 }
 
 .auth__brand {
@@ -114,9 +112,11 @@
   width: 100%;
   height: 136px;
   padding: 16px;
-  border: 1px solid rgb(255 255 255 / 0.75);
-  border-radius: 20px;
-  background: rgb(255 255 255 / 0.7);
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius-card);
+  background: var(--glass-button);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   color: var(--text);
   text-align: left;
   cursor: pointer;
@@ -127,12 +127,13 @@
 }
 .auth-role:hover {
   background: var(--surface);
+  box-shadow: 0 6px 18px rgb(20 58 75 / 0.12);
 }
 .auth-role[aria-pressed='true'] {
   border-color: var(--primary);
   background: var(--primary);
   color: var(--primary-text);
-  box-shadow: 0 10px 24px rgb(38 26 13 / 0.18);
+  box-shadow: var(--shadow-primary);
 }
 .auth-role__key {
   display: grid;
@@ -146,9 +147,9 @@
   font-variant-numeric: tabular-nums;
 }
 .auth-role[aria-pressed='true'] .auth-role__key {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--text);
+  border-color: var(--primary-text);
+  background: var(--primary-text);
+  color: var(--primary);
 }
 .auth-role__name {
   font-size: 15px;
@@ -233,6 +234,11 @@
   }
   .auth__dept {
     white-space: normal;
+  }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .auth__shell {
+    background: rgb(255 255 255 / 0.94);
   }
 }
 @media (prefers-reduced-motion: reduce) {

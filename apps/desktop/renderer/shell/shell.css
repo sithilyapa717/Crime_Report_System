@@ -1,40 +1,177 @@
-/* App shell and main menu (Figma "TopBar" and "02 Main menu"). */
+/* App shell: the dark glass sidebar (the main menu), the glass top bar and the screen, all over
+   the one app wallpaper (.ex-backdrop in design-system/styles.css). */
 .shell {
-  min-height: 100%;
   display: flex;
-  flex-direction: column;
+  min-height: 100%;
 }
-.shell > main {
+.shell__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+.shell__main > main {
   flex: 1;
 }
 
-/* ---------- Top bar: on the page background, round white back button ---------- */
+/* ---------- Sidebar: dark glass, 90% deep crevasse over the wallpaper ---------- */
+.ex-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: var(--sidebar-width);
+  height: 100vh;
+  padding: var(--space-4) var(--space-3) var(--space-3);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.22) transparent;
+  border-right: 1px solid rgb(255 255 255 / 0.08);
+  background: rgb(20 58 75 / 0.9);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  backdrop-filter: blur(24px) saturate(1.2);
+  color: var(--sidebar-text);
+}
+.ex-sidebar__brand {
+  font: inherit;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 var(--space-3);
+  padding: 6px var(--space-2);
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--primary-text);
+  font-size: var(--text-md);
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+.ex-sidebar__brand:hover {
+  background: rgb(255 255 255 / 0.08);
+}
+.ex-sidebar__mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--deep-crevasse);
+  font-size: 17px;
+  font-weight: 700;
+}
+.ex-sidebar__nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.ex-sidebar__group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ex-sidebar__label {
+  margin: 0 var(--space-3) var(--space-1);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--sidebar-label);
+}
+.ex-sidebar__item {
+  font: inherit;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 36px;
+  padding: 5px var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--sidebar-text);
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+.ex-sidebar__item:hover {
+  background: rgb(255 255 255 / 0.08);
+  color: var(--primary-text);
+}
+.ex-sidebar__item[aria-current='page'] {
+  border-color: rgb(255 255 255 / 0.16);
+  background: rgb(255 255 255 / 0.12);
+  color: var(--primary-text);
+  font-weight: 600;
+}
+.ex-sidebar__item[aria-current='page'] .ex-icon {
+  color: var(--accent);
+}
+.ex-sidebar :focus-visible {
+  outline-color: var(--accent);
+}
+.ex-sidebar__foot {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: var(--space-3);
+  border-top: 1px solid rgb(255 255 255 / 0.1);
+}
+.ex-sidebar__who {
+  margin: 0 var(--space-3) var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--sidebar-label);
+}
+
+/* ---------- Top bar: a glass strip, so the title never sits on the bare photo ---------- */
 .topbar {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  min-height: 80px;
-  padding: 20px var(--space-6);
+  gap: var(--space-3);
+  min-height: 64px;
+  margin: var(--space-4) var(--space-5) 0;
+  padding: 10px var(--space-4);
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius-card);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: var(--shadow-glass);
 }
 .topbar__back,
 .topbar__icon {
   display: grid;
-  place-items: center;
   flex: none;
+  place-items: center;
   width: 40px;
   height: 40px;
-  border: 0;
+  border: 1px solid var(--glass-line);
   border-radius: 50%;
-  background: var(--surface);
+  background: var(--glass-button);
   color: var(--text);
   cursor: pointer;
+  transition:
+    background-color 0.15s,
+    box-shadow 0.15s;
 }
 .topbar__icon {
+  border-color: transparent;
   background: transparent;
   color: var(--text-muted);
 }
 .topbar__back:hover,
 .topbar__icon:hover {
+  border-color: var(--glass-line);
   background: var(--surface);
   color: var(--text);
   box-shadow: var(--shadow-raised);
@@ -44,7 +181,7 @@
   min-width: 0;
   margin: 0;
   font-size: var(--text-xl);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
 }
 .topbar__where {
@@ -53,45 +190,45 @@
   white-space: nowrap;
 }
 
-/* ---------- Main menu ---------- */
-.home-head {
+/* ---------- Main menu page: a welcome on glass ---------- */
+.home-welcome {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding: 4px;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-6);
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius-card);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: var(--shadow-glass);
 }
-.home-head__role {
+.home-welcome__dept {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--edit-ink);
+}
+.home-welcome__role {
   margin: 0;
   font-size: 30px;
   font-weight: 700;
   line-height: 1.3;
 }
-
-.home-groups {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 20px;
-  /* Cards in a row share one height, so their bottoms line up. */
-  align-items: stretch;
-  margin-top: var(--space-3);
+.home-welcome__system {
+  margin: 0;
+  color: var(--text-muted);
 }
+
+/* ---------- Menu tiles (the administration page) ---------- */
 .home-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 0;
-  padding: 20px 12px 12px;
+  padding: 20px 14px 14px;
   border-radius: var(--radius-card);
-  background: var(--surface);
-}
-.home-group__title {
-  margin: 0 0 6px;
-  padding: 0 2px;
-  font-size: var(--text-md);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
 }
 .home-item {
   font: inherit;
@@ -101,31 +238,19 @@
   width: 100%;
   padding: 14px;
   border: 0;
-  border-radius: 16px;
+  border-radius: var(--radius);
   background: transparent;
   color: var(--text);
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.15s;
-}
-.home-item:hover,
-.home-item:focus-visible {
-  background: var(--surface-alt);
 }
 .home-item__icon {
   display: grid;
-  place-items: center;
   flex: none;
+  place-items: center;
   width: 46px;
   height: 46px;
-  border-radius: 50%;
-  background: var(--surface-alt);
-  color: var(--text);
-  transition: background-color 0.15s;
-}
-.home-item:hover .home-item__icon,
-.home-item:focus-visible .home-item__icon {
-  background: var(--accent);
+  border-radius: var(--radius);
 }
 .home-item__text {
   display: flex;
@@ -142,45 +267,10 @@
 .home-item__desc {
   font-size: var(--text-md);
   line-height: 1.35;
-  color: var(--text-muted);
 }
 
-@media (max-width: 1100px) {
-  .home-groups {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (max-width: 700px) {
-  .home-groups {
-    grid-template-columns: 1fr;
-  }
-  .topbar {
-    padding: var(--space-4);
-  }
-  .topbar__where {
-    display: none;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .home-item,
-  .home-item__icon {
-    transition: none;
-  }
-}
-@media print {
-  .topbar {
-    display: none !important;
-  }
-}
-
-/* The top bar shows the screen title; a screen's own leading title (older screens, other
-   members' screens) would repeat it. */
-.ex-page > h1:first-child {
-  display: none;
-}
-
-/* Administration page: the four admin screens as large outlined tiles, two per row, each the same
-   size, so the page reads as a menu of choices rather than a short list in an empty card. */
+/* Administration page: the four admin screens as large tiles, two per row, each the same size,
+   so the page reads as a menu of choices rather than a short list in an empty card. */
 .admin-hub {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -191,13 +281,9 @@
   align-items: center;
   min-height: 112px;
   padding: 20px 24px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-line);
   border-radius: var(--radius-card);
-}
-.admin-hub .home-item:hover,
-.admin-hub .home-item:focus-visible {
-  border-color: var(--text);
-  box-shadow: var(--shadow-raised);
+  background: rgb(255 255 255 / 0.5);
 }
 .admin-hub .home-item__icon {
   width: 56px;
@@ -206,8 +292,61 @@
 .admin-hub .home-item__name {
   font-size: var(--text-lg);
 }
+
+/* The top bar shows the screen title; a screen's own leading title (older screens, other
+   members' screens) would repeat it. */
+.ex-page > h1:first-child {
+  display: none;
+}
+
+/* ---------- Narrower windows: the sidebar keeps its icons, the captions stay for screen
+   readers and show as tooltips. ---------- */
+@media (max-width: 1100px) {
+  .ex-sidebar {
+    width: 72px;
+    padding-inline: var(--space-2);
+  }
+  .ex-sidebar__brand,
+  .ex-sidebar__item {
+    justify-content: center;
+    padding-inline: 0;
+  }
+  .ex-sidebar__text,
+  .ex-sidebar__label,
+  .ex-sidebar__who {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .ex-sidebar__group + .ex-sidebar__group {
+    padding-top: var(--space-2);
+    border-top: 1px solid rgb(255 255 255 / 0.1);
+  }
+}
 @media (max-width: 700px) {
+  .topbar {
+    margin: var(--space-3) var(--space-3) 0;
+  }
+  .topbar__where {
+    display: none;
+  }
   .admin-hub {
     grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ex-sidebar__item,
+  .topbar__back,
+  .topbar__icon {
+    transition: none;
+  }
+}
+@media print {
+  .ex-sidebar,
+  .topbar {
+    display: none !important;
   }
 }

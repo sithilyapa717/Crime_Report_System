@@ -8,6 +8,7 @@
 }
 .find-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-4);
@@ -112,6 +113,16 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+}
+/* Over the wallpaper the action row is a glass strip, so the unsaved note never sits on the
+   bare photo. */
+.ex-backdrop .cr-foot {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius-card);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  backdrop-filter: blur(18px) saturate(1.3);
 }
 .cr-foot__dirty {
   flex: 1;
